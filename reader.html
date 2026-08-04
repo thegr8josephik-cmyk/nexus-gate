@@ -3,53 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Books Reader</title>
+  <title>EPUB Reader</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Books Reader" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="EPUB Reader" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
     :root {
-      color-scheme: light dark;
-
-      --bg: #f5f5f7;
-      --panel: rgba(255, 255, 255, 0.72);
-      --border: rgba(0, 0, 0, 0.12);
-      --text: #111111;
-      --muted: rgba(0, 0, 0, 0.55);
-      --accent: #007aff;
-      --reader-bg: #ffffff;
-      --reader-text: #111111;
-      --link: #007aff;
+      --bg: #05070f;
+      --panel: rgba(18, 24, 48, 0.72);
+      --border: rgba(120, 190, 255, 0.22);
+      --text: #eaf3ff;
+      --muted: #93a7c9;
+      --accent: #66e0ff;
     }
 
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #000000;
-        --panel: rgba(28, 28, 30, 0.72);
-        --border: rgba(255, 255, 255, 0.14);
-        --text: #f5f5f7;
-        --muted: rgba(255, 255, 255, 0.55);
-        --accent: #0a84ff;
-        --reader-bg: #000000;
-        --reader-text: #f5f5f7;
-        --link: #66e0ff;
-      }
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
     body {
       height: 100dvh;
@@ -57,7 +31,7 @@
       flex-direction: column;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
       overflow: hidden;
     }
 
@@ -65,41 +39,38 @@
       display: flex;
       gap: 10px;
       align-items: center;
-      padding: max(env(safe-area-inset-top), 10px) 14px 10px;
+      padding: max(env(safe-area-inset-top), 12px) 14px 12px;
       background: var(--panel);
       border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(20px);
-      z-index: 30;
+      backdrop-filter: blur(12px);
+      flex-wrap: wrap;
     }
 
-    .file-button,
-    .tool-button {
-      appearance: none;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      padding: 9px 14px;
-      font-size: 0.95rem;
-      font-weight: 600;
+    .file-button, .tool-button {
+      display: inline-block;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 224, 255, 0.35);
+      background: rgba(102, 224, 255, 0.12);
+      color: var(--accent);
+      font-weight: 700;
       cursor: pointer;
-      background: rgba(127, 127, 127, 0.08);
-      color: var(--text);
+      user-select: none;
       white-space: nowrap;
+      font-size: 0.95rem;
     }
 
-    .file-button.primary {
-      background: var(--accent);
-      border-color: transparent;
-      color: #ffffff;
+    .tool-button {
+      border-color: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
     }
 
-    input[type="file"] {
-      display: none;
-    }
+    input[type="file"] { display: none; }
 
     #status {
       flex: 1;
-      min-width: 0;
-      text-align: center;
+      min-width: 140px;
       color: var(--muted);
       font-size: 0.92rem;
       white-space: nowrap;
@@ -111,189 +82,96 @@
       position: relative;
       flex: 1;
       overflow: hidden;
-      background: var(--reader-bg);
-      touch-action: pan-y;
+      background: var(--bg);
     }
 
     #viewer {
       width: 100%;
       height: 100%;
+      transition: opacity 0.2s ease-in-out;
+      opacity: 1; 
     }
 
-    #viewer iframe {
-      border: 0;
-      background: transparent;
-    }
+    #viewer iframe { border: 0; background: transparent; }
 
-    .tap-zone {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 18%;
-      border: 0;
-      background: transparent;
-      cursor: pointer;
-      z-index: 10;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .tap-zone.left {
-      left: 0;
-    }
-
-    .tap-zone.right {
-      right: 0;
-    }
-
-    .hint {
-      position: absolute;
-      left: 50%;
-      bottom: max(env(safe-area-inset-bottom), 16px);
-      transform: translateX(-50%);
-      padding: 8px 12px;
-      border-radius: 999px;
+    .controls {
+      display: flex;
+      gap: 10px;
+      padding: 12px 14px max(env(safe-area-inset-bottom), 14px);
       background: var(--panel);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.85rem;
-      backdrop-filter: blur(20px);
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      pointer-events: none;
-      z-index: 20;
-      white-space: nowrap;
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
     }
 
-    .hint.show {
-      opacity: 1;
+    .controls button {
+      flex: 1;
+      padding: 13px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
     }
+
+    .controls button:active { transform: scale(0.98); border-color: var(--accent); }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <label class="file-button primary" for="file">Open</label>
+    <label class="file-button" for="file">Open EPUB</label>
     <input id="file" type="file" accept=".epub,application/epub+zip" />
-
+    <button id="spreadButton" class="tool-button" type="button">Spread: Double</button>
     <div id="status">No book loaded</div>
-
-    <button id="spreadButton" class="tool-button" type="button">Two Pages</button>
   </div>
 
   <div id="stage">
     <div id="viewer"></div>
-
-    <button class="tap-zone left" id="leftZone" aria-label="Previous page"></button>
-    <button class="tap-zone right" id="rightZone" aria-label="Next page"></button>
-
-    <div class="hint" id="hint">Swipe or tap edges to turn pages</div>
   </div>
 
-  <!-- Required libraries -->
+  <div class="controls">
+    <button id="prev" type="button">← Prev</button>
+    <button id="next" type="button">Next →</button>
+  </div>
+
+  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 
   <script>
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
+    const prevButton = document.getElementById("prev");
+    const nextButton = document.getElementById("next");
     const spreadButton = document.getElementById("spreadButton");
-    const stage = document.getElementById("stage");
-    const leftZone = document.getElementById("leftZone");
-    const rightZone = document.getElementById("rightZone");
-    const hint = document.getElementById("hint");
+    const viewer = document.getElementById("viewer");
 
     let currentBuffer = null;
     let currentFileName = "";
     let book = null;
     let rendition = null;
     let animating = false;
-    let suppressClick = false;
 
     let spreadMode = localStorage.getItem("epub-spread-mode") || "double";
 
     function updateSpreadButton() {
-      spreadButton.textContent =
-        spreadMode === "double"
-          ? "Two Pages"
-          : "One Page";
+      spreadButton.textContent = spreadMode === "double" ? "Spread: Double" : "Spread: Single";
     }
-
     updateSpreadButton();
-
-    function showHint() {
-      hint.classList.add("show");
-      setTimeout(() => {
-        hint.classList.remove("show");
-      }, 2600);
-    }
-
-    function getThemeName() {
-      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        return "dark";
-      }
-      return "paper";
-    }
-
-    function registerThemes() {
-      if (!rendition) return;
-
-      rendition.themes.register("paper", {
-        "body": {
-          "background": "#ffffff !important",
-          "color": "#111111 !important"
-        },
-        "p, div, span, li, h1, h2, h3, h4, h5, h6": {
-          "color": "#111111 !important"
-        },
-        "a": {
-          "color": "#007aff !important"
-        }
-      });
-
-      rendition.themes.register("dark", {
-        "body": {
-          "background": "#000000 !important",
-          "color": "#f5f5f7 !important"
-        },
-        "p, div, span, li, h1, h2, h3, h4, h5, h6": {
-          "color": "#f5f5f7 !important"
-        },
-        "a": {
-          "color": "#66e0ff !important"
-        }
-      });
-
-      rendition.themes.select(getThemeName());
-    }
 
     async function initReader() {
       if (!currentBuffer) return;
-
       status.textContent = "Opening...";
 
       try {
         let lastLocation = null;
-
         if (rendition) {
-          try {
-            lastLocation = await Promise.resolve(rendition.currentLocation());
-          } catch (e) {
-            lastLocation = null;
-          }
-
-          try {
-            rendition.destroy();
-          } catch (e) {}
-
+          try { lastLocation = await Promise.resolve(rendition.currentLocation()); } catch (e) {}
+          try { rendition.destroy(); } catch (e) {}
           rendition = null;
         }
-
-        if (book) {
-          try {
-            book.destroy();
-          } catch (e) {}
-
-          book = null;
-        }
+        if (book) { try { book.destroy(); } catch (e) {} book = null; }
 
         book = ePub(currentBuffer.slice(0));
 
@@ -305,30 +183,55 @@
           minSpreadWidth: 0
         });
 
-        registerThemes();
+        // THE SCHOLAR'S THEME: Georgia Font + Dark Mode
+        rendition.themes.register("dark-serif", {
+          "body": {
+            "background": "#05070f !important",
+            "color": "#e5edff !important",
+            "font-family": "Georgia, 'Times New Roman', serif !important",
+            "line-height": "1.6 !important",
+            "padding": "20px !important"
+          },
+          "p, div, span, li, h1, h2, h3, h4, h5, h6": {
+            "color": "#e5edff !important",
+            "font-family": "Georgia, 'Times New Roman', serif !important"
+          },
+          "a": { "color": "#66e0ff !important" }
+        });
 
-        const target =
-          lastLocation && lastLocation.start && lastLocation.start.cfi
-            ? lastLocation.start.cfi
-            : undefined;
+        rendition.themes.select("dark-serif");
 
-        await rendition.display(target);
+        // Listen for render to fade IN
+        rendition.on('rendered', () => {
+            viewer.style.opacity = '1';
+            animating = false;
+        });
 
+        // THE MEMORY CRYSTAL (Autosave)
+        rendition.on('relocated', (locations) => {
+            if (locations && locations.start && locations.start.cfi) {
+                localStorage.setItem(`epub-progress-${currentFileName}`, locations.start.cfi);
+            }
+        });
+
+        // Determine where to start reading (Autosave retrieval)
+        const lastLocationCfi = lastLocation && lastLocation.start && lastLocation.start.cfi ? lastLocation.start.cfi : undefined;
+        const savedProgress = localStorage.getItem(`epub-progress-${currentFileName}`);
+        const startLocation = lastLocationCfi || savedProgress;
+
+        await rendition.display(startLocation);
         status.textContent = currentFileName || "Loaded";
-        showHint();
       } catch (error) {
         console.error(error);
-        status.textContent = "Could not open EPUB. It may be DRM-protected or corrupted.";
+        status.textContent = "Could not open EPUB.";
       }
     }
 
     fileInput.addEventListener("change", async function () {
       const file = fileInput.files[0];
       if (!file) return;
-
       currentFileName = file.name;
       currentBuffer = await file.arrayBuffer();
-
       await initReader();
     });
 
@@ -336,262 +239,63 @@
       spreadMode = spreadMode === "double" ? "single" : "double";
       localStorage.setItem("epub-spread-mode", spreadMode);
       updateSpreadButton();
-
       await initReader();
     });
 
-    if (window.matchMedia) {
-      const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-      if (darkQuery.addEventListener) {
-        darkQuery.addEventListener("change", function () {
-          if (rendition) {
-            rendition.themes.select(getThemeName());
-          }
-        });
-      } else if (darkQuery.addListener) {
-        darkQuery.addListener(function () {
-          if (rendition) {
-            rendition.themes.select(getThemeName());
-          }
-        });
-      }
-    }
-
-    function clampSwipe(x) {
-      return Math.max(-100, Math.min(100, x));
-    }
-
-    function clearStageStyles() {
-      stage.style.transform = "";
-      stage.style.opacity = "";
-    }
-
-    function setSuppressClick() {
-      suppressClick = true;
-      setTimeout(() => {
-        suppressClick = false;
-      }, 350);
-    }
-
+    // The "Scholar's Fade" Logic
     async function turn(direction) {
       if (!rendition || animating) return;
-
       animating = true;
 
-      try {
-        await stage.animate(
-          [
-            { transform: "translateX(0px)", opacity: 1 },
-            {
-              transform: direction === "next" ? "translateX(-42px)" : "translateX(42px)",
-              opacity: 0.25
-            }
-          ],
-          {
-            duration: 130,
-            easing: "ease-in"
-          }
-        ).finished;
+      viewer.style.opacity = '0';
+      await new Promise(r => setTimeout(r, 200));
 
-        if (direction === "next") {
-          rendition.next();
-        } else {
-          rendition.prev();
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 80));
-
-        await stage.animate(
-          [
-            {
-              transform: direction === "next" ? "translateX(42px)" : "translateX(-42px)",
-              opacity: 0.25
-            },
-            { transform: "translateX(0px)", opacity: 1 }
-          ],
-          {
-            duration: 170,
-            easing: "ease-out"
-          }
-        ).finished;
-      } catch (error) {
-        console.error(error);
-      } finally {
-        clearStageStyles();
-        animating = false;
-      }
+      if (direction === "next") await rendition.next();
+      else await rendition.prev();
     }
 
-    async function swipeTurn(direction, fromX) {
-      if (!rendition || animating) return;
-
-      animating = true;
-
-      try {
-        const fromOpacity = 1 - Math.min(Math.abs(fromX) / 260, 0.45);
-
-        await stage.animate(
-          [
-            {
-              transform: `translateX(${fromX}px)`,
-              opacity: fromOpacity
-            },
-            {
-              transform: direction === "next" ? "translateX(-110px)" : "translateX(110px)",
-              opacity: 0
-            }
-          ],
-          {
-            duration: 110,
-            easing: "ease-in"
-          }
-        ).finished;
-
-        if (direction === "next") {
-          rendition.next();
-        } else {
-          rendition.prev();
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 80));
-
-        await stage.animate(
-          [
-            {
-              transform: direction === "next" ? "translateX(110px)" : "translateX(-110px)",
-              opacity: 0
-            },
-            { transform: "translateX(0px)", opacity: 1 }
-          ],
-          {
-            duration: 190,
-            easing: "ease-out"
-          }
-        ).finished;
-      } catch (error) {
-        console.error(error);
-      } finally {
-        clearStageStyles();
-        animating = false;
-      }
-    }
-
-    leftZone.addEventListener("click", function () {
-      if (suppressClick || animating) return;
-      turn("prev");
-    });
-
-    rightZone.addEventListener("click", function () {
-      if (suppressClick || animating) return;
-      turn("next");
-    });
+    prevButton.addEventListener("click", () => turn("prev"));
+    nextButton.addEventListener("click", () => turn("next"));
 
     document.addEventListener("keydown", function (event) {
       if (!rendition || animating) return;
-
-      if (event.key === "ArrowLeft") {
-        turn("prev");
-      }
-
-      if (event.key === "ArrowRight") {
-        turn("next");
-      }
+      if (event.key === "ArrowLeft") turn("prev");
+      if (event.key === "ArrowRight") turn("next");
     });
 
-    // Swipe / drag animation
-    let pointerDown = false;
-    let startX = 0;
-    let startY = 0;
-    let lastX = 0;
-    let lastY = 0;
-    let horizontalSwipe = null;
+    let pointerDown = false, startX = 0, startY = 0, lastX = 0, lastY = 0, horizontalSwipe = null;
 
-    stage.addEventListener("pointerdown", function (event) {
+    viewer.addEventListener("pointerdown", function (event) {
       if (animating) return;
-
       pointerDown = true;
       startX = lastX = event.clientX;
       startY = lastY = event.clientY;
       horizontalSwipe = null;
-
-      stage.style.transition = "none";
     });
 
     window.addEventListener("pointermove", function (event) {
       if (!pointerDown || animating) return;
-
       lastX = event.clientX;
       lastY = event.clientY;
-
-      const dx = lastX - startX;
-      const dy = lastY - startY;
-
+      const dx = lastX - startX, dy = lastY - startY;
       if (horizontalSwipe === null && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
         horizontalSwipe = Math.abs(dx) > Math.abs(dy);
       }
-
-      if (!horizontalSwipe) return;
-
-      const x = clampSwipe(dx);
-
-      stage.style.transform = `translateX(${x}px)`;
-      stage.style.opacity = String(1 - Math.min(Math.abs(x) / 260, 0.45));
     });
 
-    async function endSwipe() {
+    window.addEventListener("pointerup", async function () {
       if (!pointerDown) return;
-
       pointerDown = false;
-      stage.style.transition = "";
-
       const dx = lastX - startX;
       const dy = lastY - startY;
-
-      if (Math.abs(dx) > 10 || Math.abs(dy) > 10) {
-        setSuppressClick();
-      }
-
-      if (
-        horizontalSwipe &&
-        Math.abs(dx) > 55 &&
-        Math.abs(dx) > Math.abs(dy)
-      ) {
+      if (horizontalSwipe && Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
         const direction = dx < 0 ? "next" : "prev";
-        const x = clampSwipe(dx);
-
-        await swipeTurn(direction, x);
-      } else {
-        const currentTransform = stage.style.transform || "translateX(0px)";
-        const currentOpacity = stage.style.opacity || "1";
-
-        try {
-          await stage.animate(
-            [
-              { transform: currentTransform, opacity: currentOpacity },
-              { transform: "translateX(0px)", opacity: 1 }
-            ],
-            {
-              duration: 150,
-              easing: "ease-out"
-            }
-          ).finished;
-        } catch (error) {}
-
-        clearStageStyles();
+        await turn(direction);
       }
-
       horizontalSwipe = null;
-    }
-
-    window.addEventListener("pointerup", endSwipe);
-    window.addEventListener("pointercancel", endSwipe);
-
-    window.addEventListener("resize", function () {
-      if (rendition) {
-        rendition.resize();
-      }
     });
+
+    window.addEventListener("resize", function () { if (rendition) rendition.resize(); });
   </script>
 </body>
 </html>
