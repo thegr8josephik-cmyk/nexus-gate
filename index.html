@@ -264,7 +264,39 @@
         </div>
       </section>
     </main>
+<button class="fab" id="addBookmarkBtn">+</button>
 
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>Inscribe New Portal</h2>
+    <div class="form-group">
+      <label>Realm Name (Title)</label>
+      <input type="text" id="bmTitle" placeholder="e.g., My Secret Base">
+    </div>
+    <div class="form-group">
+      <label>Spirit Link (URL)</label>
+      <input type="url" id="bmUrl" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label>Sigil (Emoji Icon)</label>
+      <input type="text" id="bmIcon" placeholder="🌟" maxlength="2">
+    </div>
+    <div class="form-group">
+      <label>Sect (Category)</label>
+      <select id="bmCategory">
+        <option value="personal">Personal Portals</option>
+        <option value="archives">The Grand Archives</option>
+        <option value="social">Guilds & Harmonies</option>
+        <option value="oracles">The Oracles</option>
+        <option value="academy">The Academy & Forge</option>
+      </select>
+    </div>
+    <div class="modal-buttons">
+      <button class="btn-cancel" id="cancelBtn">Cancel</button>
+      <button class="btn-save" id="saveBtn">Inscribe</button>
+    </div>
+  </div>
+</div>
     <div class="empty-state" id="empty-state">
       No artifacts match your query. The archives are silent.
     </div>
