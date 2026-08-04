@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Nexus Gate</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
+  <meta name="theme-color" content="#0f1115" />
+
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #1a1d24;
+      --panel-hover: #22262f;
+      --border: #2a2e39;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6; /* Professional Blue to match your book icon */
+      --accent-glow: rgba(59, 130, 246, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100dvh;
+      padding: max(env(safe-area-inset-top), 20px) 16px 40px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    /* Search Bar */
+    .search-wrapper {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      font-size: 1rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* Categories */
+    .category {
+      margin-bottom: 36px;
+    }
+
+    .category-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-left: 4px;
+    }
+
+    /* Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    /* Cards */
+    .card {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      background: var(--panel-hover);
+      border-color: #3f4452;
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+    }
+
+    .card-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+       .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* Empty State for Search */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    .empty-state.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Nexus Gate</h1>
+      <p class="subtitle">Curated directory for sanctioned realms and local artifacts.</p>
+      
+      <div class="search-wrapper">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="search" class="search-input" placeholder="Filter the archives..." autocomplete="off">
+      </div>
+    </header>
+
+    <main id="main-content">
+      <!-- Local Tools -->
+      <section class="category" data-category="local">
+        <h2 class="category-title">Local Artifacts</h2>
+        <div class="grid">
+          <a class="card" href="reader.html" target="_self">
+            <div class="card-icon">📘</div>
+            <div class="card-content">
+              <div class="card-title">EPUB Reader</div>
+              <div class="card-desc">Read local cultivation manuals and novels offline.</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- The Archives -->
+      <section class="category" data-category="archives">
+        <h2 class="category-title">The Grand Archives</h2>
+        <div class="grid">
+          <a class="card" href="https://annas-archive.gl" target="_self" rel="noopener noreferrer">
+            <div class="card-icon">🏛️</div>
+            <div class="card-content">
+              <div class="card-title">Shadow Library</div>
+              <div class="card-desc">Anna's Archive. Vast repository of texts and novels.</div>
+            </div>
+          </a>
+          <a class="card" href="https://comix.to" target="_self" rel="noopener noreferrer">
+            <div class="card-icon">📜</div>
+            <div class="card-content">
+              <div class="card-title">Illustrated Scrolls</div>
+              <div class="card-desc">Manga, comics, and visual storytelling.</div>
+            </div>
+          </a>
+          <a class="card" href="https://fmhy.net/startpage" target="_self" rel="noopener noreferrer">
+            <div class="card-icon">🗺️</div>
+            <div class="card-content">
+              <div class="card-title">Free Media Nexus</div>
+              <div class="card-desc">FMHY Directory for streaming and software.</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <!-- The Oracles -->
+      <section class="category" data-category="oracles">
+        <h2 class="category-title">Oracles & Search</h2>
+        <div class="grid">
+          <a class="card" href="https://chat.qwen.ai" target="_self" rel="noopener noreferrer">
+            <div class="card-icon">🤖</div>
+            <div class="card-content">
+              <div class="card-title">Oracle of Qwen</div>
+              <div class="card-desc">AI Scholar, assistant, and coding companion.</div>
+            </div>
+          </a>
+          <a class="card" href="https://google.com" target="_self" rel="noopener noreferrer">
+            <div class="card-icon">🔍</div>
+            <div class="card-content">
+              <div class="card-title">All-Seeing Eye</div>
+              <div class="card-desc">The standard global search engine.</div>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <div class="empty-state" id="empty-state">
+      No artifacts match your query. The archives are silent.
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const searchInput = document.getElementById('search');
+    const cards = document.querySelectorAll('.card');
+    const categories = document.querySelectorAll('.category');
+    const emptyState = document.getElementById('empty-state');
+
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+        
+        if (title.includes(query) || desc.includes(query)) {
+          card.style.display = 'flex';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      // Hide empty categories
+      categories.forEach(cat => {
+        const visibleCards = cat.querySelectorAll('.card[style="display: flex;"], .card:not([style])');
+        // A bit of logic to check if category has visible cards
+        let hasVisible = false;
+        cat.querySelectorAll('.card').forEach(c => {
+           if(c.style.display !== 'none') hasVisible = true;
+        });
+        cat.style.display = hasVisible ? 'block' : 'none';
+      });
+
+      // Show empty state if nothing is visible
+      if (visibleCount === 0 && query !== '') {
+        emptyState.classList.add('show');
+      } else {
+        emptyState.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "Nexus Gate",
+  "short_name": "Nexus",
+  "description": "The Ultimate Cultivation Gate",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#05070f",
+  "theme_color": "#05070f"
+}
