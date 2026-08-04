@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>EPUB Reader</title>
+  <title>Universal Reader</title>
 
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="EPUB Reader" />
+  <meta name="apple-mobile-web-app-title" content="Reader" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
   <style>
@@ -85,14 +85,44 @@
       background: var(--bg);
     }
 
+    /* EPUB viewer */
     #viewer {
       width: 100%;
       height: 100%;
       transition: opacity 0.2s ease-in-out;
-      opacity: 1; 
+      opacity: 1;
+    }
+    #viewer iframe { border: 0; background: transparent; }
+
+    /* PDF viewer */
+    #pdf-viewer {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      padding: 12px;
+      display: none;
+    }
+    #pdf-canvas {
+      display: block;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
     }
 
-    #viewer iframe { border: 0; background: transparent; }
+    /* Text viewer */
+    #text-viewer {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      padding: 28px 24px 60px;
+      font-family: Georgia, 'Times New Roman', serif;
+      color: #e5edff;
+      line-height: 1.75;
+      font-size: 1.06rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      display: none;
+    }
 
     .controls {
       display: flex;
@@ -116,54 +146,126 @@
     }
 
     .controls button:active { transform: scale(0.98); border-color: var(--accent); }
+
+    #zoom-in, #zoom-out { flex: 0 0 60px; }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <label class="file-button" for="file">Open EPUB</label>
-    <input id="file" type="file" accept=".epub,application/epub+zip" />
+    <label class="file-button" for="file">Open Book</label>
+    <input id="file" type="file" accept=".epub,.pdf,.txt,.md,application/epub+zip,application/pdf,text/plain" />
     <button id="spreadButton" class="tool-button" type="button">Spread: Double</button>
     <div id="status">No book loaded</div>
   </div>
 
   <div id="stage">
     <div id="viewer"></div>
+    <div id="pdf-viewer"><canvas id="pdf-canvas"></canvas></div>
+    <div id="text-viewer"></div>
   </div>
 
   <div class="controls">
+    <button id="zoom-out" type="button" style="display:none;">−</button>
     <button id="prev" type="button">← Prev</button>
     <button id="next" type="button">Next →</button>
+    <button id="zoom-in" type="button" style="display:none;">+</button>
   </div>
 
-  <!-- Libraries -->
+  <!-- Spirit Engines -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <script>
+    // Configure the PDF engine's worker
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+
+    // ---------- Element references ----------
     const fileInput = document.getElementById("file");
     const status = document.getElementById("status");
     const prevButton = document.getElementById("prev");
     const nextButton = document.getElementById("next");
     const spreadButton = document.getElementById("spreadButton");
+    const zoomIn = document.getElementById("zoom-in");
+    const zoomOut = document.getElementById("zoom-out");
+    const stage = document.getElementById("stage");
     const viewer = document.getElementById("viewer");
+    const pdfViewerEl = document.getElementById("pdf-viewer");
+    const textViewerEl = document.getElementById("text-viewer");
+    const pdfCanvas = document.getElementById("pdf-canvas");
 
-    let currentBuffer = null;
+    // ---------- Shared state ----------
+    let currentType = null;
     let currentFileName = "";
+    let currentBuffer = null;
+
+    // ---------- EPUB state ----------
     let book = null;
     let rendition = null;
     let animating = false;
-
     let spreadMode = localStorage.getItem("epub-spread-mode") || "double";
 
+    // ---------- PDF state ----------
+    let pdfDoc = null;
+    let pdfPage = 1;
+    let pdfNumPages = 0;
+    let pdfZoom = 1;
+    let pdfRenderTask = null;
+
+    // ---------- Text state ----------
+    let textScrollTimer = null;
+
+    // ---------- Helpers ----------
     function updateSpreadButton() {
       spreadButton.textContent = spreadMode === "double" ? "Spread: Double" : "Spread: Single";
     }
     updateSpreadButton();
 
-    async function initReader() {
-      if (!currentBuffer) return;
-      status.textContent = "Opening...";
+    function getFileType(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      if (ext === 'epub') return 'epub';
+      if (ext === 'pdf') return 'pdf';
+      if (['txt', 'md', 'text', 'markdown'].includes(ext)) return 'text';
+      return 'unknown';
+    }
 
+    function showViewer(type) {
+      viewer.style.display = type === 'epub' ? 'block' : 'none';
+      pdfViewerEl.style.display = type === 'pdf' ? 'block' : 'none';
+      textViewerEl.style.display = type === 'text' ? 'block' : 'none';
+      if (type === 'epub') viewer.style.opacity = '1';
+    }
+
+    function setControlsForType(type) {
+      const isEpub = type === 'epub';
+      const isPdf = type === 'pdf';
+      spreadButton.style.display = isEpub ? 'inline-block' : 'none';
+      prevButton.style.display = (isEpub || isPdf) ? 'block' : 'none';
+      nextButton.style.display = (isEpub || isPdf) ? 'block' : 'none';
+      zoomIn.style.display = isPdf ? 'block' : 'none';
+      zoomOut.style.display = isPdf ? 'block' : 'none';
+    }
+
+    // ---------- Router ----------
+    async function openBook() {
+      currentType = getFileType(currentFileName);
+      if (currentType === 'epub') await openEpub();
+      else if (currentType === 'pdf') await openPdf();
+      else if (currentType === 'text') await openText();
+      else {
+        showViewer('none');
+        status.textContent = 'Unsupported file. Use EPUB, PDF, or TXT.';
+      }
+    }
+
+    // ---------- EPUB engine ----------
+    async function openEpub() {
+      showViewer('epub');
+      setControlsForType('epub');
+      status.textContent = 'Opening...';
       try {
         let lastLocation = null;
         if (rendition) {
@@ -183,7 +285,6 @@
           minSpreadWidth: 0
         });
 
-        // THE SCHOLAR'S THEME: Georgia Font + Dark Mode
         rendition.themes.register("dark-serif", {
           "body": {
             "background": "#05070f !important",
@@ -198,80 +299,165 @@
           },
           "a": { "color": "#66e0ff !important" }
         });
-
         rendition.themes.select("dark-serif");
 
-        // Listen for render to fade IN
         rendition.on('rendered', () => {
-            viewer.style.opacity = '1';
-            animating = false;
+          viewer.style.opacity = '1';
+          animating = false;
         });
 
-        // THE MEMORY CRYSTAL (Autosave)
         rendition.on('relocated', (locations) => {
-            if (locations && locations.start && locations.start.cfi) {
-                localStorage.setItem(`epub-progress-${currentFileName}`, locations.start.cfi);
-            }
+          if (locations && locations.start && locations.start.cfi) {
+            localStorage.setItem(`epub-progress-${currentFileName}`, locations.start.cfi);
+          }
         });
 
-              // Open the book first to let the engine map the chapters
-        await rendition.display(); 
-        
-        // THEN try to jump to the saved progress
+        await rendition.display();
         const savedProgress = localStorage.getItem(`epub-progress-${currentFileName}`);
         if (savedProgress) {
-            try {
-                await rendition.display(savedProgress);
-            } catch (e) {
-                console.warn("Could not restore progress, starting at beginning.", e);
-            }
+          try { await rendition.display(savedProgress); } catch (e) { console.warn(e); }
         }
-        status.textContent = currentFileName || "Loaded";
+        status.textContent = currentFileName;
       } catch (error) {
         console.error(error);
-        status.textContent = "Could not open EPUB.";
+        status.textContent = 'Error: ' + (error.message || error.name || 'Could not open EPUB');
       }
     }
 
+    // Scholar's Fade (EPUB only)
+    async function turn(direction) {
+      if (!rendition || animating) return;
+      animating = true;
+      viewer.style.opacity = '0';
+      await new Promise(r => setTimeout(r, 200));
+      if (direction === "next") await rendition.next();
+      else await rendition.prev();
+    }
+
+    // ---------- PDF engine ----------
+    async function openPdf() {
+      showViewer('pdf');
+      setControlsForType('pdf');
+      status.textContent = 'Opening PDF...';
+      try {
+        pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(currentBuffer) }).promise;
+        pdfNumPages = pdfDoc.numPages;
+        pdfPage = 1;
+        pdfZoom = 1;
+        const savedPage = localStorage.getItem(`pdf-page-${currentFileName}`);
+        if (savedPage) {
+          const p = parseInt(savedPage);
+          if (p >= 1 && p <= pdfNumPages) pdfPage = p;
+        }
+        await renderPdfPage();
+      } catch (error) {
+        console.error(error);
+        status.textContent = 'Error: Could not open PDF';
+      }
+    }
+
+    async function renderPdfPage() {
+      if (!pdfDoc) return;
+      try {
+        if (pdfRenderTask) { try { pdfRenderTask.cancel(); } catch (e) {} }
+        const page = await pdfDoc.getPage(pdfPage);
+        const containerWidth = pdfViewerEl.clientWidth - 24;
+        const baseViewport = page.getViewport({ scale: 1 });
+        const fitScale = containerWidth / baseViewport.width;
+        const scale = fitScale * pdfZoom;
+        const viewport = page.getViewport({ scale: scale });
+
+        pdfCanvas.width = viewport.width;
+        pdfCanvas.height = viewport.height;
+        const ctx = pdfCanvas.getContext('2d');
+
+        pdfRenderTask = page.render({ canvasContext: ctx, viewport: viewport });
+        await pdfRenderTask.promise;
+        pdfRenderTask = null;
+
+        localStorage.setItem(`pdf-page-${currentFileName}`, pdfPage);
+        status.textContent = `${currentFileName} — Page ${pdfPage} / ${pdfNumPages}`;
+      } catch (e) {
+        if (e && e.name !== 'RenderingCancelledException') console.error(e);
+      }
+    }
+
+    // ---------- Text engine ----------
+    async function openText() {
+      showViewer('text');
+      setControlsForType('text');
+      status.textContent = 'Opening...';
+      try {
+        const text = new TextDecoder().decode(currentBuffer);
+        textViewerEl.textContent = text;
+        const savedScroll = localStorage.getItem(`txt-scroll-${currentFileName}`);
+        requestAnimationFrame(() => {
+          if (savedScroll) textViewerEl.scrollTop = parseInt(savedScroll);
+        });
+        status.textContent = `${currentFileName} — Scroll to read`;
+      } catch (error) {
+        console.error(error);
+        status.textContent = 'Error: Could not open text file';
+      }
+    }
+
+    textViewerEl.addEventListener('scroll', () => {
+      if (currentType !== 'text') return;
+      clearTimeout(textScrollTimer);
+      textScrollTimer = setTimeout(() => {
+        localStorage.setItem(`txt-scroll-${currentFileName}`, textViewerEl.scrollTop);
+      }, 300);
+    });
+
+    // ---------- File input ----------
     fileInput.addEventListener("change", async function () {
       const file = fileInput.files[0];
       if (!file) return;
       currentFileName = file.name;
       currentBuffer = await file.arrayBuffer();
-      await initReader();
+      await openBook();
     });
 
+    // ---------- Spread toggle (EPUB only) ----------
     spreadButton.addEventListener("click", async function () {
+      if (currentType !== 'epub') return;
       spreadMode = spreadMode === "double" ? "single" : "double";
       localStorage.setItem("epub-spread-mode", spreadMode);
       updateSpreadButton();
-      await initReader();
+      await openEpub();
     });
 
-    // The "Scholar's Fade" Logic
-    async function turn(direction) {
-      if (!rendition || animating) return;
-      animating = true;
+    // ---------- Zoom (PDF only) ----------
+    zoomIn.addEventListener("click", () => {
+      if (currentType === 'pdf') { pdfZoom = Math.min(pdfZoom + 0.25, 4); renderPdfPage(); }
+    });
+    zoomOut.addEventListener("click", () => {
+      if (currentType === 'pdf') { pdfZoom = Math.max(pdfZoom - 0.25, 0.5); renderPdfPage(); }
+    });
 
-      viewer.style.opacity = '0';
-      await new Promise(r => setTimeout(r, 200));
-
-      if (direction === "next") await rendition.next();
-      else await rendition.prev();
+    // ---------- Navigation ----------
+    function goPrev() {
+      if (currentType === 'epub') turn('prev');
+      else if (currentType === 'pdf' && pdfPage > 1) { pdfPage--; renderPdfPage(); }
     }
-
-    prevButton.addEventListener("click", () => turn("prev"));
-    nextButton.addEventListener("click", () => turn("next"));
+    function goNext() {
+      if (currentType === 'epub') turn('next');
+      else if (currentType === 'pdf' && pdfPage < pdfNumPages) { pdfPage++; renderPdfPage(); }
+    }
+    prevButton.addEventListener("click", goPrev);
+    nextButton.addEventListener("click", goNext);
 
     document.addEventListener("keydown", function (event) {
-      if (!rendition || animating) return;
-      if (event.key === "ArrowLeft") turn("prev");
-      if (event.key === "ArrowRight") turn("next");
+      if (animating) return;
+      if (event.key === "ArrowLeft") goPrev();
+      if (event.key === "ArrowRight") goNext();
     });
 
+    // ---------- Swipe ----------
     let pointerDown = false, startX = 0, startY = 0, lastX = 0, lastY = 0, horizontalSwipe = null;
 
-    viewer.addEventListener("pointerdown", function (event) {
+    stage.addEventListener("pointerdown", function (event) {
+      if (currentType === 'text') return;
       if (animating) return;
       pointerDown = true;
       startX = lastX = event.clientX;
@@ -292,16 +478,19 @@
     window.addEventListener("pointerup", async function () {
       if (!pointerDown) return;
       pointerDown = false;
+      if (currentType === 'text') return;
       const dx = lastX - startX;
       const dy = lastY - startY;
       if (horizontalSwipe && Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)) {
-        const direction = dx < 0 ? "next" : "prev";
-        await turn(direction);
+        if (dx < 0) goNext(); else goPrev();
       }
       horizontalSwipe = null;
     });
 
-    window.addEventListener("resize", function () { if (rendition) rendition.resize(); });
+    window.addEventListener("resize", function () {
+      if (currentType === 'epub' && rendition) rendition.resize();
+      if (currentType === 'pdf') renderPdfPage();
+    });
   </script>
 </body>
 </html>
