@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Media Player</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
+
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Player" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <style>
+    :root {
+      --bg: #05070f;
+      --panel: rgba(18, 24, 48, 0.72);
+      --border: rgba(120, 190, 255, 0.22);
+      --text: #eaf3ff;
+      --muted: #93a7c9;
+      --accent: #66e0ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: max(env(safe-area-inset-top), 12px) 14px 12px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      flex-wrap: wrap;
+    }
+
+    .file-button {
+      display: inline-block;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(102, 224, 255, 0.35);
+      background: rgba(102, 224, 255, 0.12);
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+
+    input[type="file"].hidden-input { display: none; }
+
+    #status {
+      flex: 1;
+      min-width: 120px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #stage {
+      position: relative;
+      flex: 1;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #player {
+      max-width: 100%;
+      max-height: 100%;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #audioOverlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      background: radial-gradient(circle at center, #101527, #05070f);
+      pointer-events: none;
+      padding: 20px;
+      text-align: center;
+    }
+    #audioOverlay.visible { display: flex; }
+    .overlay-icon { font-size: 4rem; }
+    .overlay-title {
+      color: var(--text);
+      font-size: 1.1rem;
+      font-weight: 600;
+      max-width: 90%;
+      word-wrap: break-word;
+    }
+
+    .info-row {
+      padding: 10px 16px 4px;
+      background: var(--panel);
+    }
+    #trackTitle {
+      font-weight: 600;
+      font-size: 0.98rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .seek-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 16px 10px;
+      background: var(--panel);
+    }
+    .seek-row span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-width: 42px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      flex: 1;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.15);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--panel);
+    }
+    .controls.secondary { padding-top: 0; }
+
+    .ctrl {
+      flex: 1;
+      padding: 12px 0;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.2s, background 0.2s;
+    }
+    .ctrl:active { transform: scale(0.95); }
+    .ctrl.main { font-size: 1.4rem; border-color: rgba(102,224,255,0.4); }
+    .ctrl.on { background: rgba(102,224,255,0.2); border-color: var(--accent); color: var(--accent); }
+
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px 12px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+    .volume-row span { font-size: 1rem; }
+
+    #playlist {
+      max-height: 160px;
+      overflow-y: auto;
+      background: rgba(10, 13, 25, 0.9);
+    }
+    .pl-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      cursor: pointer;
+    }
+    .pl-item.active { background: rgba(102,224,255,0.12); }
+    .pl-icon { font-size: 1.1rem; }
+    .pl-name {
+      flex: 1;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pl-item.active .pl-name { color: var(--accent); font-weight: 600; }
+    .pl-remove {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .pl-remove:hover { color: #ff6b6b; }
+    .pl-empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px 16px;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <label class="file-button" for="file">Add Media</label>
+    <input id="file" class="hidden-input" type="file" accept="audio/*,video/*" multiple />
+    <input id="subFile" class="hidden-input" type="file" accept=".vtt,.srt" />
+    <div id="status">No media loaded</div>
+  </div>
+
+  <div id="stage">
+    <video id="player" playsinline webkit-playsinline></video>
+    <div id="audioOverlay">
+      <div class="overlay-icon">🎵</div>
+      <div class="overlay-title" id="overlayTitle"></div>
+    </div>
+  </div>
+
+  <div class="info-row">
+    <div id="trackTitle">—</div>
+  </div>
+
+  <div class="seek-row">
+    <span id="currentTime">0:00</span>
+    <input type="range" id="seek" min="0" max="0" value="0" step="0.1" />
+    <span id="duration">0:00</span>
+  </div>
+
+  <!-- Main playback controls -->
+  <div class="controls">
+    <button id="prevBtn" class="ctrl">⏮</button>
+    <button id="back10" class="ctrl">−10</button>
+    <button id="playBtn" class="ctrl main">▶</button>
+    <button id="fwd10" class="ctrl">+10</button>
+    <button id="nextBtn" class="ctrl">⏭</button>
+  </div>
+
+  <!-- Secondary controls -->
+  <div class="controls secondary">
+    <button id="shuffleBtn" class="ctrl">🔀</button>
+    <button id="muteBtn" class="ctrl">🔊</button>
+    <button id="ccBtn" class="ctrl">CC</button>
+    <button id="loopBtn" class="ctrl">🔁</button>
+  </div>
+
+  <div class="volume-row">
+    <span>🔊</span>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1" />
+  </div>
+
+  <div id="playlist">
+    <div class="pl-empty">Add audio or video files to build your queue.</div>
+  </div>
+
+  <script>
+    // ---------- Element references ----------
+    const fileInput = document.getElementById("file");
+    const subFile = document.getElementById("subFile");
+    const status = document.getElementById("status");
+    const player = document.getElementById("player");
+    const audioOverlay = document.getElementById("audioOverlay");
+    const overlayTitle = document.getElementById("overlayTitle");
+    const trackTitle = document.getElementById("trackTitle");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+    const seek = document.getElementById("seek");
+    const playBtn = document.getElementById("playBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const back10 = document.getElementById("back10");
+    const fwd10 = document.getElementById("fwd10");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const muteBtn = document.getElementById("muteBtn");
+    const ccBtn = document.getElementById("ccBtn");
+    const loopBtn = document.getElementById("loopBtn");
+    const volume = document.getElementById("volume");
+    const playlistEl = document.getElementById("playlist");
+
+    // ---------- State ----------
+    let playlist = [];
+    let currentIndex = -1;
+    let isSeeking = false;
+    let isShuffle = localStorage.getItem("player-shuffle") === "true";
+    let isLoop = localStorage.getItem("player-loop") === "true";
+    let pendingRestore = 0;
+    let lastSaveTs = 0;
+
+    // ---------- Init persisted settings ----------
+    const savedVolume = localStorage.getItem("player-volume");
+    if (savedVolume !== null) player.volume = parseFloat(savedVolume);
+    volume.value = player.volume;
+    updateToggleUI();
+    updateMuteUI();
+
+    function updateToggleUI() {
+      shuffleBtn.classList.toggle("on", isShuffle);
+      loopBtn.classList.toggle("on", isLoop);
+    }
+
+    function updateMuteUI() {
+      muteBtn.textContent = player.muted ? "🔇" : "🔊";
+      muteBtn.classList.toggle("on", player.muted);
+    }
+
+    function formatTime(s) {
+      if (isNaN(s)) return "0:00";
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60);
+      return m + ":" + (sec < 10 ? "0" : "") + sec;
+    }
+
+    function stripExt(name) {
+      return name.replace(/\.[^/.]+$/, "");
+    }
+
+    // ---------- File input ----------
+    fileInput.addEventListener("change", (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach((f) => {
+        playlist.push({
+          name: f.name,
+          url: URL.createObjectURL(f),
+          isVideo: f.type.startsWith("video")
+        });
+      });
+      renderPlaylist();
+      if (currentIndex === -1 && playlist.length > 0) playTrack(0);
+      fileInput.value = "";
+    });
+
+    // ---------- Media Session (background + lock screen) ----------
+    function setupMediaSession(item) {
+      if (!("mediaSession" in navigator)) return;
+      try {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: stripExt(item.name),
+          artist: "Nexus Gate",
+          album: "Media Player"
+        });
+        navigator.mediaSession.setActionHandler("play", () => player.play());
+        navigator.mediaSession.setActionHandler("pause", () => player.pause());
+        navigator.mediaSession.setActionHandler("previoustrack", () => prevTrack());
+        navigator.mediaSession.setActionHandler("nexttrack", () => nextTrack());
+        navigator.mediaSession.setActionHandler("seekbackward", () => {
+          player.currentTime = Math.max(0, player.currentTime - 10);
+        });
+        navigator.mediaSession.setActionHandler("seekforward", () => {
+          player.currentTime = Math.min(player.duration || 0, player.currentTime + 10);
+        });
+      } catch (e) {
+        console.warn("Media Session error:", e);
+      }
+    }
+
+    // ---------- Core playback ----------
+    function playTrack(i) {
+      if (i < 0 || i >= playlist.length) return;
+      currentIndex = i;
+      const item = playlist[i];
+      player.src = item.url;
+      player.play().catch((e) => console.warn(e));
+      trackTitle.textContent = item.name;
+      status.textContent = item.name;
+
+      // Autosave restore (keyed by filename)
+      const saved = localStorage.getItem("media-progress-" + item.name);
+      pendingRestore = saved ? parseFloat(saved) : 0;
+
+      if (item.isVideo) {
+        audioOverlay.classList.remove("visible");
+      } else {
+        overlayTitle.textContent = item.name;
+        audioOverlay.classList.add("visible");
+      }
+
+      setupMediaSession(item);
+      renderPlaylist();
+    }
+
+    function togglePlay() {
+      if (playlist.length === 0) return;
+      if (currentIndex === -1) { playTrack(0); return; }
+      if (player.paused) player.play(); else player.pause();
+    }
+
+    function prevTrack() {
+      if (playlist.length === 0) return;
+      if (player.currentTime > 3) { player.currentTime = 0; return; }
+      let prev = currentIndex - 1;
+      if (prev < 0) prev = playlist.length - 1;
+      playTrack(prev);
+    }
+
+    function nextTrack() {
+      if (playlist.length === 0) return;
+      let next = currentIndex + 1;
+      if (next >= playlist.length) next = 0;
+      playTrack(next);
+    }
+
+    playBtn.addEventListener("click", togglePlay);
+    prevBtn.addEventListener("click", prevTrack);
+    nextBtn.addEventListener("click", nextTrack);
+
+    back10.addEventListener("click", () => {
+      player.currentTime = Math.max(0, player.currentTime - 10);
+    });
+    fwd10.addEventListener("click", () => {
+      player.currentTime = Math.min(player.duration || 0, player.currentTime + 10);
+    });
+
+    player.addEventListener("play", () => { playBtn.textContent = "⏸"; });
+    player.addEventListener("pause", () => { playBtn.textContent = "▶"; });
+
+    player.addEventListener("click", togglePlay);
+
+    player.addEventListener("ended", () => {
+      // Clear saved progress so it doesn't resume at the end next time
+      if (currentIndex >= 0) {
+        localStorage.removeItem("media-progress-" + playlist[currentIndex].name);
+      }
+      if (isShuffle) {
+        if (playlist.length === 1) { player.currentTime = 0; player.play(); return; }
+        let r;
+        do { r = Math.floor(Math.random() * playlist.length); } while (r === currentIndex);
+        playTrack(r);
+        return;
+      }
+      let next = currentIndex + 1;
+      if (next >= playlist.length) {
+        if (isLoop) next = 0;
+        else return;
+      }
+      playTrack(next);
+    });
+
+    // ---------- Seek + time + autosave ----------
+    player.addEventListener("loadedmetadata", () => {
+      seek.max = player.duration;
+      durationEl.textContent = formatTime(player.duration);
+      // Restore saved position if valid
+      if (pendingRestore > 0 && pendingRestore < player.duration - 5) {
+        player.currentTime = pendingRestore;
+      }
+      pendingRestore = 0;
+    });
+
+    player.addEventListener("timeupdate", () => {
+      currentTimeEl.textContent = formatTime(player.currentTime);
+      if (!isSeeking) seek.value = player.currentTime;
+
+      // Throttled autosave every ~2 seconds
+      const now = Date.now();
+      if (currentIndex >= 0 && now - lastSaveTs > 2000) {
+        lastSaveTs = now;
+        localStorage.setItem("media-progress-" + playlist[currentIndex].name, player.currentTime);
+      }
+    });
+
+    seek.addEventListener("pointerdown", () => { isSeeking = true; });
+    seek.addEventListener("pointerup", () => { isSeeking = false; });
+    seek.addEventListener("input", () => {
+      isSeeking = true;
+      player.currentTime = parseFloat(seek.value);
+    });
+    seek.addEventListener("change", () => { isSeeking = false; });
+
+    // ---------- Volume + mute ----------
+    volume.addEventListener("input", () => {
+      player.volume = parseFloat(volume.value);
+      localStorage.setItem("player-volume", volume.value);
+    });
+
+    muteBtn.addEventListener("click", () => {
+      player.muted = !player.muted;
+      updateMuteUI();
+    });
+
+    // ---------- Toggles ----------
+    shuffleBtn.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      localStorage.setItem("player-shuffle", isShuffle);
+      updateToggleUI();
+    });
+    loopBtn.addEventListener("click", () => {
+      isLoop = !isLoop;
+      localStorage.setItem("player-loop", isLoop);
+      updateToggleUI();
+    });
+
+    // ---------- Subtitles ----------
+    function srtToVtt(srt) {
+      const cleaned = srt.replace(/\r+/g, "");
+      const converted = cleaned.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, "$1.$2");
+      return "WEBVTT\n\n" + converted;
+    }
+
+    ccBtn.addEventListener("click", () => subFile.click());
+
+    subFile.addEventListener("change", async (e) => {
+      const f = e.target.files[0];
+      if (!f) return;
+      let text = await f.text();
+      if (f.name.toLowerCase().endsWith(".srt")) {
+        text = srtToVtt(text);
+      }
+      const blob = new Blob([text], { type: "text/vtt" });
+      const url = URL.createObjectURL(blob);
+
+      // Remove existing tracks
+      player.querySelectorAll("track").forEach((t) => t.remove());
+
+      const track = document.createElement("track");
+      track.kind = "subtitles";
+      track.label = "Subtitles";
+      track.srclang = "en";
+      track.src = url;
+      track.default = true;
+      player.appendChild(track);
+
+      setTimeout(() => {
+        for (const tt of player.textTracks) {
+          tt.mode = "showing";
+        }
+      }, 100);
+
+      ccBtn.classList.add("on");
+      status.textContent = "Subtitles: " + f.name;
+      subFile.value = "";
+    });
+
+    // ---------- Playlist rendering ----------
+    function renderPlaylist() {
+      playlistEl.innerHTML = "";
+      if (playlist.length === 0) {
+        playlistEl.innerHTML = '<div class="pl-empty">Add audio or video files to build your queue.</div>';
+        return;
+      }
+      playlist.forEach((item, i) => {
+        const row = document.createElement("div");
+        row.className = "pl-item" + (i === currentIndex ? " active" : "");
+
+        const icon = document.createElement("span");
+        icon.className = "pl-icon";
+        icon.textContent = item.isVideo ? "🎬" : "🎵";
+
+        const name = document.createElement("span");
+        name.className = "pl-name";
+        name.textContent = item.name;
+
+        const remove = document.createElement("button");
+        remove.className = "pl-remove";
+        remove.textContent = "✕";
+        remove.addEventListener("click", (e) => {
+          e.stopPropagation();
+          removeTrack(i);
+        });
+
+        row.appendChild(icon);
+        row.appendChild(name);
+        row.appendChild(remove);
+        row.addEventListener("click", () => playTrack(i));
+        playlistEl.appendChild(row);
+      });
+    }
+
+    function removeTrack(i) {
+      if (i < 0 || i >= playlist.length) return;
+      URL.revokeObjectURL(playlist[i].url);
+      playlist.splice(i, 1);
+
+      if (i === currentIndex) {
+        player.pause();
+        player.removeAttribute("src");
+        currentIndex = -1;
+        trackTitle.textContent = "—";
+        audioOverlay.classList.remove("visible");
+        if (playlist.length > 0) playTrack(Math.min(i, playlist.length - 1));
+      } else if (i < currentIndex) {
+        currentIndex--;
+      }
+      renderPlaylist();
+    }
+  </script>
+</body>
+</html>
