@@ -214,12 +214,18 @@
             }
         });
 
-        // Determine where to start reading (Autosave retrieval)
-        const lastLocationCfi = lastLocation && lastLocation.start && lastLocation.start.cfi ? lastLocation.start.cfi : undefined;
+              // Open the book first to let the engine map the chapters
+        await rendition.display(); 
+        
+        // THEN try to jump to the saved progress
         const savedProgress = localStorage.getItem(`epub-progress-${currentFileName}`);
-        const startLocation = lastLocationCfi || savedProgress;
-
-        await rendition.display(startLocation);
+        if (savedProgress) {
+            try {
+                await rendition.display(savedProgress);
+            } catch (e) {
+                console.warn("Could not restore progress, starting at beginning.", e);
+            }
+        }
         status.textContent = currentFileName || "Loaded";
       } catch (error) {
         console.error(error);
