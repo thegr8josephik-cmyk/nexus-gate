@@ -13,7 +13,46 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
   <meta name="theme-color" content="#0f1115" />
+/* Custom Bookmarks Formation */
+.fab {
+  position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+  background: var(--accent); color: white; border: none; border-radius: 50%;
+  font-size: 2rem; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); cursor: pointer; z-index: 100;
+  transition: transform 0.2s;
+}
+.fab:hover { transform: scale(1.1); }
 
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center;
+  z-index: 200; padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+  padding: 24px; width: 100%; max-width: 400px;
+}
+.modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
+.form-group input, .form-group select {
+  width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-size: 1rem;
+}
+.modal-buttons { display: flex; gap: 12px; }
+.modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+.btn-save { background: var(--accent); color: white; }
+.btn-cancel { background: var(--border); color: var(--text); }
+
+.custom-card { position: relative; }
+.delete-btn {
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px;
+  background: rgba(255,0,0,0.2); color: #ff4444; border: none; border-radius: 50%;
+  font-size: 0.8rem; cursor: pointer; display: none; align-items: center; justify-content: center;
+}
+.custom-card:hover .delete-btn { display: flex; }
   <style>
     :root {
       --bg: #0f1115;
