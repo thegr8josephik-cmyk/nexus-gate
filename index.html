@@ -303,17 +303,18 @@
   </div>
 
   <script src="app.js"></script>
-  <script>
+    <script>
+    // --- SEARCH & FILTER FORMATION ---
     const searchInput = document.getElementById('search');
-    const cards = document.querySelectorAll('.card');
-    const categories = document.querySelectorAll('.category');
     const emptyState = document.getElementById('empty-state');
 
-    searchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
+    function runSearch() {
+      const query = searchInput.value.toLowerCase().trim();
+      const allCards = document.querySelectorAll('.card');
+      const allCategories = document.querySelectorAll('.category');
       let visibleCount = 0;
 
-      cards.forEach(card => {
+      allCards.forEach(card => {
         const title = card.querySelector('.card-title').textContent.toLowerCase();
         const desc = card.querySelector('.card-desc').textContent.toLowerCase();
         
@@ -325,7 +326,7 @@
         }
       });
 
-      categories.forEach(cat => {
+      allCategories.forEach(cat => {
         let hasVisible = false;
         cat.querySelectorAll('.card').forEach(c => {
            if(c.style.display !== 'none') hasVisible = true;
@@ -338,7 +339,102 @@
       } else {
         emptyState.classList.remove('show');
       }
+    }
+
+    searchInput.addEventListener('input', runSearch);
+
+    // --- CUSTOM BOOKMARKS FORMATION ---
+    const fab = document.getElementById('addBookmarkBtn');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const saveBtn = document.getElementById('saveBtn');
+
+    fab.addEventListener('click', () => modalOverlay.classList.add('active'));
+    cancelBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
+
+    saveBtn.addEventListener('click', () => {
+      const title = document.getElementById('bmTitle').value.trim();
+      const url = document.getElementById('bmUrl').value.trim();
+      const icon = document.getElementById('bmIcon').value.trim() || '🔗';
+      const category = document.getElementById('bmCategory').value;
+
+      if (!title || !url) {
+        alert('A portal requires a Name and a Link, Sect Leader!');
+        return;
+      }
+
+      const bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+      bookmarks.push({ title, url, icon, category, id: Date.now() });
+      localStorage.setItem('nexus_bookmarks', JSON.stringify(bookmarks));
+      
+      modalOverlay.classList.remove('active');
+      document.getElementById('bmTitle').value = '';
+      document.getElementById('bmUrl').value = '';
+      document.getElementById('bmIcon').value = '';
+      renderCustomBookmarks();
+      runSearch(); 
     });
+
+    function renderCustomBookmarks() {
+      document.querySelectorAll('.custom-card').forEach(el => el.remove());
+      const personalCat = document.querySelector('[data-category="personal"]');
+      if (personalCat) personalCat.remove();
+
+      const bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+      if (bookmarks.length === 0) return;
+
+      const mainContent = document.getElementById('main-content');
+      
+      const personalBookmarks = bookmarks.filter(b => b.category === 'personal');
+      if (personalBookmarks.length > 0) {
+        const personalSection = document.createElement('section');
+        personalSection.className = 'category';
+        personalSection.dataset.category = 'personal';
+        personalSection.innerHTML = `<h2 class="category-title">Personal Portals</h2><div class="grid"></div>`;
+        mainContent.insertBefore(personalSection, mainContent.firstChild);
+      }
+
+      bookmarks.forEach(bm => {
+        let targetGrid;
+        if (bm.category === 'personal') {
+          targetGrid = document.querySelector('[data-category="personal"] .grid');
+        } else {
+          const existingCat = document.querySelector(`[data-category="${bm.category}"] .grid`);
+          targetGrid = existingCat || document.querySelector('[data-category="personal"] .grid') || document.querySelector('.grid');
+        }
+
+        const card = document.createElement('a');
+        card.className = 'card custom-card';
+        card.href = bm.url;
+        card.target = '_self';
+        card.rel = 'noopener noreferrer';
+        card.innerHTML = `
+          <div class="card-icon">${bm.icon}</div>
+          <div class="card-content">
+            <div class="card-title">${bm.title}</div>
+            <div class="card-desc">Custom inscribed portal.</div>
+          </div>
+          <button class="delete-btn" data-id="${bm.id}">✕</button>
+        `;
+
+        targetGrid.appendChild(card);
+
+        card.querySelector('.delete-btn').addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (confirm(`Banish the portal "${bm.title}" from your memory crystals?`)) {
+            let currentBookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+            currentBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
+            localStorage.setItem('nexus_bookmarks', JSON.stringify(currentBookmarks));
+            renderCustomBookmarks();
+            runSearch();
+          }
+        });
+      });
+    }
+
+    // Initialize on load
+    renderCustomBookmarks();
   </script>
 </body>
 </html>
