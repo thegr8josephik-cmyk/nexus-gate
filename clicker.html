@@ -47,8 +47,13 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:10}
 
 /* CORE */
 .cv{display:flex;flex-direction:column;align-items:center;gap:16px;padding-top:10px}
-.sc{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--accent),#312e81);border:3px solid rgba(99,102,241,.3);box-shadow:0 0 40px var(--glow);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:2.8rem;user-select:none;transition:transform .05s;position:relative;z-index:5}
+.core-container{position:relative;width:260px;height:260px;display:flex;align-items:center;justify-content:center;z-index:5}
+.sc{width:220px;height:220px;border-radius:50%;background:radial-gradient(circle at 35% 35%,var(--accent),#312e81);border:3px solid rgba(99,102,241,.3);box-shadow:0 0 50px var(--glow);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:4.5rem;user-select:none;transition:transform .05s;position:relative;z-index:5}
 .sc:active{transform:scale(.92)}
+.orbit-wrapper{position:absolute;width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 12s linear infinite;pointer-events:none;z-index:4}
+@keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
+.sat-core{position:absolute;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#818cf8,#312e81);border:2px solid rgba(255,255,255,.3);box-shadow:0 0 15px var(--glow);top:50%;left:50%;margin:-21px 0 0 -21px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;animation:counter-spin 12s linear infinite}
+@keyframes counter-spin{100%{transform:rotate(-360deg)}}
 .fq{position:absolute;color:var(--gold);font-weight:700;font-size:1.1rem;pointer-events:none;animation:fu .8s ease-out forwards;z-index:15}
 @keyframes fu{0%{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-50px) scale(.7)}}
 .cpb{width:100%;max-width:300px;height:6px;background:var(--panel);border-radius:3px;overflow:hidden;margin-top:4px}
@@ -233,7 +238,7 @@ const ADMIN_CODE="SECTLEADER";
 
 // === DATA ===
 const REALMS=[{n:"Mortal",t:0,i:0},{n:"Qi Condensation",t:1000,i:2},{n:"Foundation Establishment",t:15000,i:5},{n:"Golden Core",t:150000,i:10},{n:"Nascent Soul",t:1500000,i:25},{n:"Immortal Ascension",t:20000000,i:100}];
-const UPGRADES=[{id:"mat",n:"Meditation Mat",i:"🧘",d:"+1 Qi/tap",bc:15,cm:1.5,t:"tap",v:1},{id:"array",n:"Spirit Array",i:"🔮",d:"+5 Qi/s",bc:100,cm:1.6,t:"auto",v:5},{id:"pill",n:"Qi Pill",i:"💊",d:"+10 Qi/tap",bc:1000,cm:1.7,t:"tap",v:10},{id:"elder",n:"Sect Elder",i:"👴",d:"+50 Qi/s",bc:5000,cm:1.8,t:"auto",v:50},{id:"beast",n:"Spirit Beast",i:"🐉",d:"+200 Qi/s",bc:25000,cm:1.9,t:"auto",v:200},{id:"heaven",n:"Heavenly Forge",i:"⚡",d:"+1K Qi/s",bc:100000,cm:2,t:"auto",v:1000}];
+const UPGRADES=[{id:"mat",n:"Meditation Mat",i:"🧘",d:"+1 Qi/tap",bc:15,cm:1.5,t:"tap",v:1},{id:"array",n:"Spirit Array",i:"🔮",d:"+5 Qi/s",bc:100,cm:1.6,t:"auto",v:5},{id:"pill",n:"Qi Pill",i:"💊",d:"+10 Qi/tap",bc:1000,cm:1.7,t:"tap",v:10},{id:"elder",n:"Sect Elder",i:"👴",d:"+50 Qi/s",bc:5000,cm:1.8,t:"auto",v:50},{id:"beast",n:"Spirit Beast",i:"🐉",d:"+200 Qi/s",bc:25000,cm:1.9,t:"auto",v:200},{id:"heaven",n:"Heavenly Forge",i:"⚡",d:"+1K Qi/s",bc:100000,cm:2,t:"auto",v:1000},{id:"sat_core",n:"Satellite Core",i:"🪐",d:"Orbiting Core (+100% Tap to QPS)",bc:10000,cm:2.5,t:"sat",v:1}];
 
 const SKILLS=[
 {id:"O1",p:"orthodox",n:"Clear Heart",d:"+20% QPS",c:1,r:[],e:{qm:.2}},
@@ -398,8 +403,9 @@ const comboPct=Math.min(S.combo/50*100,100);
 const comboMult=getComboMult();
 let sk=ACTIVE_SKILLS.map(s=>{const ul=isSkUl(s);const cd=S.scd[s.id]||0;const oc=cd>0;return`<div class="sk ${ul?"":"lk"} ${oc?"oc":""}" onclick="useAS('${s.id}')" title="${s.n}: ${s.d}">${s.i}${oc?`<div class="cdo">${fT(cd)}</div>`:""}</div>`;}).join("");
 let cor=S.corrupt>0?`<div class="corruption-bar">⚠️ Corruption: ${S.corrupt}</div>`:"";
-mc.innerHTML=`<div class="cv">
-<div class="sc" id="core-btn">${SPECIES.find(s=>s.id===S.species)?.i||"☯"}</div>
+let satCount=S.ups.sat_core||0;let satHTML='';
+if(satCount>0){const vis=Math.min(satCount,8);satHTML=`<div class="orbit-wrapper">`;for(let i=0;i<vis;i++){const angle=(i/vis)*360;satHTML+=`<div class="sat-core" style="transform:rotate(${angle}deg) translateY(-125px) rotate(-${angle}deg);">${SPECIES.find(s=>s.id===S.species)?.i||"☯"}</div>`;}satHTML+=`</div>`;}
+mc.innerHTML=`<div class="cv"><div class="core-container">${satHTML}<div class="sc" id="core-btn">${SPECIES.find(s=>s.id===S.species)?.i||"☯"}</div></div>
 <div style="width:100%;max-width:300px"><div class="cpb"><div class="cpf" style="width:${pct}%"></div></div>
 <div class="cpl">Jade Slip: ${S.cts}/${st}</div>
 <div class="combo-bar"><div class="combo-fill" style="width:${comboPct}%"></div></div>
@@ -411,8 +417,8 @@ Reincs: ${S.reincs} | Mult: x${S.gm.toFixed(1)}
 ${S.isAdmin?'<br><span style="color:var(--sovereign)">👑 Sovereign Access</span>':""}
 </div></div>`;
 const core=document.getElementById("core-btn");
-core.addEventListener("pointerdown",tapCore);
-core.addEventListener("touchstart",e=>e.preventDefault(),{passive:false});
+core.addEventListener("touchstart",e=>{e.preventDefault();for(let i=0;i<e.changedTouches.length;i++){const t=e.changedTouches[i];tapCoreLogic(t.clientX,t.clientY,core);}},{passive:false});
+core.addEventListener("mousedown",e=>tapCoreLogic(e.clientX,e.clientY,core));
 }
 
 // === RENDER: FORGE ===
@@ -516,7 +522,7 @@ function rQuests(mc){const cats=["Progression","Repeatable","Achievement"];let h
 function rShop(mc){const cats=["Pills","Refiners","Artifacts"];let h=`<div class="lv"><div style="text-align:center;margin-bottom:12px"><span style="font-size:1.5rem">💎</span> <span style="font-size:1.2rem;font-weight:700">${S.st} Spirit Stones</span></div>`;cats.forEach(cat=>{h+=`<div class="st">${cat}</div><div class="sg">`;SHOP_ITEMS.filter(i=>i.cat===cat).forEach(item=>{const own=item.t==="eq"?S.eq===item.id:item.t==="art"?S.arts.includes(item.id):false;const can=S.st>=item.c&&!own;h+=`<div class="si ${can?"":"dis"}" onclick="buySI('${item.id}')"><div class="sii">${item.i}</div><div class="sin">${item.n}</div><div class="sid">${item.d}</div><div class="sic">${own?"✅ Owned":`${item.c} 💎`}</div></div>`;});h+=`</div>`;});mc.innerHTML=h+"</div>";}
 
 // === RENDER: ASCEND ===
-function rAscend(mc){mc.innerHTML=`<div class="cv" style="gap:16px;text-align:center;padding-top:20px"><div style="font-size:3rem">🔥</div><h3 style="color:var(--accent)">Reincarnation Cycle</h3><p style="font-size:.8rem;color:var(--dim);max-width:280px;line-height:1.5">Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong style="color:var(--accent)">+20% Global Mult</strong>.<br>${S.rbKeep?'<span style="color:var(--gold)">Rebirth Pill: Skills kept!</span>':""}</p><button class="btn bp" style="max-width:200px;padding:14px" onclick="openReincModal()">Reincarnate</button><div style="margin-top:24px;width:100%;max-width:300px"><div class="st">Identity</div><div style="padding:12px;background:var(--panel);border-radius:12px;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--accent)">${S.username}</div><div style="font-size:.9rem;letter-spacing:2px;color:var(--dim);margin-top:4px">${S.saveCode}</div></div><div style="margin-top:16px"><div class="st">Admin Verification</div><div style="padding:12px;background:var(--panel);border-radius:12px;border:1px solid var(--border);text-align:center"><div style="font-size:.8rem;margin-bottom:8px">Are you the Sect Leader?</div><input class="mi" id="admin-input" placeholder="Enter admin code..." maxlength="10" style="margin-bottom:8px"><button class="btn bg" style="width:100%" onclick="verifyAdmin()">Verify</button>${S.isAdmin?'<div style="margin-top:8px;color:var(--sovereign);font-weight:700">👑 Verified</div>':""}</div></div></div></div>`;}
+function rAscend(mc){mc.innerHTML=`<div class="cv" style="gap:16px;text-align:center;padding-top:20px"><div style="font-size:3rem">🔥</div><h3 style="color:var(--accent)">Reincarnation Cycle</h3><p style="font-size:.8rem;color:var(--dim);max-width:280px;line-height:1.5">Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong style="color:var(--accent)">+20% Global Mult</strong>.<br>${S.rbKeep?'<span style="color:var(--gold)">Rebirth Pill: Skills kept!</span>':""}</p><button class="btn bp" style="max-width:200px;padding:14px" onclick="openReincModal()">Reincarnate</button><div style="margin-top:24px;width:100%;max-width:300px"><div class="st">Identity</div><div style="padding:12px;background:var(--panel);border-radius:12px;border:1px solid var(--border);text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--accent)">${S.username}</div><div style="font-size:.9rem;letter-spacing:2px;color:var(--dim);margin-top:4px">${S.saveCode}</div><button class="btn bs" style="width:100%;margin-top:10px" onclick="adminExport()">📤 Export Save String</button><button class="btn bs" style="width:100%;margin-top:8px" onclick="adminImportPrompt()">📥 Import Save String</button></div><div style="margin-top:16px"><div class="st">Admin Verification</div><div style="padding:12px;background:var(--panel);border-radius:12px;border:1px solid var(--border);text-align:center"><div style="font-size:.8rem;margin-bottom:8px">Are you the Sect Leader?</div><input class="mi" id="admin-input" placeholder="Enter admin code..." maxlength="10" style="margin-bottom:8px"><button class="btn bg" style="width:100%" onclick="verifyAdmin()">Verify</button>${S.isAdmin?'<div style="margin-top:8px;color:var(--sovereign);font-weight:700">👑 Verified</div>':""}</div></div></div></div>`;}
 
 // === RENDER: ADMIN ===
 function rAdmin(mc){
@@ -538,7 +544,7 @@ mc.innerHTML=`<div class="lv">
 }
 
 // === GAME LOGIC ===
-function tapCore(e){
+function tapCoreLogic(cx,cy,target){
 let base=getTP(),final=base;
 if(hasSk("C1")||hasSk("C2")){if(hasSk("H2"))final=base*(3+Math.random()*2);else if(hasSk("C5"))final=base*(2+Math.random()*3);else if(hasSk("C2"))final=base*(.5+Math.random()*7.5);else final=base*(.1+Math.random()*4.9);}
 if(hasSk("D2")&&Math.random()<.05){final*=10;showToast("⚡ Soul Siphoned! 10x!");}
@@ -551,9 +557,8 @@ S.combo=Math.min(S.combo+1,50);S.comboTimer=Date.now()+2000;
 const st=hasSk("SV3")?50:(hasArt("slip_magnet")?80:100);
 if(S.cts>=st){S.cts=0;S.js++;S.slipsE++;showToast("🟢 Jade Slip!");uQP("slips",1);}
 chkRealm();uQP("clicks",1);uQP("clicks_s",1);uQP("totalQi",final);uQP("qi_s",final);
-spawnFloat(e,final);
-const rect=e.target.getBoundingClientRect();
-spawnParts(e.clientX||rect.left+rect.width/2,e.clientY||rect.top+rect.height/2,getPartColor(),6+Math.min(Math.floor(final/1000),10));
+spawnFloat({clientX:cx,clientY:cy,target},final);
+spawnParts(cx,cy,getPartColor(),6+Math.min(Math.floor(final/1000),10));
 updateUI();if(curView==="core")rCore(document.getElementById("mc"));
 }
 
@@ -586,7 +591,7 @@ if(curView==="core")rCore(document.getElementById("mc"));
 
 // === CALCULATIONS ===
 function getTP(){let b=1;UPGRADES.filter(u=>u.t==="tap").forEach(u=>b+=(S.ups[u.id]||0)*u.v);let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.tm)m+=s.e.tm;if(s.e.am)am+=s.e.am;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.tm)m+=sp.b.tm;if(sp?.b.am)am+=sp.b.am;if(S.arts.includes("body_pill_perm"))m+=.1;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;return Math.max(1,b*m*am);}
-function getQPS(){let b=0;UPGRADES.filter(u=>u.t==="auto").forEach(u=>b+=(S.ups[u.id]||0)*u.v);let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.qm)m+=s.e.qm;if(s.e.am)am+=s.e.am;});if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.qm)m+=eq.e.qm;}const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.qm)m+=sp.b.qm;if(sp?.b.am)am+=sp.b.am;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;if(S.corrupt>=5)return 0;return Math.max(0,b*m*am);}
+function getQPS(){let b=0;UPGRADES.filter(u=>u.t==="auto").forEach(u=>b+=(S.ups[u.id]||0)*u.v);b+=(S.ups.sat_core||0)*getTP();let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.qm)m+=s.e.qm;if(s.e.am)am+=s.e.am;});if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.qm)m+=eq.e.qm;}const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.qm)m+=sp.b.qm;if(sp?.b.am)am+=sp.b.am;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;if(S.corrupt>=5)return 0;return Math.max(0,b*m*am);}
 function getDPS(){let d=0;DEFENDERS.forEach(df=>{d+=(S.defs[df.id]||0)*df.dps;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
 function getIM(){let m=1;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.im)m+=s.e.im;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.im)m+=sp.b.im;if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.im)m+=eq.e.im;}return m;}
 function gUC(u){return Math.floor(u.bc*Math.pow(u.cm,S.ups[u.id]||0));}
