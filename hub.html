@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Astral Hub</title>
+  <style>
+    body { 
+      margin: 0; font-family: -apple-system, sans-serif; 
+      background: #090a0f; color: #f1f5f9; 
+      display: flex; flex-direction: column; align-items: center; justify-content: center; 
+      height: 100vh; text-align: center; padding: 20px;
+      background-image: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+    }
+    h1 { 
+      font-size: 2.5rem; margin: 0; 
+      background: linear-gradient(135deg, #6366f1, #a855f7); 
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+    }
+    p { color: #94a3b8; margin-bottom: 30px; font-size: 1.1rem; }
+    .search-box { 
+      display: flex; gap: 10px; background: rgba(22, 25, 35, 0.8); 
+      backdrop-filter: blur(10px); padding: 12px; border-radius: 50px; 
+      border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 500px; 
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    input { 
+      flex: 1; background: transparent; border: none; color: white; 
+      font-size: 1rem; outline: none; padding: 10px; 
+    }
+    button { 
+      background: #6366f1; border: none; color: white; 
+      padding: 10px 24px; border-radius: 50px; font-weight: bold; cursor: pointer; 
+      transition: transform 0.1s;
+    }
+    button:active { transform: scale(0.95); }
+    .quick-links { margin-top: 40px; display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }
+    .quick-links a { 
+      color: #94a3b8; text-decoration: none; padding: 8px 16px; 
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; 
+      transition: 0.2s; font-size: 0.9rem;
+    }
+    .quick-links a:hover { border-color: #6366f1; color: white; background: rgba(99, 102, 241, 0.1); }
+  </style>
+</head>
+<body>
+  <h1>The Astral Hub</h1>
+  <p>Your personal gateway to the multiverse.</p>
+  <form class="search-box" onsubmit="event.preventDefault(); window.open('https://www.google.com/search?q=' + this.query.value, '_blank');">
+    <input type="text" name="query" placeholder="Search the Astral Web..." required>
+    <button type="submit">Seek</button>
+  </form>
+  <div class="quick-links">
+    <a href="https://en.wikipedia.org" target="_blank">Wikipedia</a>
+    <a href="https://archive.org" target="_blank">Internet Archive</a>
+    <a href="https://github.com" target="_blank">GitHub</a>
+  </div>
+</body>
+</html>
