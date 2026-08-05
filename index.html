@@ -531,7 +531,7 @@
       if (!t) return null;
       if (/^https?:\/\//i.test(t)) return t;
       if (/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t)) return 'https://' + t;
-      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(t);
+      return 'https://www.mojeek.com/search?q=' + encodeURIComponent(t);
     }
 
     function viewerNavigate(url, pushToHistory) {
