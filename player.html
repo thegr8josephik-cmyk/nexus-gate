@@ -233,6 +233,36 @@
   </style>
 </head>
 <body>
+<!-- THE CLOSE SIGIL (Paste after <body>) -->
+<style>
+  .close-sigil {
+    position: fixed;
+    top: max(env(safe-area-inset-top), 15px);
+    right: 15px;
+    z-index: 9999;
+    background: rgba(26, 29, 36, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #e2e8f0;
+    border: 1px solid #2a2e39;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+  }
+  .close-sigil:hover { background: rgba(255, 80, 80, 0.2); border-color: rgba(255, 80, 80, 0.4); transform: scale(1.05); }
+  .close-sigil svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+</style>
+
+<a href="index.html" class="close-sigil" title="Return to Gate">
+  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+</a>
+<!-- END OF CLOSE SIGIL -->
   <div class="toolbar">
     <label class="file-button" for="file">Add Media</label>
     <input id="file" class="hidden-input" type="file" accept="audio/*,video/*" multiple />
