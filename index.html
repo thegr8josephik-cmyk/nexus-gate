@@ -612,7 +612,7 @@
     document.getElementById('openViewerBtn').addEventListener('click', (e) => {
       e.preventDefault();
       viewerOverlay.classList.add('active');
-      if (viewerIndex === -1) viewerNavigate('https://en.wikipedia.org/wiki/Main_Page');
+      if (viewerIndex === -1) viewerNavigate('./hub.html');
       viewerOmnibox.focus();
     });
 
