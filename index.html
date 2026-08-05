@@ -6,53 +6,14 @@
   <title>Nexus Gate</title>
 
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-180.png?v=2" />
+  <link rel="apple-touch-icon" href="icons/icon-180.png" />
 
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
   <meta name="theme-color" content="#0f1115" />
-/* Custom Bookmarks Formation */
-.fab {
-  position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
-  background: var(--accent); color: white; border: none; border-radius: 50%;
-  font-size: 2rem; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); cursor: pointer; z-index: 100;
-  transition: transform 0.2s;
-}
-.fab:hover { transform: scale(1.1); }
 
-.modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center;
-  z-index: 200; padding: 20px;
-}
-.modal-overlay.active { display: flex; }
-
-.modal {
-  background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
-  padding: 24px; width: 100%; max-width: 400px;
-}
-.modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
-.form-group { margin-bottom: 16px; }
-.form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
-.form-group input, .form-group select {
-  width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border);
-  border-radius: 8px; color: var(--text); font-size: 1rem;
-}
-.modal-buttons { display: flex; gap: 12px; }
-.modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
-.btn-save { background: var(--accent); color: white; }
-.btn-cancel { background: var(--border); color: var(--text); }
-
-.custom-card { position: relative; }
-.delete-btn {
-  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px;
-  background: rgba(255,0,0,0.2); color: #ff4444; border: none; border-radius: 50%;
-  font-size: 0.8rem; cursor: pointer; display: none; align-items: center; justify-content: center;
-}
-.custom-card:hover .delete-btn { display: flex; }
   <style>
     :root {
       --bg: #0f1115;
@@ -120,6 +81,88 @@
 
     .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); display: none; }
     .empty-state.show { display: block; }
+
+    /* Custom Bookmarks Formation */
+    .fab {
+      position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px;
+      background: var(--accent); color: white; border: none; border-radius: 50%;
+      font-size: 2rem; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); cursor: pointer; z-index: 100;
+      transition: transform 0.2s;
+    }
+    .fab:hover { transform: scale(1.1); }
+
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center;
+      z-index: 200; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+      padding: 24px; width: 100%; max-width: 400px;
+    }
+    .modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
+    .form-group input, .form-group select {
+      width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: 1rem;
+    }
+    .modal-buttons { display: flex; gap: 12px; }
+    .modal-buttons button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+    .btn-save { background: var(--accent); color: white; }
+    .btn-cancel { background: var(--border); color: var(--text); }
+
+    .custom-card { position: relative; }
+    .delete-btn {
+      position: absolute; top: 8px; right: 8px; width: 24px; height: 24px;
+      background: rgba(255,0,0,0.2); color: #ff4444; border: none; border-radius: 50%;
+      font-size: 0.8rem; cursor: pointer; display: none; align-items: center; justify-content: center;
+    }
+    .custom-card:hover .delete-btn { display: flex; }
+
+    /* Portal Viewer Formation */
+    .viewer-overlay {
+      position: fixed; inset: 0; background: var(--bg); z-index: 300;
+      display: none; flex-direction: column;
+    }
+    .viewer-overlay.active { display: flex; animation: viewerRise 0.25s ease; }
+    @keyframes viewerRise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .viewer-toolbar {
+      display: flex; gap: 8px; align-items: center; padding: 10px 12px;
+      padding-top: max(env(safe-area-inset-top), 10px);
+      background: var(--panel); border-bottom: 1px solid var(--border);
+    }
+    .viewer-btn {
+      width: 38px; height: 38px; flex-shrink: 0; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); border-radius: 10px;
+      font-size: 1rem; cursor: pointer;
+    }
+    .viewer-btn:hover { background: var(--panel-hover); }
+    .viewer-omnibox {
+      flex: 1; min-width: 0; padding: 10px 16px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 10px; color: var(--text);
+      font-size: 0.95rem; outline: none;
+    }
+    .viewer-omnibox:focus { border-color: var(--accent); }
+    .viewer-stage { flex: 1; position: relative; background: #fff; }
+    .viewer-stage iframe { width: 100%; height: 100%; border: none; }
+
+    .viewer-ward {
+      position: absolute; inset: 0; background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 30px; gap: 12px;
+    }
+    .ward-icon { font-size: 3rem; }
+    .viewer-ward h3 { font-size: 1.1rem; }
+    .viewer-ward p { color: var(--text-muted); font-size: 0.9rem; max-width: 420px; margin-bottom: 8px; }
+    .ward-btn {
+      padding: 12px 24px; border: none; border-radius: 8px;
+      background: var(--accent); color: white; font-size: 1rem; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -154,6 +197,13 @@
             <div class="card-content">
               <div class="card-title">Media Player</div>
               <div class="card-desc">Play local audio and video files with a playlist queue.</div>
+            </div>
+          </a>
+          <a class="card" href="#" id="openViewerBtn">
+            <div class="card-icon">🌐</div>
+            <div class="card-content">
+              <div class="card-title">Portal Viewer</div>
+              <div class="card-desc">Browse frame-friendly realms without leaving the Gate.</div>
             </div>
           </a>
         </div>
@@ -264,46 +314,71 @@
         </div>
       </section>
     </main>
-<button class="fab" id="addBookmarkBtn">+</button>
 
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2>Inscribe New Portal</h2>
-    <div class="form-group">
-      <label>Realm Name (Title)</label>
-      <input type="text" id="bmTitle" placeholder="e.g., My Secret Base">
-    </div>
-    <div class="form-group">
-      <label>Spirit Link (URL)</label>
-      <input type="url" id="bmUrl" placeholder="https://...">
-    </div>
-    <div class="form-group">
-      <label>Sigil (Emoji Icon)</label>
-      <input type="text" id="bmIcon" placeholder="🌟" maxlength="2">
-    </div>
-    <div class="form-group">
-      <label>Sect (Category)</label>
-      <select id="bmCategory">
-        <option value="personal">Personal Portals</option>
-        <option value="archives">The Grand Archives</option>
-        <option value="social">Guilds & Harmonies</option>
-        <option value="oracles">The Oracles</option>
-        <option value="academy">The Academy & Forge</option>
-      </select>
-    </div>
-    <div class="modal-buttons">
-      <button class="btn-cancel" id="cancelBtn">Cancel</button>
-      <button class="btn-save" id="saveBtn">Inscribe</button>
-    </div>
-  </div>
-</div>
     <div class="empty-state" id="empty-state">
       No artifacts match your query. The archives are silent.
     </div>
   </div>
 
+  <!-- Bookmark Summoning Talisman -->
+  <button class="fab" id="addBookmarkBtn">+</button>
+
+  <!-- Bookmark Inscription Modal -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2>Inscribe New Portal</h2>
+      <div class="form-group">
+        <label>Realm Name (Title)</label>
+        <input type="text" id="bmTitle" placeholder="e.g., My Secret Base">
+      </div>
+      <div class="form-group">
+        <label>Spirit Link (URL)</label>
+        <input type="url" id="bmUrl" placeholder="https://...">
+      </div>
+      <div class="form-group">
+        <label>Sigil (Emoji Icon)</label>
+        <input type="text" id="bmIcon" placeholder="🌟" maxlength="2">
+      </div>
+      <div class="form-group">
+        <label>Sect (Category)</label>
+        <select id="bmCategory">
+          <option value="personal">Personal Portals</option>
+          <option value="archives">The Grand Archives</option>
+          <option value="social">Guilds & Harmonies</option>
+          <option value="oracles">The Oracles</option>
+          <option value="academy">The Academy & Forge</option>
+        </select>
+      </div>
+      <div class="modal-buttons">
+        <button class="btn-cancel" id="cancelBtn">Cancel</button>
+        <button class="btn-save" id="saveBtn">Inscribe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portal Viewer (In-App Browser) -->
+  <div class="viewer-overlay" id="viewerOverlay">
+    <div class="viewer-toolbar">
+      <button class="viewer-btn" id="viewerBack" title="Back">←</button>
+      <button class="viewer-btn" id="viewerForward" title="Forward">→</button>
+      <button class="viewer-btn" id="viewerReload" title="Reload">⟳</button>
+      <input type="text" class="viewer-omnibox" id="viewerOmnibox" placeholder="Summon a realm (e.g., en.wikipedia.org)" autocomplete="off">
+      <button class="viewer-btn" id="viewerExternal" title="Open in new tab">↗</button>
+      <button class="viewer-btn" id="viewerClose" title="Close">✕</button>
+    </div>
+    <div class="viewer-stage">
+      <iframe id="viewerFrame" src="about:blank" allow="fullscreen"></iframe>
+      <div class="viewer-ward" id="viewerWard" style="display:none;">
+        <div class="ward-icon">🛡️</div>
+        <h3>This realm is protected by Anti-Summoning Wards.</h3>
+        <p>Some realms refuse to appear inside another app's frame. You must visit them directly through the outer veil.</p>
+        <button class="ward-btn" id="wardOpen">Open in New Tab ↗</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
-    <script>
+  <script>
     // --- SEARCH & FILTER FORMATION ---
     const searchInput = document.getElementById('search');
     const emptyState = document.getElementById('empty-state');
@@ -390,7 +465,7 @@
         const personalSection = document.createElement('section');
         personalSection.className = 'category';
         personalSection.dataset.category = 'personal';
-        personalSection.innerHTML = `<h2 class="category-title">Personal Portals</h2><div class="grid"></div>`;
+        personalSection.innerHTML = '<h2 class="category-title">Personal Portals</h2><div class="grid"></div>';
         mainContent.insertBefore(personalSection, mainContent.firstChild);
       }
 
@@ -399,7 +474,7 @@
         if (bm.category === 'personal') {
           targetGrid = document.querySelector('[data-category="personal"] .grid');
         } else {
-          const existingCat = document.querySelector(`[data-category="${bm.category}"] .grid`);
+          const existingCat = document.querySelector('[data-category="' + bm.category + '"] .grid');
           targetGrid = existingCat || document.querySelector('[data-category="personal"] .grid') || document.querySelector('.grid');
         }
 
@@ -408,21 +483,20 @@
         card.href = bm.url;
         card.target = '_self';
         card.rel = 'noopener noreferrer';
-        card.innerHTML = `
-          <div class="card-icon">${bm.icon}</div>
-          <div class="card-content">
-            <div class="card-title">${bm.title}</div>
-            <div class="card-desc">Custom inscribed portal.</div>
-          </div>
-          <button class="delete-btn" data-id="${bm.id}">✕</button>
-        `;
+        card.innerHTML = 
+          '<div class="card-icon">' + bm.icon + '</div>' +
+          '<div class="card-content">' +
+            '<div class="card-title">' + bm.title + '</div>' +
+            '<div class="card-desc">Custom inscribed portal.</div>' +
+          '</div>' +
+          '<button class="delete-btn" data-id="' + bm.id + '">✕</button>';
 
         targetGrid.appendChild(card);
 
         card.querySelector('.delete-btn').addEventListener('click', (e) => {
           e.preventDefault();
           e.stopPropagation();
-          if (confirm(`Banish the portal "${bm.title}" from your memory crystals?`)) {
+          if (confirm('Banish the portal "' + bm.title + '" from your memory crystals?')) {
             let currentBookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
             currentBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
             localStorage.setItem('nexus_bookmarks', JSON.stringify(currentBookmarks));
@@ -433,8 +507,77 @@
       });
     }
 
-    // Initialize on load
     renderCustomBookmarks();
+
+    // --- PORTAL VIEWER FORMATION (In-App Browser) ---
+    const viewerOverlay = document.getElementById('viewerOverlay');
+    const viewerFrame = document.getElementById('viewerFrame');
+    const viewerOmnibox = document.getElementById('viewerOmnibox');
+    const viewerWard = document.getElementById('viewerWard');
+    let viewerHistory = [];
+    let viewerIndex = -1;
+
+    const wardedRealms = ['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
+
+    function isWarded(url) {
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, '');
+        return wardedRealms.some(r => host === r || host.endsWith('.' + r));
+      } catch (e) { return false; }
+    }
+
+    function normalizeUrl(input) {
+      const t = input.trim();
+      if (!t) return null;
+      if (/^https?:\/\//i.test(t)) return t;
+      if (/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t)) return 'https://' + t;
+      return 'https://en.wikipedia.org/w/index.php?search=' + encodeURIComponent(t);
+    }
+
+    function viewerNavigate(url, pushToHistory) {
+      if (pushToHistory === undefined) pushToHistory = true;
+      if (!url) return;
+      if (isWarded(url)) {
+        viewerWard.style.display = 'flex';
+        viewerFrame.src = 'about:blank';
+        document.getElementById('wardOpen').onclick = () => window.open(url, '_blank');
+      } else {
+        viewerWard.style.display = 'none';
+        viewerFrame.src = url;
+      }
+      viewerOmnibox.value = url;
+      if (pushToHistory) {
+        viewerHistory = viewerHistory.slice(0, viewerIndex + 1);
+        viewerHistory.push(url);
+        viewerIndex = viewerHistory.length - 1;
+      }
+    }
+
+    document.getElementById('openViewerBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      viewerOverlay.classList.add('active');
+      if (viewerIndex === -1) viewerNavigate('https://en.wikipedia.org/wiki/Main_Page');
+      viewerOmnibox.focus();
+    });
+
+    viewerOmnibox.addEventListener('focus', () => viewerOmnibox.select());
+    viewerOmnibox.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') viewerNavigate(normalizeUrl(viewerOmnibox.value));
+    });
+
+    document.getElementById('viewerClose').addEventListener('click', () => viewerOverlay.classList.remove('active'));
+    document.getElementById('viewerBack').addEventListener('click', () => {
+      if (viewerIndex > 0) { viewerIndex--; viewerNavigate(viewerHistory[viewerIndex], false); }
+    });
+    document.getElementById('viewerForward').addEventListener('click', () => {
+      if (viewerIndex < viewerHistory.length - 1) { viewerIndex++; viewerNavigate(viewerHistory[viewerIndex], false); }
+    });
+    document.getElementById('viewerReload').addEventListener('click', () => {
+      if (viewerIndex >= 0) viewerNavigate(viewerHistory[viewerIndex], false);
+    });
+    document.getElementById('viewerExternal').addEventListener('click', () => {
+      if (viewerIndex >= 0) window.open(viewerHistory[viewerIndex], '_blank');
+    });
   </script>
 </body>
 </html>
