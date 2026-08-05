@@ -357,6 +357,31 @@ function updateParts(){ctx.clearRect(0,0,cvs.width,cvs.height);for(let i=parts.l
 function getPartColor(){const m={"human":"#6366f1","fox":"#f97316","golem":"#78716c","dragon":"#eab308","phoenix":"#ef4444","celestial":"#fbbf24","voidwalker":"#6b7280","nexus":"#ffffff"};return m[S.species]||"#6366f1";}
 setInterval(updateParts,16);
 
+// =============================================
+// PRESENCE WARD — Anti-Punishment Shield
+// =============================================
+let lastAct=Date.now(),isAway=false;const AWAY_MS=120000;
+(function(){
+const d=document.createElement('div');
+d.style.cssText='position:fixed;bottom:max(env(safe-area-inset-bottom),16px);left:16px;z-index:150;display:flex;align-items:center;gap:6px;padding:5px 11px;background:var(--panel);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:20px;font-size:.6rem;color:var(--dim);pointer-events:none';
+d.innerHTML='<span id="pw-dot" style="width:8px;height:8px;border-radius:50%;background:#22c55e"></span><span id="pw-txt">Active</span>';
+document.body.appendChild(d);
+})();
+function syncWard(){const dot=document.getElementById('pw-dot'),txt=document.getElementById('pw-txt');if(!dot)return;if(isAway){dot.style.background='#f59e0b';txt.textContent='Away · Safe';}else{dot.style.background='#22c55e';txt.textContent='Active';}}
+function markActive(){lastAct=Date.now();if(isAway){isAway=false;syncWard();showToast('👀 Welcome back! You are protected.');}}
+function checkPresence(){const away=document.hidden||(Date.now()-lastAct>AWAY_MS);if(away&&!isAway){isAway=true;syncWard();saveGame();}else if(!away&&isAway){isAway=false;syncWard();}}
+function isPresent(){return !isAway&&!document.hidden;}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)markActive();checkPresence();});
+['pointerdown','keydown','touchstart'].forEach(e=>document.addEventListener(e,markActive,{passive:true}));
+setInterval(checkPresence,1000);
+(function(){
+const prev=parseInt(localStorage.getItem('nexus-presence-lastseen')||'0');
+const now=Date.now(),gap=now-prev;
+localStorage.setItem('nexus-presence-lastseen',now);
+setInterval(()=>localStorage.setItem('nexus-presence-lastseen',Date.now()),5000);
+if(prev>0&&gap>300000)setTimeout(()=>showToast('🛡️ Welcome back! Your realm was guarded while you were away.'),900);
+})();
+
 // === INIT ===
 function init(){
 loadGame();
@@ -365,7 +390,7 @@ document.getElementById("username-modal").classList.remove("active");
 if(S.isAdmin){document.getElementById("nav-admin").style.display="flex";}
 setupDrawer();switchView("core");
 setInterval(gameTick,100);setInterval(saveGame,5000);
-setInterval(()=>{S.playtime++;S.sClicks=0;S.sQi=0;S.sSkills=0;S.sRolls=0;},60000);
+setInterval(()=>{S.playtime+=60;},60000);
 updateUI();
 }
 
@@ -592,7 +617,7 @@ if(curView==="core")rCore(document.getElementById("mc"));
 // === CALCULATIONS ===
 function getTP(){let b=1;UPGRADES.filter(u=>u.t==="tap").forEach(u=>b+=(S.ups[u.id]||0)*u.v);let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.tm)m+=s.e.tm;if(s.e.am)am+=s.e.am;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.tm)m+=sp.b.tm;if(sp?.b.am)am+=sp.b.am;if(S.arts.includes("body_pill_perm"))m+=.1;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;return Math.max(1,b*m*am);}
 function getQPS(){let b=0;UPGRADES.filter(u=>u.t==="auto").forEach(u=>b+=(S.ups[u.id]||0)*u.v);b+=(S.ups.sat_core||0)*getTP();let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.qm)m+=s.e.qm;if(s.e.am)am+=s.e.am;});if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.qm)m+=eq.e.qm;}const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.qm)m+=sp.b.qm;if(sp?.b.am)am+=sp.b.am;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;if(S.corrupt>=5)return 0;return Math.max(0,b*m*am);}
-function getDPS(){let d=0;DEFENDERS.forEach(df=>{d+=(S.defs[df.id]||0)*df.dps;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
+function getDPS(){let d=10+Math.floor(getTP()/100);DEFENDERS.forEach(df=>{d+=(S.defs[df.id]||0)*df.dps;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
 function getIM(){let m=1;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.im)m+=s.e.im;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.im)m+=sp.b.im;if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.im)m+=eq.e.im;}return m;}
 function gUC(u){return Math.floor(u.bc*Math.pow(u.cm,S.ups[u.id]||0));}
 function hasSk(id){return S.skills.includes(id);}
@@ -667,7 +692,7 @@ function spawnFloat(e,amt){const el=document.createElement("div");el.className="
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
 function showModal(title,desc,btns,showInput=false){document.getElementById("mot").innerHTML=title;document.getElementById("mod").innerHTML=desc;document.getElementById("moi").style.display=showInput?"block":"none";document.getElementById("moi").value="";document.getElementById("mob").innerHTML=btns.map(b=>`<button class="btn ${b.c}" onclick="${b.a}">${b.t}</button>`).join("");document.getElementById("mo").classList.add("active");}
 function closeModal(){document.getElementById("mo").classList.remove("active");}
-function fN(n){if(n<1000)return Math.floor(n).toLocaleString();if(n<1e6)return(n/1e3).toFixed(1)+"K";if(n<1e9)return(n/1e6).toFixed(1)+"M";return(n/1e9).toFixed(1)+"B";}
+function fN(n){const s=["","K","M","B","T","Qa","Qi","Sx","Sp","Oc","No","Dc"];if(n<1000)return Math.floor(n).toLocaleString();let t=Math.floor(Math.log10(n)/3);if(t>=s.length)return n.toExponential(2);return(n/Math.pow(10,t*3)).toFixed(1)+s[t];}
 function fT(s){if(s<60)return`${Math.floor(s)}s`;if(s<3600)return`${Math.floor(s/60)}m`;return`${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;}
 
 // === SAVE/LOAD ===
