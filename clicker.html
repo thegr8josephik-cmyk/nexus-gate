@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Spirit Clicker | Nexus Gate</title>
+  <link rel="apple-touch-icon" href="icons/icon-180.png?v=2">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --panel: rgba(255, 255, 255, 0.04);
+      --panel-hover: rgba(255, 255, 255, 0.08);
+      --border: rgba(255, 255, 255, 0.08);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.4);
+      --text: #e2e8f0;
+      --text-dim: #94a3b8;
+      --gold: #fbbf24;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Georgia", "Merriweather", serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* --- CLOSE SIGIL --- */
+    .close-sigil {
+      position: fixed;
+      top: max(env(safe-area-inset-top), 12px);
+      right: 16px;
+      z-index: 100;
+      width: 40px; height: 40px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none;
+      color: var(--text-dim);
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .close-sigil:hover { background: var(--panel-hover); color: var(--text); }
+
+    /* --- MAIN LAYOUT --- */
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 70px 20px 30px;
+      gap: 24px;
+    }
+
+    /* --- REALM DISPLAY --- */
+    .realm-display {
+      text-align: center;
+      padding: 16px 24px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .realm-title { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+    .realm-name { font-size: 1.5rem; font-weight: 700; color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
+    .qi-display { margin-top: 12px; font-size: 2rem; font-weight: 700; }
+    .qi-label { font-size: 0.85rem; color: var(--text-dim); }
+    .qps-display { font-size: 0.8rem; color: var(--gold); margin-top: 4px; }
+
+    /* --- CORE BUTTON --- */
+    .core-container { position: relative; margin: 10px 0; }
+    .spirit-core {
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--accent), #312e81);
+      border: 3px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 0 40px var(--accent-glow), inset 0 0 30px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .spirit-core:active { transform: scale(0.93); box-shadow: 0 0 60px var(--accent-glow); }
+    .spirit-core::after {
+      content: ''; position: absolute; inset: -8px;
+      border-radius: 50%;
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      animation: pulse-ring 3s ease-in-out infinite;
+    }
+
+    @keyframes pulse-ring {
+      0%, 100% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.08); opacity: 0.2; }
+    }
+
+    /* --- FLOATING QI NUMBERS --- */
+    .float-qi {
+      position: absolute;
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 1.3rem;
+      pointer-events: none;
+      animation: floatUp 0.8s ease-out forwards;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-60px) scale(0.7); }
+    }
+
+    /* --- UPGRADES PANEL --- */
+    .upgrades-panel {
+      width: 100%;
+      max-width: 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .panel-header {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--text-dim);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .upgrade-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .upgrade-card:hover { background: var(--panel-hover); border-color: rgba(99,102,241,0.2); }
+    .upgrade-card.disabled { opacity: 0.4; pointer-events: none; }
+    .upgrade-card:active { transform: scale(0.98); }
+
+    .upgrade-icon { font-size: 1.8rem; width: 44px; text-align: center; flex-shrink: 0; }
+    .upgrade-info { flex: 1; min-width: 0; }
+    .upgrade-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
+    .upgrade-desc { font-size: 0.75rem; color: var(--text-dim); }
+    .upgrade-cost { 
+      font-size: 0.8rem; font-weight: 700; color: var(--gold); 
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .upgrade-count { font-size: 0.7rem; color: var(--text-dim); margin-left: 4px; }
+
+    /* --- RESET BUTTON --- */
+    .reset-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: rgba(239, 68, 68, 0.6);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .reset-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239,68,68,0.5); }
+  </style>
+</head>
+<body>
+
+  <!-- Close Sigil -->
+  <a href="./index.html" class="close-sigil" aria-label="Return to Nexus Gate">✕</a>
+
+  <div class="container">
+    <!-- Realm & Qi Display -->
+    <div class="realm-display">
+      <div class="realm-title">Current Realm</div>
+      <div class="realm-name" id="realm-name">Mortal</div>
+      <div class="qi-display" id="qi-display">0</div>
+      <div class="qi-label">Qi Gathered</div>
+      <div class="qps-display" id="qps-display">0 Qi/sec</div>
+    </div>
+
+    <!-- Spirit Core -->
+    <div class="core-container">
+      <div class="spirit-core" id="core-btn">☯</div>
+    </div>
+
+    <!-- Upgrades -->
+    <div class="upgrades-panel">
+      <div class="panel-header">Cultivation Methods</div>
+      <div id="upgrades-list"></div>
+    </div>
+
+    <!-- Reset Progress -->
+    <button class="reset-btn" id="reset-btn">Sever Cultivation (Reset)</button>
+  </div>
+
+<script>
+// === SPIRIT CLICKER ENGINE ===
+
+const REALMS = [
+  { name: "Mortal", threshold: 0 },
+  { name: "Qi Condensation", threshold: 500 },
+  { name: "Foundation Establishment", threshold: 5000 },
+  { name: "Golden Core", threshold: 50000 },
+  { name: "Nascent Soul", threshold: 500000 },
+  { name: "Immortal Ascension", threshold: 5000000 }
+];
+
+const UPGRADES = [
+  { id: "mat", name: "Meditation Mat", icon: "🧘", desc: "+1 Qi/tap", baseCost: 15, costMult: 1.5, type: "tap", value: 1 },
+  { id: "array", name: "Spirit Array", icon: "🔮", desc: "+2 Qi/sec", baseCost: 100, costMult: 1.6, type: "auto", value: 2 },
+  { id: "pill", name: "Qi Pill", icon: "💊", desc: "+5 Qi/tap", baseCost: 500, costMult: 1.7, type: "tap", value: 5 },
+  { id: "elder", name: "Sect Elder", icon: "👴", desc: "+15 Qi/sec", baseCost: 2000, costMult: 1.8, type: "auto", value: 15 },
+  { id: "beast", name: "Spirit Beast", icon: "🐉", desc: "+50 Qi/sec", baseCost: 10000, costMult: 1.9, type: "auto", value: 50 },
+  { id: "heaven", name: "Heavenly Tribulation", icon: "⚡", desc: "+200 Qi/tap", baseCost: 50000, costMult: 2.0, type: "tap", value: 200 }
+];
+
+// State
+let state = {
+  qi: 0,
+  totalQi: 0,
+  upgrades: {}
+};
+
+// Initialize upgrade counts
+UPGRADES.forEach(u => { if (!(u.id in state.upgrades)) state.upgrades[u.id] = 0; });
+
+// DOM Elements
+const qiDisplay = document.getElementById('qi-display');
+const realmName = document.getElementById('realm-name');
+const qpsDisplay = document.getElementById('qps-display');
+const coreBtn = document.getElementById('core-btn');
+const upgradesList = document.getElementById('upgrades-list');
+const resetBtn = document.getElementById('reset-btn');
+
+// === LOAD / SAVE ===
+function loadGame() {
+  try {
+    const saved = localStorage.getItem('nexus-clicker-save');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      state.qi = parsed.qi || 0;
+      state.totalQi = parsed.totalQi || 0;
+      state.upgrades = parsed.upgrades || {};
+      // Ensure all upgrade keys exist
+      UPGRADES.forEach(u => { if (!(u.id in state.upgrades)) state.upgrades[u.id] = 0; });
+    }
+  } catch(e) { console.warn('Memory Crystal corrupted, starting fresh.'); }
+}
+
+function saveGame() {
+  try {
+    localStorage.setItem('nexus-clicker-save', JSON.stringify(state));
+  } catch(e) { console.warn('Failed to save to Memory Crystal.'); }
+}
+
+// === CALCULATIONS ===
+function getTapPower() {
+  let power = 1;
+  UPGRADES.filter(u => u.type === 'tap').forEach(u => {
+    power += (state.upgrades[u.id] || 0) * u.value;
+  });
+  return power;
+}
+
+function getAutoQiPerSec() {
+  let qps = 0;
+  UPGRADES.filter(u => u.type === 'auto').forEach(u => {
+    qps += (state.upgrades[u.id] || 0) * u.value;
+  });
+  return qps;
+}
+
+function getUpgradeCost(upgrade) {
+  const count = state.upgrades[upgrade.id] || 0;
+  return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMult, count));
+}
+
+function getCurrentRealm() {
+  let realm = REALMS[0];
+  for (const r of REALMS) {
+    if (state.totalQi >= r.threshold) realm = r;
+  }
+  return realm;
+}
+
+// === UI UPDATES ===
+function updateUI() {
+  qiDisplay.textContent = Math.floor(state.qi).toLocaleString();
+  realmName.textContent = getCurrentRealm().name;
+  qpsDisplay.textContent = `${getAutoQiPerSec().toLocaleString()} Qi/sec | ${getTapPower().toLocaleString()} Qi/tap`;
+  renderUpgrades();
+}
+
+function renderUpgrades() {
+  upgradesList.innerHTML = '';
+  UPGRADES.forEach(u => {
+    const cost = getUpgradeCost(u);
+    const count = state.upgrades[u.id] || 0;
+    const canAfford = state.qi >= cost;
+
+    const card = document.createElement('div');
+    card.className = `upgrade-card${canAfford ? '' : ' disabled'}`;
+    card.innerHTML = `
+      <div class="upgrade-icon">${u.icon}</div>
+      <div class="upgrade-info">
+        <div class="upgrade-name">${u.name}<span class="upgrade-count">×${count}</span></div>
+        <div class="upgrade-desc">${u.desc}</div>
+      </div>
+      <div class="upgrade-cost">${cost.toLocaleString()} Qi</div>
+    `;
+    card.addEventListener('click', () => buyUpgrade(u));
+    upgradesList.appendChild(card);
+  });
+}
+
+// === ACTIONS ===
+function tapCore(e) {
+  const power = getTapPower();
+  state.qi += power;
+  state.totalQi += power;
+  
+  // Floating number effect
+  spawnFloatingQi(e, power);
+  
+  updateUI();
+}
+
+function spawnFloatingQi(e, amount) {
+  const el = document.createElement('div');
+  el.className = 'float-qi';
+  el.textContent = `+${amount.toLocaleString()}`;
+  
+  // Position near tap/click
+  const rect = coreBtn.getBoundingClientRect();
+  const x = (e.clientX || (rect.left + rect.width/2)) - rect.left;
+  const y = (e.clientY || (rect.top + rect.height/2)) - rect.top;
+  
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+  coreBtn.parentElement.appendChild(el);
+  
+  setTimeout(() => el.remove(), 800);
+}
+
+function buyUpgrade(upgrade) {
+  const cost = getUpgradeCost(upgrade);
+  if (state.qi >= cost) {
+    state.qi -= cost;
+    state.upgrades[upgrade.id] = (state.upgrades[upgrade.id] || 0) + 1;
+    updateUI();
+    saveGame();
+  }
+}
+
+function resetGame() {
+  if (confirm('Sever your cultivation? All progress will be lost.')) {
+    state = { qi: 0, totalQi: 0, upgrades: {} };
+    UPGRADES.forEach(u => state.upgrades[u.id] = 0);
+    saveGame();
+    updateUI();
+  }
+}
+
+// === AUTO QI TICK ===
+setInterval(() => {
+  const qps = getAutoQiPerSec();
+  if (qps > 0) {
+    const tick = qps / 10; // 100ms intervals
+    state.qi += tick;
+    state.totalQi += tick;
+    updateUI();
+  }
+}, 100);
+
+// === AUTOSAVE EVERY 3 SECONDS ===
+setInterval(saveGame, 3000);
+
+// === EVENT LISTENERS ===
+coreBtn.addEventListener('pointerdown', tapCore); // pointerdown feels snappier than click on mobile
+resetBtn.addEventListener('click', resetGame);
+
+// Prevent double-tap zoom on core
+coreBtn.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+
+// === INIT ===
+loadGame();
+updateUI();
+
+</script>
+</body>
+</html>
