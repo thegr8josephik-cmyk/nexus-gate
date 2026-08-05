@@ -3,405 +3,1521 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Spirit Clicker | Nexus Gate</title>
+  <title>Dao Matrix | Nexus Gate</title>
   <link rel="apple-touch-icon" href="icons/icon-180.png?v=2">
   <style>
     :root {
       --bg: #090a0f;
-      --panel: rgba(255, 255, 255, 0.04);
-      --panel-hover: rgba(255, 255, 255, 0.08);
-      --border: rgba(255, 255, 255, 0.08);
+      --panel: rgba(255,255,255,0.04);
+      --panel-hover: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.08);
       --accent: #6366f1;
-      --accent-glow: rgba(99, 102, 241, 0.4);
+      --accent-glow: rgba(99,102,241,0.4);
       --text: #e2e8f0;
       --text-dim: #94a3b8;
       --gold: #fbbf24;
+      --orthodox: #3b82f6;
+      --demonic: #ef4444;
+      --chaotic: #f59e0b;
+      --body: #22c55e;
+      --spirit: #a855f7;
+      --void: #6b7280;
+      --sovereign: #f59e0b;
     }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Georgia", "Merriweather", serif;
-      min-height: 100dvh;
+      font-family: "Georgia","Merriweather",serif;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      overflow: hidden;
     }
 
-    /* --- CLOSE SIGIL --- */
-    .close-sigil {
+    /* HAMBURGER */
+    .hamburger {
       position: fixed;
-      top: max(env(safe-area-inset-top), 12px);
-      right: 16px;
-      z-index: 100;
+      top: max(env(safe-area-inset-top),12px);
+      left: 16px;
+      z-index: 200;
       width: 40px; height: 40px;
       background: var(--panel);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 1.3rem;
+    }
+    .close-sigil {
+      position: fixed;
+      top: max(env(safe-area-inset-top),12px);
+      right: 16px;
+      z-index: 200;
+      width: 40px; height: 40px;
+      background: var(--panel);
+      backdrop-filter: blur(12px);
       border: 1px solid var(--border);
       border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
       text-decoration: none;
       color: var(--text-dim);
+      font-size: 1.1rem;
+    }
+
+    /* DRAWER */
+    .drawer-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 300;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .drawer-overlay.active { opacity: 1; pointer-events: auto; }
+    .drawer {
+      position: fixed;
+      top: 0; left: -280px;
+      width: 280px; height: 100%;
+      background: #0d0f14;
+      border-right: 1px solid var(--border);
+      z-index: 301;
+      transition: left 0.3s ease;
+      padding: max(env(safe-area-inset-top),20px) 0 20px;
+      overflow-y: auto;
+    }
+    .drawer.active { left: 0; }
+    .drawer-title {
+      padding: 0 20px 16px;
       font-size: 1.2rem;
-      transition: all 0.2s ease;
+      font-weight: 800;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
     }
-    .close-sigil:hover { background: var(--panel-hover); color: var(--text); }
+    .drawer-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 0.95rem;
+    }
+    .drawer-item:hover { background: var(--panel-hover); }
+    .drawer-item.active { background: var(--panel); color: var(--accent); border-right: 3px solid var(--accent); }
+    .drawer-item .di-icon { font-size: 1.3rem; width: 30px; text-align: center; }
 
-    /* --- MAIN LAYOUT --- */
-    .container {
+    /* HEADER */
+    .stats-bar {
+      padding: max(env(safe-area-inset-top),12px) 16px 10px;
+      padding-left: 60px;
+      background: linear-gradient(to bottom, rgba(9,10,15,0.95), rgba(9,10,15,0.8));
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+    }
+    .realm-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
+    .realm-name { font-size: 1rem; font-weight: 700; color: var(--accent); }
+    .currency-row { display: flex; gap: 10px; font-size: 0.7rem; }
+    .currency-badge { padding: 2px 8px; border-radius: 10px; border: 1px solid; }
+    .cb-insight { color: var(--gold); border-color: rgba(251,191,36,0.3); background: rgba(251,191,36,0.1); }
+    .cb-stones { color: #a78bfa; border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.1); }
+    .qi-main { font-size: 1.6rem; font-weight: 800; margin: 2px 0; }
+    .qi-sub { font-size: 0.7rem; color: var(--text-dim); display: flex; gap: 12px; }
+
+    /* MAIN CONTENT */
+    .main-content {
       flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 70px 20px 30px;
-      gap: 24px;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: none;
     }
+    .main-content::-webkit-scrollbar { display: none; }
 
-    /* --- REALM DISPLAY --- */
-    .realm-display {
-      text-align: center;
-      padding: 16px 24px;
-      background: var(--panel);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 400px;
-    }
-    .realm-title { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
-    .realm-name { font-size: 1.5rem; font-weight: 700; color: var(--accent); text-shadow: 0 0 20px var(--accent-glow); }
-    .qi-display { margin-top: 12px; font-size: 2rem; font-weight: 700; }
-    .qi-label { font-size: 0.85rem; color: var(--text-dim); }
-    .qps-display { font-size: 0.8rem; color: var(--gold); margin-top: 4px; }
-
-    /* --- CORE BUTTON --- */
-    .core-container { position: relative; margin: 10px 0; }
+    /* CORE VIEW */
+    .core-view { display: flex; flex-direction: column; align-items: center; gap: 20px; padding-top: 10px; }
     .spirit-core {
-      width: 180px; height: 180px;
+      width: 150px; height: 150px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, var(--accent), #312e81);
-      border: 3px solid rgba(99, 102, 241, 0.3);
-      box-shadow: 0 0 40px var(--accent-glow), inset 0 0 30px rgba(0,0,0,0.3);
+      border: 3px solid rgba(99,102,241,0.3);
+      box-shadow: 0 0 40px var(--accent-glow);
       cursor: pointer;
-      transition: transform 0.1s ease, box-shadow 0.2s ease;
       display: flex; align-items: center; justify-content: center;
-      font-size: 3rem;
+      font-size: 2.8rem;
       user-select: none;
-      -webkit-user-select: none;
+      transition: transform 0.05s;
+      position: relative;
     }
-    .spirit-core:active { transform: scale(0.93); box-shadow: 0 0 60px var(--accent-glow); }
-    .spirit-core::after {
-      content: ''; position: absolute; inset: -8px;
-      border-radius: 50%;
-      border: 1px solid rgba(99, 102, 241, 0.15);
-      animation: pulse-ring 3s ease-in-out infinite;
-    }
-
-    @keyframes pulse-ring {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.08); opacity: 0.2; }
-    }
-
-    /* --- FLOATING QI NUMBERS --- */
+    .spirit-core:active { transform: scale(0.92); }
     .float-qi {
-      position: absolute;
-      color: var(--gold);
-      font-weight: 700;
-      font-size: 1.3rem;
-      pointer-events: none;
-      animation: floatUp 0.8s ease-out forwards;
+      position: absolute; color: var(--gold); font-weight: 700; font-size: 1.1rem;
+      pointer-events: none; animation: floatUp 0.8s ease-out forwards;
     }
     @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-60px) scale(0.7); }
+      0% { opacity:1; transform: translateY(0) scale(1); }
+      100% { opacity:0; transform: translateY(-50px) scale(0.7); }
     }
+    .click-progress { width: 100%; max-width: 300px; }
+    .cp-bar { height: 6px; background: var(--panel); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+    .cp-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.2s; }
+    .cp-label { font-size: 0.7rem; color: var(--text-dim); text-align: center; margin-top: 4px; }
 
-    /* --- UPGRADES PANEL --- */
-    .upgrades-panel {
-      width: 100%;
-      max-width: 400px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+    /* ACTIVE SKILLS ROW */
+    .skills-row {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+      padding: 10px 0;
     }
-    .panel-header {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      color: var(--text-dim);
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .upgrade-card {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 14px 16px;
-      background: var(--panel);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
+    .skill-btn {
+      width: 50px; height: 50px;
       border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
       cursor: pointer;
-      transition: all 0.2s ease;
-      user-select: none;
-    }
-    .upgrade-card:hover { background: var(--panel-hover); border-color: rgba(99,102,241,0.2); }
-    .upgrade-card.disabled { opacity: 0.4; pointer-events: none; }
-    .upgrade-card:active { transform: scale(0.98); }
-
-    .upgrade-icon { font-size: 1.8rem; width: 44px; text-align: center; flex-shrink: 0; }
-    .upgrade-info { flex: 1; min-width: 0; }
-    .upgrade-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
-    .upgrade-desc { font-size: 0.75rem; color: var(--text-dim); }
-    .upgrade-cost { 
-      font-size: 0.8rem; font-weight: 700; color: var(--gold); 
-      white-space: nowrap; flex-shrink: 0;
-    }
-    .upgrade-count { font-size: 0.7rem; color: var(--text-dim); margin-left: 4px; }
-
-    /* --- RESET BUTTON --- */
-    .reset-btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: transparent;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: rgba(239, 68, 68, 0.6);
-      border-radius: 8px;
-      font-family: inherit;
-      font-size: 0.75rem;
-      cursor: pointer;
+      position: relative;
       transition: all 0.2s;
     }
-    .reset-btn:hover { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: rgba(239,68,68,0.5); }
+    .skill-btn.locked { opacity: 0.3; pointer-events: none; }
+    .skill-btn.on-cd { opacity: 0.5; }
+    .skill-btn .cd-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.6);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; color: white;
+    }
+    .skill-btn .skill-tip {
+      position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
+      font-size: 0.55rem; color: var(--text-dim); white-space: nowrap;
+    }
+
+    /* CARDS */
+    .list-view { display: flex; flex-direction: column; gap: 10px; padding-bottom: 40px; }
+    .section-title {
+      font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--text-dim); margin: 12px 0 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px;
+    }
+    .card {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer; transition: all 0.2s;
+      position: relative;
+    }
+    .card:active { transform: scale(0.98); background: var(--panel-hover); }
+    .card.disabled { opacity: 0.4; pointer-events: none; }
+    .card.locked { opacity: 0.5; }
+    .card-icon { font-size: 1.5rem; width: 36px; text-align: center; flex-shrink: 0; }
+    .card-info { flex: 1; min-width: 0; }
+    .card-title { font-weight: 700; font-size: 0.9rem; }
+    .card-desc { font-size: 0.7rem; color: var(--text-dim); margin-top: 2px; }
+    .card-cost { font-size: 0.7rem; font-weight: 700; color: var(--gold); margin-top: 3px; }
+    .card-right { text-align: right; flex-shrink: 0; }
+
+    /* PATH BORDERS */
+    .path-orthodox { border-left: 4px solid var(--orthodox); }
+    .path-demonic { border-left: 4px solid var(--demonic); }
+    .path-chaotic { border-left: 4px solid var(--chaotic); }
+    .path-body { border-left: 4px solid var(--body); }
+    .path-spirit { border-left: 4px solid var(--spirit); }
+    .path-void { border-left: 4px solid var(--void); }
+    .path-sovereign { border-left: 4px solid var(--sovereign); }
+
+    /* QUEST CARDS */
+    .quest-card { border-left: 4px solid var(--accent); }
+    .quest-progress { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 6px; }
+    .quest-fill { height: 100%; background: var(--accent); border-radius: 2px; }
+    .quest-claim {
+      padding: 6px 12px; background: var(--accent); color: white;
+      border: none; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+    }
+    .quest-claim:disabled { opacity: 0.4; }
+
+    /* SHOP */
+    .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .shop-item {
+      padding: 12px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .shop-item:active { transform: scale(0.96); }
+    .shop-item.disabled { opacity: 0.4; pointer-events: none; }
+    .shop-item .si-icon { font-size: 2rem; margin-bottom: 6px; }
+    .shop-item .si-name { font-size: 0.8rem; font-weight: 700; }
+    .shop-item .si-desc { font-size: 0.65rem; color: var(--text-dim); margin: 4px 0; }
+    .shop-item .si-cost { font-size: 0.75rem; color: #a78bfa; font-weight: 700; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+      background: var(--panel); border: 1px solid var(--accent); backdrop-filter: blur(10px);
+      padding: 10px 20px; border-radius: 12px; font-weight: 700; color: var(--accent);
+      opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 500;
+      text-align: center; font-size: 0.85rem; max-width: 90%;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+      display: none; align-items: center; justify-content: center; z-index: 400; padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+      background: #13151a; border: 1px solid var(--accent); border-radius: 16px;
+      padding: 24px; max-width: 340px; width: 100%; text-align: center;
+    }
+    .modal-title { font-size: 1.2rem; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
+    .modal-desc { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 16px; line-height: 1.5; }
+    .modal-input {
+      width: 100%; padding: 12px; background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-family: inherit; font-size: 1rem;
+      text-align: center; margin-bottom: 12px; outline: none;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-btns { display: flex; gap: 10px; }
+    .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; font-family: inherit; font-weight: 700; cursor: pointer; font-size: 0.85rem; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-secondary { background: var(--panel); color: var(--text); border: 1px solid var(--border); }
+    .btn-gold { background: var(--gold); color: #000; }
+
+    /* CORRUPTION BAR */
+    .corruption-bar {
+      width: 100%; max-width: 300px; margin-top: 8px;
+      padding: 8px 12px; background: rgba(107,114,128,0.1);
+      border: 1px solid rgba(107,114,128,0.3); border-radius: 8px;
+      font-size: 0.7rem; color: var(--void); text-align: center;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Close Sigil -->
-  <a href="./index.html" class="close-sigil" aria-label="Return to Nexus Gate">✕</a>
+  <!-- HAMBURGER -->
+  <div class="hamburger" onclick="toggleDrawer()">☰</div>
+  <a href="./index.html" class="close-sigil">✕</a>
 
-  <div class="container">
-    <!-- Realm & Qi Display -->
-    <div class="realm-display">
-      <div class="realm-title">Current Realm</div>
+  <!-- DRAWER -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="toggleDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-title">☰ Nexus Gate</div>
+    <div class="drawer-item active" data-view="core"><span class="di-icon">☯</span> Core</div>
+    <div class="drawer-item" data-view="forge"><span class="di-icon">⚒️</span> Forge</div>
+    <div class="drawer-item" data-view="dao"><span class="di-icon">🌌</span> Dao Matrix</div>
+    <div class="drawer-item" data-view="mystic"><span class="di-icon">🎲</span> Mystic</div>
+    <div class="drawer-item" data-view="evolution"><span class="di-icon">🧬</span> Evolution</div>
+    <div class="drawer-item" data-view="quests"><span class="di-icon">📜</span> Quests</div>
+    <div class="drawer-item" data-view="shop"><span class="di-icon">🏪</span> Shop</div>
+    <div class="drawer-item" data-view="ascend"><span class="di-icon">🔥</span> Ascend</div>
+  </div>
+
+  <!-- HEADER -->
+  <div class="stats-bar">
+    <div class="realm-row">
       <div class="realm-name" id="realm-name">Mortal</div>
-      <div class="qi-display" id="qi-display">0</div>
-      <div class="qi-label">Qi Gathered</div>
-      <div class="qps-display" id="qps-display">0 Qi/sec</div>
+      <div class="currency-row">
+        <span class="currency-badge cb-insight" id="insight-badge">✨ 0</span>
+        <span class="currency-badge cb-stones" id="stones-badge">💎 0</span>
+      </div>
     </div>
-
-    <!-- Spirit Core -->
-    <div class="core-container">
-      <div class="spirit-core" id="core-btn">☯</div>
+    <div class="qi-main" id="qi-main">0</div>
+    <div class="qi-sub">
+      <span id="qps-display">0 Qi/sec</span>
+      <span id="tap-display">1 Qi/tap</span>
     </div>
+  </div>
 
-    <!-- Upgrades -->
-    <div class="upgrades-panel">
-      <div class="panel-header">Cultivation Methods</div>
-      <div id="upgrades-list"></div>
+  <!-- MAIN CONTENT -->
+  <div class="main-content" id="main-content"></div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- MODALS -->
+  <div class="modal-overlay" id="modal-generic">
+    <div class="modal-box">
+      <div class="modal-title" id="modal-title">Title</div>
+      <div class="modal-desc" id="modal-desc">Description</div>
+      <input class="modal-input" id="modal-input" style="display:none;" placeholder="Enter code...">
+      <div class="modal-btns" id="modal-btns"></div>
     </div>
-
-    <!-- Reset Progress -->
-    <button class="reset-btn" id="reset-btn">Sever Cultivation (Reset)</button>
   </div>
 
 <script>
-// === SPIRIT CLICKER ENGINE ===
+// ============================================
+// DAO MATRIX - COMPLETE GAME ENGINE
+// ============================================
 
+// === CONSTANTS ===
 const REALMS = [
-  { name: "Mortal", threshold: 0 },
-  { name: "Qi Condensation", threshold: 500 },
-  { name: "Foundation Establishment", threshold: 5000 },
-  { name: "Golden Core", threshold: 50000 },
-  { name: "Nascent Soul", threshold: 500000 },
-  { name: "Immortal Ascension", threshold: 5000000 }
+  { name:"Mortal", threshold:0, insight:0 },
+  { name:"Qi Condensation", threshold:1000, insight:2 },
+  { name:"Foundation Establishment", threshold:15000, insight:5 },
+  { name:"Golden Core", threshold:150000, insight:10 },
+  { name:"Nascent Soul", threshold:1500000, insight:25 },
+  { name:"Immortal Ascension", threshold:20000000, insight:100 }
 ];
 
 const UPGRADES = [
-  { id: "mat", name: "Meditation Mat", icon: "🧘", desc: "+1 Qi/tap", baseCost: 15, costMult: 1.5, type: "tap", value: 1 },
-  { id: "array", name: "Spirit Array", icon: "🔮", desc: "+2 Qi/sec", baseCost: 100, costMult: 1.6, type: "auto", value: 2 },
-  { id: "pill", name: "Qi Pill", icon: "💊", desc: "+5 Qi/tap", baseCost: 500, costMult: 1.7, type: "tap", value: 5 },
-  { id: "elder", name: "Sect Elder", icon: "👴", desc: "+15 Qi/sec", baseCost: 2000, costMult: 1.8, type: "auto", value: 15 },
-  { id: "beast", name: "Spirit Beast", icon: "🐉", desc: "+50 Qi/sec", baseCost: 10000, costMult: 1.9, type: "auto", value: 50 },
-  { id: "heaven", name: "Heavenly Tribulation", icon: "⚡", desc: "+200 Qi/tap", baseCost: 50000, costMult: 2.0, type: "tap", value: 200 }
+  { id:"mat", name:"Meditation Mat", icon:"🧘", desc:"+1 Qi/tap", baseCost:15, costMult:1.5, type:"tap", value:1 },
+  { id:"array", name:"Spirit Array", icon:"🔮", desc:"+5 Qi/sec", baseCost:100, costMult:1.6, type:"auto", value:5 },
+  { id:"pill", name:"Qi Pill", icon:"💊", desc:"+10 Qi/tap", baseCost:1000, costMult:1.7, type:"tap", value:10 },
+  { id:"elder", name:"Sect Elder", icon:"👴", desc:"+50 Qi/sec", baseCost:5000, costMult:1.8, type:"auto", value:50 },
+  { id:"beast", name:"Spirit Beast", icon:"🐉", desc:"+200 Qi/sec", baseCost:25000, costMult:1.9, type:"auto", value:200 },
+  { id:"heaven", name:"Heavenly Forge", icon:"⚡", desc:"+1000 Qi/sec", baseCost:100000, costMult:2.0, type:"auto", value:1000 }
 ];
 
-// State
+const SKILL_TREE = [
+  // ORTHODOX (5 nodes)
+  { id:"O1", path:"orthodox", name:"Clear Heart", desc:"+20% Qi/sec", cost:1, requires:[], effect:{qps_mult:0.2} },
+  { id:"O2", path:"orthodox", name:"Sect Harmony", desc:"+40% Qi/sec", cost:2, requires:["O1"], effect:{qps_mult:0.4} },
+  { id:"O3", path:"orthodox", name:"Righteous Aura", desc:"+60% Qi/sec, requires Spirit 1", cost:3, requires:["O2","S1"], effect:{qps_mult:0.6} },
+  { id:"O4", path:"orthodox", name:"Celestial Law", desc:"+100% Qi/sec", cost:5, requires:["O3"], effect:{qps_mult:1.0} },
+  { id:"O5", path:"orthodox", name:"Dao of Peace", desc:"+200% Qi/sec", cost:8, requires:["O4"], effect:{qps_mult:2.0} },
+  // DEMONIC (5 nodes)
+  { id:"D1", path:"demonic", name:"Blood Ignition", desc:"+100% Qi/tap, -20% Qi/sec", cost:1, requires:[], effect:{tap_mult:1.0, qps_mult:-0.2} },
+  { id:"D2", path:"demonic", name:"Soul Siphon", desc:"5% chance 10x tap", cost:2, requires:["D1"], effect:{tap_crit:0.05} },
+  { id:"D3", path:"demonic", name:"Blood Fury", desc:"+200% Qi/tap", cost:4, requires:["D2"], effect:{tap_mult:2.0} },
+  { id:"D4", path:"demonic", name:"Demon Lord", desc:"+300% tap, requires Body 2", cost:6, requires:["D3","B2"], effect:{tap_mult:3.0} },
+  { id:"D5", path:"demonic", name:"Asura Rebirth", desc:"+500% tap, -50% QPS", cost:10, requires:["D4"], effect:{tap_mult:5.0, qps_mult:-0.5} },
+  // CHAOTIC (5 nodes)
+  { id:"C1", path:"chaotic", name:"Tribulation Surf", desc:"Taps yield 0.1x-5x randomly", cost:1, requires:[], effect:{tap_variance:true} },
+  { id:"C2", path:"chaotic", name:"Storm Gambit", desc:"Wider range: 0.5x-8x", cost:2, requires:["C1"], effect:{tap_variance2:true} },
+  { id:"C3", path:"chaotic", name:"Fate Weaver", desc:"+10% rare roll chance", cost:3, requires:["C2"], effect:{luck:0.1} },
+  { id:"C4", path:"chaotic", name:"Chaos Theory", desc:"All RNG rewards +50%", cost:5, requires:["C3"], effect:{rng_bonus:0.5} },
+  { id:"C5", path:"chaotic", name:"Primordial Chaos", desc:"Taps never roll below 2x", cost:8, requires:["C4"], effect:{tap_floor:true} },
+  // BODY (5 nodes)
+  { id:"B1", path:"body", name:"Iron Skin", desc:"+50% Qi/tap", cost:1, requires:[], effect:{tap_mult:0.5} },
+  { id:"B2", path:"body", name:"Steel Bones", desc:"+100% Qi/tap", cost:2, requires:["B1"], effect:{tap_mult:1.0} },
+  { id:"B3", path:"body", name:"Titan Fist", desc:"+200% Qi/tap", cost:4, requires:["B2"], effect:{tap_mult:2.0} },
+  { id:"B4", path:"body", name:"Immortal Body", desc:"+300% tap, +50% QPS", cost:6, requires:["B3"], effect:{tap_mult:3.0, qps_mult:0.5} },
+  { id:"B5", path:"body", name:"Pangu's Might", desc:"+500% Qi/tap", cost:10, requires:["B4"], effect:{tap_mult:5.0} },
+  // SPIRIT (5 nodes)
+  { id:"S1", path:"spirit", name:"Mind's Eye", desc:"+50% Insight gain", cost:1, requires:[], effect:{insight_mult:0.5} },
+  { id:"S2", path:"spirit", name:"Astral Projection", desc:"+100% Insight gain", cost:2, requires:["S1"], effect:{insight_mult:1.0} },
+  { id:"S3", path:"spirit", name:"Soul Expansion", desc:"Skills cost 1 less Insight (min 1)", cost:4, requires:["S2"], effect:{skill_discount:true} },
+  { id:"S4", path:"spirit", name:"Cosmic Mind", desc:"+200% Insight gain", cost:6, requires:["S3"], effect:{insight_mult:2.0} },
+  { id:"S5", path:"spirit", name:"Omniscience", desc:"Unlock all quest rewards +50%", cost:10, requires:["S4"], effect:{quest_bonus:0.5} },
+  // VOID (5 nodes)
+  { id:"V1", path:"void", name:"Void Whisper", desc:"+100% all Qi, +1 Corruption. Requires 2 skills from different paths.", cost:3, requires:["ANY2"], effect:{all_mult:1.0, corruption:1} },
+  { id:"V2", path:"void", name:"Null Space", desc:"+200% tap, +1 Corruption", cost:4, requires:["V1"], effect:{tap_mult:2.0, corruption:1} },
+  { id:"V3", path:"void", name:"Entropy", desc:"+300% QPS, +2 Corruption", cost:5, requires:["V2"], effect:{qps_mult:3.0, corruption:2} },
+  { id:"V4", path:"void", name:"Void Consumption", desc:"Steal 50% QPS, add to tap. +2 Corruption", cost:7, requires:["V3"], effect:{void_steal:true, corruption:2} },
+  { id:"V5", path:"void", name:"Absolute Void", desc:"+1000% all Qi, +3 Corruption", cost:12, requires:["V4"], effect:{all_mult:10.0, corruption:3} },
+  // SOVEREIGN (5 nodes) - SECRET PATH
+  { id:"SV1", path:"sovereign", name:"Sovereign's Decree", desc:"+200% all Qi gains", cost:0, requires:[], effect:{all_mult:2.0} },
+  { id:"SV2", path:"sovereign", name:"Time Sovereignty", desc:"All skill cooldowns halved", cost:0, requires:["SV1"], effect:{cd_halved:true} },
+  { id:"SV3", path:"sovereign", name:"Reality Warp", desc:"Jade Slips every 50 clicks", cost:0, requires:["SV2"], effect:{slip_rate:50} },
+  { id:"SV4", path:"sovereign", name:"Infinite Insight", desc:"+10 Insight per Realm breakthrough", cost:0, requires:["SV3"], effect:{insight_flat:10} },
+  { id:"SV5", path:"sovereign", name:"Nexus Ascension", desc:"Unlock Nexus species. +500% everything.", cost:0, requires:["SV4"], effect:{all_mult:5.0, nexus_species:true} },
+  // HYBRID SKILLS
+  { id:"H1", path:"orthodox", name:"Blood Meditation", desc:"+80% QPS AND +80% tap", cost:4, requires:["O2","D2"], effect:{qps_mult:0.8, tap_mult:0.8} },
+  { id:"H2", path:"chaotic", name:"Storm Body", desc:"Taps always 3x-5x", cost:4, requires:["B2","C2"], effect:{tap_stable:true} },
+  { id:"H3", path:"spirit", name:"Soul Forge", desc:"+150% Insight, +50% tap", cost:5, requires:["S2","B3"], effect:{insight_mult:1.5, tap_mult:0.5} },
+  { id:"H4", path:"void", name:"Void Consumption", desc:"Steal 10% QPS → tap power", cost:5, requires:["V1","D3"], effect:{void_steal_small:true} },
+  { id:"H5", path:"chaotic", name:"Enlightened Chaos", desc:"RNG rewards doubled", cost:6, requires:["S3","C3"], effect:{rng_double:true} },
+  { id:"H6", path:"orthodox", name:"Iron Doctrine", desc:"+250% QPS, immune to negative effects", cost:6, requires:["O3","B3"], effect:{qps_mult:2.5, immune:true} }
+];
+
+const SPECIES = [
+  { id:"human", name:"Human", icon:"☯", cost:{}, desc:"No bonus. The beginning.", bonus:{} },
+  { id:"fox", name:"Spirit Fox", icon:"🦊", cost:{qi:10000}, desc:"+15% Qi/tap", bonus:{tap_mult:0.15} },
+  { id:"golem", name:"Stone Golem", icon:"🪨", cost:{qi:50000}, desc:"+25% Qi/sec", bonus:{qps_mult:0.25} },
+  { id:"dragon", name:"Dragon", icon:"🐉", cost:{qi:200000, insight:10}, desc:"+35% All Qi", bonus:{all_mult:0.35} },
+  { id:"phoenix", name:"Phoenix", icon:"🔥", cost:{qi:1000000, insight:30}, desc:"+60% Global Mult", bonus:{all_mult:0.6} },
+  { id:"celestial", name:"Celestial", icon:"🌟", cost:{reincarnations:3}, desc:"+100% Insight Gain", bonus:{insight_mult:1.0} },
+  { id:"voidwalker", name:"Void Walker", icon:"🕳️", cost:{qi:10000000, insight:100}, desc:"+250% Tap, -50% QPS", bonus:{tap_mult:2.5, qps_mult:-0.5} },
+  { id:"nexus", name:"Nexus Being", icon:"💠", cost:{secret:true}, desc:"+500% Everything. Sovereign only.", bonus:{all_mult:5.0} }
+];
+
+const ACTIVE_SKILLS = [
+  { id:"meditation", name:"Meditation", icon:"🧘", desc:"2x Qi/sec for 30s", cd:300, duration:30, effect:"qps_double", unlock:"free" },
+  { id:"qi_burst", name:"Qi Burst", icon:"💥", desc:"Gain 1 min of QPS instantly", cd:180, effect:"qi_burst", unlock:"quest:First Steps" },
+  { id:"blood_fury", name:"Blood Fury", icon:"🩸", desc:"5x tap for 20s, lose 5% Qi", cd:600, duration:20, effect:"tap_5x", unlock:"demonic3" },
+  { id:"time_fold", name:"Time Fold", icon:"⏳", desc:"Gain 10 min of QPS", cd:3600, effect:"time_fold", unlock:"quest:Time Weaver" },
+  { id:"insight_flash", name:"Insight Flash", icon:"💡", desc:"+1 Dao Insight", cd:1800, effect:"insight_gain", unlock:"quest:Scholar's Path" },
+  { id:"golden_touch", name:"Golden Touch", icon:"✨", desc:"Next 10 taps give 10x", cd:900, effect:"golden_touch", unlock:"shop:50" },
+  { id:"spirit_surge", name:"Spirit Surge", icon:"🐉", desc:"+50% all Qi for 60s", cd:480, duration:60, effect:"surge", unlock:"species:dragon" },
+  { id:"void_step", name:"Void Step", icon:"🕳️", desc:"+100K Qi, +1 Corruption", cd:1200, effect:"void_step", unlock:"void2" }
+];
+
+const SHOP_ITEMS = [
+  // Pills
+  { id:"qi_pill", cat:"Pills", name:"Qi Gathering Pill", icon:"💊", desc:"+100% QPS for 5 min", cost:3, type:"consumable", effect:"qps_pill" },
+  { id:"enlighten_pill", cat:"Pills", name:"Enlightenment Pill", icon:"🌟", desc:"+1 Dao Insight", cost:5, type:"consumable", effect:"insight_pill" },
+  { id:"body_pill", cat:"Pills", name:"Body Tempering Pill", icon:"💪", desc:"+10% tap permanently", cost:8, type:"consumable", effect:"tap_perm" },
+  { id:"cleanse_pill", cat:"Pills", name:"Cleansing Pill", icon:"🌿", desc:"Remove all Corruption", cost:10, type:"consumable", effect:"cleanse" },
+  { id:"rebirth_pill", cat:"Pills", name:"Rebirth Pill", icon:"🔥", desc:"Keep skills on next Reincarnation", cost:25, type:"consumable", effect:"rebirth_keep" },
+  // Refiners
+  { id:"bronze_ref", cat:"Refiners", name:"Bronze Refiner", icon:"🥉", desc:"+10% Qi/sec", cost:5, type:"equipment", effect:{qps_mult:0.1} },
+  { id:"silver_ref", cat:"Refiners", name:"Silver Refiner", icon:"🥈", desc:"+25% Qi/sec", cost:15, type:"equipment", effect:{qps_mult:0.25} },
+  { id:"gold_ref", cat:"Refiners", name:"Gold Refiner", icon:"🥇", desc:"+50% Qi/sec", cost:40, type:"equipment", effect:{qps_mult:0.5} },
+  { id:"jade_ref", cat:"Refiners", name:"Jade Refiner", icon:"💚", desc:"+75% QPS, +10% Insight", cost:80, type:"equipment", effect:{qps_mult:0.75, insight_mult:0.1} },
+  { id:"void_ref", cat:"Refiners", name:"Void Refiner", icon:"🖤", desc:"+150% QPS, +1 Corruption", cost:150, type:"equipment", effect:{qps_mult:1.5, corruption:1} },
+  // Artifacts
+  { id:"lucky_charm", cat:"Artifacts", name:"Lucky Charm", icon:"🍀", desc:"+5% rare drop rate", cost:20, type:"artifact", effect:{luck:0.05} },
+  { id:"slip_magnet", cat:"Artifacts", name:"Jade Slip Magnet", icon:"🧲", desc:"Slips every 80 clicks", cost:40, type:"artifact", effect:{slip_rate:80} },
+  { id:"soul_lantern", cat:"Artifacts", name:"Soul Lantern", icon:"🏮", desc:"Keep 3 skills on Reincarnation", cost:50, type:"artifact", effect:{keep_skills:3} },
+  { id:"void_seal", cat:"Artifacts", name:"Void Seal", icon:"🔮", desc:"Unlock Void Path immediately", cost:100, type:"artifact", effect:{unlock_void:true} }
+];
+
+const QUESTS = [
+  // Progression
+  { id:"q_first_steps", cat:"Progression", name:"First Steps", desc:"Tap the core 10 times", type:"clicks", target:10, reward:{stones:1, skill:"qi_burst"}, oneTime:true },
+  { id:"q_cultivation", cat:"Progression", name:"Cultivation Begins", desc:"Reach 1,000 Qi", type:"totalQi", target:1000, reward:{stones:2}, oneTime:true },
+  { id:"q_forge", cat:"Progression", name:"The Forge", desc:"Buy your first upgrade", type:"upgrades", target:1, reward:{stones:1}, oneTime:true },
+  { id:"q_breakthrough", cat:"Progression", name:"Breaking Through", desc:"Reach Qi Condensation", type:"realm", target:1, reward:{stones:3}, oneTime:true },
+  { id:"q_path", cat:"Progression", name:"Path Chosen", desc:"Unlock first Skill Tree node", type:"skills", target:1, reward:{stones:2}, oneTime:true },
+  { id:"q_jade", cat:"Progression", name:"Jade Collector", desc:"Earn your first Jade Slip", type:"slips", target:1, reward:{stones:1}, oneTime:true },
+  { id:"q_gambler", cat:"Progression", name:"Gambler's Heart", desc:"Roll a Gift Voucher", type:"rolls", target:1, reward:{stones:3}, oneTime:true },
+  { id:"q_golden", cat:"Progression", name:"Golden Ambition", desc:"Merge 5 Jade Slips", type:"merges", target:1, reward:{stones:2}, oneTime:true },
+  { id:"q_evolution", cat:"Progression", name:"Evolution", desc:"Evolve into a new species", type:"evolutions", target:1, reward:{stones:5}, oneTime:true },
+  { id:"q_scholar", cat:"Progression", name:"Scholar's Path", desc:"Unlock 5 Skill Tree nodes", type:"skills", target:5, reward:{stones:3, skill:"insight_flash"}, oneTime:true },
+  { id:"q_time", cat:"Progression", name:"Time Weaver", desc:"Play for 30 minutes", type:"playtime", target:1800, reward:{stones:3, skill:"time_fold"}, oneTime:true },
+  { id:"q_rebirth", cat:"Progression", name:"Rebirth", desc:"Reincarnate for the first time", type:"reincarnations", target:1, reward:{stones:10}, oneTime:true },
+  { id:"q_void", cat:"Progression", name:"Void Toucher", desc:"Unlock a Void skill", type:"void_skills", target:1, reward:{stones:3}, oneTime:true },
+  { id:"q_ascendant", cat:"Progression", name:"Ascendant", desc:"Reach Immortal Ascension", type:"realm", target:5, reward:{stones:20}, oneTime:true },
+  // Repeatable
+  { id:"r_diligent", cat:"Repeatable", name:"Diligent Cultivator", desc:"Tap 500 times", type:"clicks_session", target:500, reward:{stones:1}, repeatable:true, cd:1800 },
+  { id:"r_hoarder", cat:"Repeatable", name:"Qi Hoarder", desc:"Accumulate 50,000 Qi", type:"qi_session", target:50000, reward:{stones:2}, repeatable:true, cd:3600 },
+  { id:"r_study", cat:"Repeatable", name:"Scholar's Study", desc:"Buy 3 Skill nodes", type:"skills_session", target:3, reward:{stones:3}, repeatable:true, cd:7200 },
+  { id:"r_lucky", cat:"Repeatable", name:"Lucky Draw", desc:"Roll 3 Vouchers", type:"rolls_session", target:3, reward:{stones:2}, repeatable:true, cd:3600 },
+  // Achievements
+  { id:"a_click10k", cat:"Achievement", name:"Click Master", desc:"10,000 total clicks", type:"clicks", target:10000, reward:{stones:5}, oneTime:true },
+  { id:"a_million", cat:"Achievement", name:"Millionaire", desc:"1,000,000 total Qi", type:"totalQi", target:1000000, reward:{stones:10}, oneTime:true },
+  { id:"a_dao15", cat:"Achievement", name:"Dao Seeker", desc:"Unlock 15 Skill nodes", type:"skills", target:15, reward:{stones:5}, oneTime:true },
+  { id:"a_dao_all", cat:"Achievement", name:"Dao Master", desc:"Unlock all Skill nodes", type:"skills", target:36, reward:{stones:50}, oneTime:true },
+  { id:"a_species3", cat:"Achievement", name:"Collector", desc:"Unlock 3 species", type:"species_count", target:3, reward:{stones:5}, oneTime:true },
+  { id:"a_species_all", cat:"Achievement", name:"Completionist", desc:"Unlock all species", type:"species_count", target:8, reward:{stones:15}, oneTime:true },
+  { id:"a_reborn5", cat:"Achievement", name:"Reborn Legend", desc:"Reincarnate 5 times", type:"reincarnations", target:5, reward:{stones:20}, oneTime:true },
+  { id:"a_corrupt5", cat:"Achievement", name:"Void Consumed", desc:"Reach Corruption 5", type:"corruption", target:5, reward:{stones:5, title:"Void Consumed"}, oneTime:true }
+];
+
+// === STATE ===
+const SECRET_CODE = "SECTLEADER";
 let state = {
-  qi: 0,
-  totalQi: 0,
-  upgrades: {}
+  qi:0, totalQi:0, insight:0, stones:0,
+  reincarnations:0, globalMult:1,
+  upgrades:{}, skills:[], species:"human", unlockedSpecies:["human"],
+  activeSkills:[], skillCooldowns:{},
+  clicks:0, clicksToSlip:0, jadeSlips:0, giftVouchers:0, goldenVouchers:0,
+  totalRolls:0, totalMerges:0, totalEvolutions:0,
+  corruption:0, title:"", sovereignUnlocked:false,
+  identityCode:"", playtime:0,
+  questProgress:{}, questCompleted:{}, questCooldowns:{},
+  sessionClicks:0, sessionQi:0, sessionSkills:0, sessionRolls:0,
+  goldenTouchTaps:0, activeBuffs:{},
+  equipment:null, artifacts:[], rebirthKeepSkills:false
 };
 
-// Initialize upgrade counts
-UPGRADES.forEach(u => { if (!(u.id in state.upgrades)) state.upgrades[u.id] = 0; });
+let currentView = "core";
+let lastTick = Date.now();
 
-// DOM Elements
-const qiDisplay = document.getElementById('qi-display');
-const realmName = document.getElementById('realm-name');
-const qpsDisplay = document.getElementById('qps-display');
-const coreBtn = document.getElementById('core-btn');
-const upgradesList = document.getElementById('upgrades-list');
-const resetBtn = document.getElementById('reset-btn');
-
-// === LOAD / SAVE ===
-function loadGame() {
-  try {
-    const saved = localStorage.getItem('nexus-clicker-save');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      state.qi = parsed.qi || 0;
-      state.totalQi = parsed.totalQi || 0;
-      state.upgrades = parsed.upgrades || {};
-      // Ensure all upgrade keys exist
-      UPGRADES.forEach(u => { if (!(u.id in state.upgrades)) state.upgrades[u.id] = 0; });
+// === INIT ===
+function init() {
+  loadGame();
+  if (!state.identityCode) {
+    state.identityCode = generateCode();
+    if (state.identityCode === SECRET_CODE) {
+      state.sovereignUnlocked = true;
     }
-  } catch(e) { console.warn('Memory Crystal corrupted, starting fresh.'); }
+    saveGame();
+    setTimeout(() => showToast(`Your Identity Sigil: ${state.identityCode}`), 1000);
+  }
+  if (state.identityCode === SECRET_CODE) state.sovereignUnlocked = true;
+  setupDrawer();
+  switchView("core");
+  setInterval(gameTick, 100);
+  setInterval(saveGame, 5000);
+  setInterval(() => { state.playtime++; state.sessionClicks=0; state.sessionQi=0; state.sessionSkills=0; state.sessionRolls=0; }, 60000);
 }
 
-function saveGame() {
-  try {
-    localStorage.setItem('nexus-clicker-save', JSON.stringify(state));
-  } catch(e) { console.warn('Failed to save to Memory Crystal.'); }
+function generateCode() {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let code = "";
+  for (let i = 0; i < 10; i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+// === DRAWER ===
+function setupDrawer() {
+  document.querySelectorAll(".drawer-item").forEach(item => {
+    item.addEventListener("click", () => {
+      switchView(item.dataset.view);
+      toggleDrawer();
+    });
+  });
+}
+
+function toggleDrawer() {
+  document.getElementById("drawer").classList.toggle("active");
+  document.getElementById("drawer-overlay").classList.toggle("active");
+}
+
+// === VIEW SWITCHING ===
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll(".drawer-item").forEach(i => i.classList.toggle("active", i.dataset.view === view));
+  const mc = document.getElementById("main-content");
+  if (view === "core") renderCore(mc);
+  else if (view === "forge") renderForge(mc);
+  else if (view === "dao") renderDao(mc);
+  else if (view === "mystic") renderMystic(mc);
+  else if (view === "evolution") renderEvolution(mc);
+  else if (view === "quests") renderQuests(mc);
+  else if (view === "shop") renderShop(mc);
+  else if (view === "ascend") renderAscend(mc);
+}
+
+// === RENDER: CORE ===
+function renderCore(mc) {
+  const slipTarget = hasSkill("SV3") ? 50 : (hasArtifact("slip_magnet") ? 80 : 100);
+  const progress = Math.min((state.clicksToSlip / slipTarget) * 100, 100);
+  
+  let skillsHtml = ACTIVE_SKILLS.map(s => {
+    const unlocked = isSkillUnlocked(s);
+    const cd = state.skillCooldowns[s.id] || 0;
+    const onCd = cd > 0;
+    return `<div class="skill-btn ${unlocked?'':'locked'} ${onCd?'on-cd':''}" onclick="useActiveSkill('${s.id}')" title="${s.name}: ${s.desc}">
+      ${s.icon}
+      ${onCd ? `<div class="cd-overlay">${formatTime(cd)}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  let corruptionHtml = state.corruption > 0 ? `<div class="corruption-bar">⚠️ Corruption Level: ${state.corruption}</div>` : '';
+
+  mc.innerHTML = `
+    <div class="core-view">
+      <div class="spirit-core" id="core-btn" style="font-size:2.8rem;">${SPECIES.find(s=>s.id===state.species)?.icon || '☯'}</div>
+      <div class="click-progress">
+        <div class="cp-bar"><div class="cp-fill" style="width:${progress}%"></div></div>
+        <div class="cp-label">Jade Slip: ${state.clicksToSlip}/${slipTarget} clicks</div>
+      </div>
+      ${corruptionHtml}
+      <div class="skills-row">${skillsHtml}</div>
+      <div style="font-size:0.7rem; color:var(--text-dim); text-align:center;">
+        ${state.title ? `Title: <span style="color:var(--gold)">${state.title}</span><br>` : ''}
+        Reincarnations: ${state.reincarnations} | Global Mult: x${state.globalMult.toFixed(1)}
+      </div>
+    </div>
+  `;
+  
+  const core = document.getElementById("core-btn");
+  core.addEventListener("pointerdown", tapCore);
+  core.addEventListener("touchstart", e => e.preventDefault(), {passive:false});
+}
+
+// === RENDER: FORGE ===
+function renderForge(mc) {
+  let html = `<div class="list-view"><div class="section-title">Artifacts & Formations</div>`;
+  UPGRADES.forEach(u => {
+    const cost = getUpgCost(u);
+    const count = state.upgrades[u.id] || 0;
+    const can = state.qi >= cost;
+    html += `<div class="card ${can?'':'disabled'}" onclick="buyUpg('${u.id}')">
+      <div class="card-icon">${u.icon}</div>
+      <div class="card-info">
+        <div class="card-title">${u.name} <span style="color:var(--text-dim)">x${count}</span></div>
+        <div class="card-desc">${u.desc}</div>
+        <div class="card-cost">${formatNum(cost)} Qi</div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  mc.innerHTML = html;
+}
+
+// === RENDER: DAO MATRIX ===
+function renderDao(mc) {
+  const paths = [
+    { key:"orthodox", name:"☯️ Orthodox Dao", color:"var(--orthodox)" },
+    { key:"demonic", name:"🩸 Demonic Path", color:"var(--demonic)" },
+    { key:"chaotic", name:"⚡ Chaotic Dao", color:"var(--chaotic)" },
+    { key:"body", name:"💪 Body Path", color:"var(--body)" },
+    { key:"spirit", name:"🔮 Spirit Path", color:"var(--spirit)" },
+    { key:"void", name:"🕳️ Void Path", color:"var(--void)" }
+  ];
+  if (state.sovereignUnlocked) {
+    paths.push({ key:"sovereign", name:"👑 Sovereign's Path", color:"var(--sovereign)" });
+  }
+
+  let html = `<div class="list-view">`;
+  paths.forEach(p => {
+    html += `<div class="section-title" style="color:${p.color}">${p.name}</div>`;
+    const skills = SKILL_TREE.filter(s => s.path === p.key && !s.id.startsWith("H"));
+    skills.forEach(s => {
+      const unlocked = state.skills.includes(s.id);
+      const reqMet = checkReq(s);
+      const cost = hasSkill("S3") ? Math.max(1, s.cost - 1) : s.cost;
+      const canBuy = !unlocked && reqMet && state.insight >= cost;
+      let cls = `card path-${s.path}`;
+      if (unlocked) cls += ' disabled';
+      else if (!reqMet) cls += ' locked';
+      else if (!canBuy) cls += ' disabled';
+      
+      let reqText = s.requires.includes("ANY2") ? "Requires: 2 skills from different paths" : 
+                    s.requires.length > 0 ? `Requires: ${s.requires.join(', ')}` : '';
+      
+      html += `<div class="${cls}" onclick="buySkillNode('${s.id}')">
+        <div class="card-info">
+          <div class="card-title">${s.name} ${unlocked?'✅':''}</div>
+          <div class="card-desc">${s.desc}</div>
+          ${reqText ? `<div class="card-desc" style="color:var(--text-dim);font-style:italic">${reqText}</div>` : ''}
+          <div class="card-cost">${unlocked ? 'Mastered' : `Cost: ${cost} Insight`}</div>
+        </div>
+      </div>`;
+    });
+  });
+  
+  // Hybrids
+  html += `<div class="section-title" style="color:var(--gold)">⚗️ Hybrid Skills</div>`;
+  const hybrids = SKILL_TREE.filter(s => s.id.startsWith("H"));
+  hybrids.forEach(s => {
+    const unlocked = state.skills.includes(s.id);
+    const reqMet = s.requires.every(r => state.skills.includes(r));
+    const cost = hasSkill("S3") ? Math.max(1, s.cost - 1) : s.cost;
+    const canBuy = !unlocked && reqMet && state.insight >= cost;
+    let cls = `card path-${s.path}`;
+    if (unlocked) cls += ' disabled';
+    else if (!reqMet) cls += ' locked';
+    else if (!canBuy) cls += ' disabled';
+    
+    html += `<div class="${cls}" onclick="buySkillNode('${s.id}')">
+      <div class="card-info">
+        <div class="card-title">${s.name} ${unlocked?'✅':''}</div>
+        <div class="card-desc">${s.desc}</div>
+        <div class="card-desc" style="font-style:italic">Requires: ${s.requires.join(' + ')}</div>
+        <div class="card-cost">${unlocked ? 'Mastered' : `Cost: ${cost} Insight`}</div>
+      </div>
+    </div>`;
+  });
+  
+  html += `</div>`;
+  mc.innerHTML = html;
+}
+
+// === RENDER: MYSTIC ===
+function renderMystic(mc) {
+  mc.innerHTML = `
+    <div class="list-view">
+      <div class="section-title">Jade Slips & Vouchers</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; text-align:center; margin-bottom:16px;">
+        <div style="padding:12px; background:var(--panel); border-radius:12px; border:1px solid var(--border);">
+          <div style="font-size:1.5rem;">🟢</div>
+          <div style="font-size:1.2rem; font-weight:700;">${state.jadeSlips}</div>
+          <div style="font-size:0.65rem; color:var(--text-dim);">Jade Slips</div>
+        </div>
+        <div style="padding:12px; background:var(--panel); border-radius:12px; border:1px solid var(--border);">
+          <div style="font-size:1.5rem;">🎁</div>
+          <div style="font-size:1.2rem; font-weight:700;">${state.giftVouchers}</div>
+          <div style="font-size:0.65rem; color:var(--text-dim);">Gift Vouchers</div>
+        </div>
+        <div style="padding:12px; background:var(--panel); border-radius:12px; border:1px solid var(--border);">
+          <div style="font-size:1.5rem;">✨</div>
+          <div style="font-size:1.2rem; font-weight:700;">${state.goldenVouchers}</div>
+          <div style="font-size:0.65rem; color:var(--text-dim);">Golden</div>
+        </div>
+      </div>
+      
+      <div class="section-title">Actions</div>
+      <div class="card" onclick="openJadeSlip()" ${state.jadeSlips<1?'class="card disabled"':''}>
+        <div class="card-icon">🟢</div>
+        <div class="card-info">
+          <div class="card-title">Open Jade Slip</div>
+          <div class="card-desc">Small random reward</div>
+        </div>
+      </div>
+      <div class="card" onclick="mergeJadeToVoucher()" ${state.jadeSlips<5?'class="card disabled"':''}>
+        <div class="card-icon">🔀</div>
+        <div class="card-info">
+          <div class="card-title">Merge: 5 Jade → 1 Gift Voucher</div>
+          <div class="card-desc">Combine for better rewards</div>
+        </div>
+      </div>
+      <div class="card" onclick="mergeVoucherToGolden()" ${state.giftVouchers<5?'class="card disabled"':''}>
+        <div class="card-icon">✨</div>
+        <div class="card-info">
+          <div class="card-title">Merge: 5 Vouchers → 1 Golden</div>
+          <div class="card-desc">The ultimate gamble</div>
+        </div>
+      </div>
+      <div class="card" onclick="splitGolden()" ${state.goldenVouchers<1?'class="card disabled"':''}>
+        <div class="card-icon">↩️</div>
+        <div class="card-info">
+          <div class="card-title">Split: 1 Golden → 5 Vouchers</div>
+          <div class="card-desc">Break it back down</div>
+        </div>
+      </div>
+      
+      <div class="section-title">Rolling</div>
+      <div class="card" onclick="rollVoucher()" ${state.giftVouchers<1?'class="card disabled"':''}>
+        <div class="card-icon">🎲</div>
+        <div class="card-info">
+          <div class="card-title">Roll Gift Voucher</div>
+          <div class="card-desc">Common to Mythic rewards</div>
+        </div>
+      </div>
+      <div class="card" onclick="rollGolden()" ${state.goldenVouchers<1?'class="card disabled"':''}>
+        <div class="card-icon">🌟</div>
+        <div class="card-info">
+          <div class="card-title">Roll Golden Voucher</div>
+          <div class="card-desc">Epic to Divine rewards</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// === RENDER: EVOLUTION ===
+function renderEvolution(mc) {
+  let html = `<div class="list-view"><div class="section-title">Species Evolution</div>`;
+  SPECIES.forEach(sp => {
+    const unlocked = state.unlockedSpecies.includes(sp.id);
+    const active = state.species === sp.id;
+    const canAfford = checkSpeciesCost(sp);
+    let cls = `card ${active ? 'disabled' : (!unlocked && !canAfford ? 'disabled' : '')}`;
+    let costText = sp.id === 'human' ? 'Free' : formatSpeciesCost(sp.cost);
+    if (sp.cost.secret) costText = 'Sovereign Only';
+    
+    html += `<div class="${cls}" onclick="evolveSpecies('${sp.id}')" style="${active?'border-color:var(--accent);':''}">
+      <div class="card-icon">${sp.icon}</div>
+      <div class="card-info">
+        <div class="card-title">${sp.name} ${active?'(Active)':''} ${unlocked&&!active?'✅':''}</div>
+        <div class="card-desc">${sp.desc}</div>
+        <div class="card-cost">${unlocked ? (active ? 'Currently Evolved' : 'Tap to Switch (1,000 Qi)') : costText}</div>
+      </div>
+    </div>`;
+  });
+  html += `</div>`;
+  mc.innerHTML = html;
+}
+
+// === RENDER: QUESTS ===
+function renderQuests(mc) {
+  const cats = ["Progression", "Repeatable", "Achievement"];
+  let html = `<div class="list-view">`;
+  cats.forEach(cat => {
+    html += `<div class="section-title">${cat === 'Progression' ? '📖' : cat === 'Repeatable' ? '🔄' : '🏆'} ${cat}</div>`;
+    const quests = QUESTS.filter(q => q.cat === cat);
+    quests.forEach(q => {
+      const completed = state.questCompleted[q.id];
+      const progress = getQuestProgress(q);
+      const pct = Math.min((progress / q.target) * 100, 100);
+      const onCd = q.repeatable && state.questCooldowns[q.id] && state.questCooldowns[q.id] > Date.now();
+      
+      if (completed && q.oneTime) return; // Hide completed one-time quests
+      
+      let cls = `card quest-card ${completed || onCd ? 'disabled' : ''}`;
+      let btnHtml = '';
+      if (pct >= 100 && !completed && !onCd) {
+        btnHtml = `<button class="quest-claim" onclick="claimQuest('${q.id}', event)">Claim</button>`;
+      } else if (onCd) {
+        const remaining = Math.ceil((state.questCooldowns[q.id] - Date.now()) / 1000);
+        btnHtml = `<span style="font-size:0.65rem;color:var(--text-dim);">${formatTime(remaining)}</span>`;
+      }
+      
+      html += `<div class="${cls}">
+        <div class="card-info">
+          <div class="card-title">${q.name}</div>
+          <div class="card-desc">${q.desc}</div>
+          <div class="card-desc" style="color:var(--gold);">Reward: ${formatReward(q.reward)}</div>
+          <div class="quest-progress"><div class="quest-fill" style="width:${pct}%"></div></div>
+          <div style="font-size:0.6rem;color:var(--text-dim);margin-top:2px;">${Math.floor(progress)} / ${q.target}</div>
+        </div>
+        <div class="card-right">${btnHtml}</div>
+      </div>`;
+    });
+  });
+  html += `</div>`;
+  mc.innerHTML = html;
+}
+
+// === RENDER: SHOP ===
+function renderShop(mc) {
+  const cats = ["Pills", "Refiners", "Artifacts"];
+  let html = `<div class="list-view">
+    <div style="text-align:center;margin-bottom:12px;">
+      <span style="font-size:1.5rem;">💎</span>
+      <span style="font-size:1.2rem;font-weight:700;">${state.stones} Spirit Stones</span>
+    </div>`;
+  
+  cats.forEach(cat => {
+    html += `<div class="section-title">${cat}</div><div class="shop-grid">`;
+    const items = SHOP_ITEMS.filter(i => i.cat === cat);
+    items.forEach(item => {
+      const owned = item.type === 'equipment' ? state.equipment === item.id : 
+                    item.type === 'artifact' ? state.artifacts.includes(item.id) : false;
+      const can = state.stones >= item.cost && !owned;
+      html += `<div class="shop-item ${can?'':'disabled'}" onclick="buyShopItem('${item.id}')">
+        <div class="si-icon">${item.icon}</div>
+        <div class="si-name">${item.name}</div>
+        <div class="si-desc">${item.desc}</div>
+        <div class="si-cost">${owned ? '✅ Owned' : `${item.cost} 💎`}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  html += `</div>`;
+  mc.innerHTML = html;
+}
+
+// === RENDER: ASCEND ===
+function renderAscend(mc) {
+  mc.innerHTML = `
+    <div class="core-view" style="gap:16px; text-align:center; padding-top:20px;">
+      <div style="font-size:3rem;">🔥</div>
+      <h3 style="color:var(--accent);">Reincarnation Cycle</h3>
+      <p style="font-size:0.8rem; color:var(--text-dim); max-width:280px; line-height:1.5;">
+        Sever your cultivation to be reborn.<br>
+        Lose Qi, Upgrades, Skills.<br>
+        Keep Insight & Spirit Stones.<br>
+        Gain <strong style="color:var(--accent);">+20% Global Mult</strong>.
+        ${state.rebirthKeepSkills ? '<br><span style="color:var(--gold);">Rebirth Pill: Skills kept!</span>' : ''}
+      </p>
+      <button class="btn btn-primary" style="max-width:200px;padding:14px;" onclick="openReincarnateModal()">Reincarnate</button>
+      
+      <div style="margin-top:30px; width:100%; max-width:300px;">
+        <div class="section-title">Identity Sigil</div>
+        <div style="padding:12px; background:var(--panel); border-radius:12px; border:1px solid var(--border); text-align:center;">
+          <div style="font-size:1.2rem; font-weight:700; letter-spacing:2px; color:var(--accent);">${state.identityCode}</div>
+          <div style="font-size:0.65rem; color:var(--text-dim); margin-top:4px;">Your unique code for save transfers</div>
+        </div>
+        <div style="margin-top:12px;">
+          <div class="section-title">Enter Secret Code</div>
+          <input class="modal-input" id="secret-code-input" placeholder="Enter 10-letter code..." maxlength="10" style="text-transform:uppercase;">
+          <button class="btn btn-gold" style="width:100%;margin-top:8px;" onclick="enterSecretCode()">Unlock</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// === GAME LOGIC ===
+function tapCore(e) {
+  let base = getTapPower();
+  let final = base;
+  
+  // Chaotic variance
+  if (hasSkill("C1") || hasSkill("C2")) {
+    if (hasSkill("H2")) { final = base * (3 + Math.random()*2); }
+    else if (hasSkill("C5")) { final = base * (2 + Math.random()*3); }
+    else if (hasSkill("C2")) { final = base * (0.5 + Math.random()*7.5); }
+    else { final = base * (0.1 + Math.random()*4.9); }
+  }
+  
+  // Demonic crit
+  if (hasSkill("D2") && Math.random() < 0.05) {
+    final *= 10;
+    showToast("⚡ Soul Siphoned! 10x Qi!");
+  }
+  
+  // Golden Touch
+  if (state.goldenTouchTaps > 0) {
+    final *= 10;
+    state.goldenTouchTaps--;
+  }
+  
+  // Active buffs
+  if (state.activeBuffs.tap_5x && state.activeBuffs.tap_5x > Date.now()) final *= 5;
+  if (state.activeBuffs.surge && state.activeBuffs.surge > Date.now()) final *= 1.5;
+  
+  state.qi += final;
+  state.totalQi += final;
+  state.clicks++;
+  state.clicksToSlip++;
+  state.sessionClicks++;
+  
+  const slipTarget = hasSkill("SV3") ? 50 : (hasArtifact("slip_magnet") ? 80 : 100);
+  if (state.clicksToSlip >= slipTarget) {
+    state.clicksToSlip = 0;
+    state.jadeSlips++;
+    showToast("🟢 Jade Slip earned!");
+    updateQuestProgress("slips", 1);
+  }
+  
+  checkRealm();
+  updateQuestProgress("clicks", 1);
+  updateQuestProgress("clicks_session", 1);
+  updateQuestProgress("totalQi", final);
+  updateQuestProgress("qi_session", final);
+  
+  spawnFloat(e, final);
+  updateUI();
+  if (currentView === "core") renderCore(document.getElementById("main-content"));
+}
+
+function gameTick() {
+  const now = Date.now();
+  const dt = (now - lastTick) / 1000;
+  lastTick = now;
+  
+  // QPS
+  let qps = getQPS();
+  if (state.activeBuffs.qps_double && state.activeBuffs.qps_double > Date.now()) qps *= 2;
+  if (state.activeBuffs.qps_pill && state.activeBuffs.qps_pill > Date.now()) qps *= 2;
+  if (state.activeBuffs.surge && state.activeBuffs.surge > Date.now()) qps *= 1.5;
+  
+  if (qps > 0) {
+    const gain = qps * dt;
+    state.qi += gain;
+    state.totalQi += gain;
+    state.sessionQi += gain;
+  }
+  
+  // Cooldowns
+  Object.keys(state.skillCooldowns).forEach(k => {
+    if (state.skillCooldowns[k] > 0) state.skillCooldowns[k] -= dt;
+    if (state.skillCooldowns[k] < 0) state.skillCooldowns[k] = 0;
+  });
+  
+  checkRealm();
+  updateQuestProgress("playtime", dt);
+  updateUI();
 }
 
 // === CALCULATIONS ===
 function getTapPower() {
-  let power = 1;
-  UPGRADES.filter(u => u.type === 'tap').forEach(u => {
-    power += (state.upgrades[u.id] || 0) * u.value;
+  let base = 1;
+  UPGRADES.filter(u=>u.type==='tap').forEach(u => base += (state.upgrades[u.id]||0)*u.value);
+  let mult = 1;
+  let allMult = state.globalMult;
+  
+  SKILL_TREE.filter(s=>state.skills.includes(s.id)).forEach(s => {
+    if (s.effect.tap_mult) mult += s.effect.tap_mult;
+    if (s.effect.all_mult) allMult += s.effect.all_mult;
   });
-  return power;
+  
+  // Species bonus
+  const sp = SPECIES.find(s=>s.id===state.species);
+  if (sp && sp.bonus.tap_mult) mult += sp.bonus.tap_mult;
+  if (sp && sp.bonus.all_mult) allMult += sp.bonus.all_mult;
+  
+  // Body pill permanent
+  if (state.artifacts.includes("body_pill_perm")) mult += 0.1;
+  
+  // Corruption penalty
+  if (state.corruption >= 3 && !hasSkill("H6")) mult *= 0.8;
+  
+  return Math.max(1, base * mult * allMult);
 }
 
-function getAutoQiPerSec() {
-  let qps = 0;
-  UPGRADES.filter(u => u.type === 'auto').forEach(u => {
-    qps += (state.upgrades[u.id] || 0) * u.value;
+function getQPS() {
+  let base = 0;
+  UPGRADES.filter(u=>u.type==='auto').forEach(u => base += (state.upgrades[u.id]||0)*u.value);
+  let mult = 1;
+  let allMult = state.globalMult;
+  
+  SKILL_TREE.filter(s=>state.skills.includes(s.id)).forEach(s => {
+    if (s.effect.qps_mult) mult += s.effect.qps_mult;
+    if (s.effect.all_mult) allMult += s.effect.all_mult;
   });
-  return qps;
-}
-
-function getUpgradeCost(upgrade) {
-  const count = state.upgrades[upgrade.id] || 0;
-  return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMult, count));
-}
-
-function getCurrentRealm() {
-  let realm = REALMS[0];
-  for (const r of REALMS) {
-    if (state.totalQi >= r.threshold) realm = r;
+  
+  // Equipment
+  if (state.equipment) {
+    const eq = SHOP_ITEMS.find(i=>i.id===state.equipment);
+    if (eq && eq.effect.qps_mult) mult += eq.effect.qps_mult;
   }
-  return realm;
+  
+  // Species
+  const sp = SPECIES.find(s=>s.id===state.species);
+  if (sp && sp.bonus.qps_mult) mult += sp.bonus.qps_mult;
+  if (sp && sp.bonus.all_mult) allMult += sp.bonus.all_mult;
+  
+  // Corruption penalty
+  if (state.corruption >= 3 && !hasSkill("H6")) mult *= 0.8;
+  if (state.corruption >= 5) return 0;
+  
+  return Math.max(0, base * mult * allMult);
 }
 
-// === UI UPDATES ===
-function updateUI() {
-  qiDisplay.textContent = Math.floor(state.qi).toLocaleString();
-  realmName.textContent = getCurrentRealm().name;
-  qpsDisplay.textContent = `${getAutoQiPerSec().toLocaleString()} Qi/sec | ${getTapPower().toLocaleString()} Qi/tap`;
-  renderUpgrades();
-}
-
-function renderUpgrades() {
-  upgradesList.innerHTML = '';
-  UPGRADES.forEach(u => {
-    const cost = getUpgradeCost(u);
-    const count = state.upgrades[u.id] || 0;
-    const canAfford = state.qi >= cost;
-
-    const card = document.createElement('div');
-    card.className = `upgrade-card${canAfford ? '' : ' disabled'}`;
-    card.innerHTML = `
-      <div class="upgrade-icon">${u.icon}</div>
-      <div class="upgrade-info">
-        <div class="upgrade-name">${u.name}<span class="upgrade-count">×${count}</span></div>
-        <div class="upgrade-desc">${u.desc}</div>
-      </div>
-      <div class="upgrade-cost">${cost.toLocaleString()} Qi</div>
-    `;
-    card.addEventListener('click', () => buyUpgrade(u));
-    upgradesList.appendChild(card);
+function getInsightMult() {
+  let mult = 1;
+  SKILL_TREE.filter(s=>state.skills.includes(s.id)).forEach(s => {
+    if (s.effect.insight_mult) mult += s.effect.insight_mult;
   });
+  const sp = SPECIES.find(s=>s.id===state.species);
+  if (sp && sp.bonus.insight_mult) mult += sp.bonus.insight_mult;
+  if (state.equipment) {
+    const eq = SHOP_ITEMS.find(i=>i.id===state.equipment);
+    if (eq && eq.effect.insight_mult) mult += eq.effect.insight_mult;
+  }
+  return mult;
+}
+
+function getUpgCost(u) { return Math.floor(u.baseCost * Math.pow(u.costMult, state.upgrades[u.id]||0)); }
+
+function hasSkill(id) { return state.skills.includes(id); }
+function hasArtifact(id) { return state.artifacts.includes(id); }
+
+function checkReq(skill) {
+  if (skill.requires.includes("ANY2")) {
+    const paths = new Set(SKILL_TREE.filter(s=>state.skills.includes(s.id) && !s.id.startsWith("H")).map(s=>s.path));
+    return paths.size >= 2;
+  }
+  return skill.requires.every(r => state.skills.includes(r));
+}
+
+function isSkillUnlocked(as) {
+  if (as.unlock === "free") return true;
+  if (as.unlock.startsWith("quest:")) return state.questCompleted[as.unlock.replace("quest:","")];
+  if (as.unlock === "demonic3") return state.skills.filter(s=>s.startsWith("D")).length >= 3;
+  if (as.unlock === "void2") return state.skills.includes("V2");
+  if (as.unlock.startsWith("species:")) return state.unlockedSpecies.includes(as.unlock.replace("species:",""));
+  if (as.unlock.startsWith("shop:")) return state.artifacts.includes(as.unlock) || state.activeSkills.includes(as.id);
+  return false;
 }
 
 // === ACTIONS ===
-function tapCore(e) {
-  const power = getTapPower();
-  state.qi += power;
-  state.totalQi += power;
+function buyUpg(id) {
+  const u = UPGRADES.find(x=>x.id===id);
+  const cost = getUpgCost(u);
+  if (state.qi >= cost) {
+    state.qi -= cost;
+    state.upgrades[u.id] = (state.upgrades[u.id]||0) + 1;
+    updateQuestProgress("upgrades", 1);
+    updateUI();
+    if (currentView==="forge") renderForge(document.getElementById("main-content"));
+  }
+}
+
+function buySkillNode(id) {
+  const s = SKILL_TREE.find(x=>x.id===id);
+  if (state.skills.includes(id)) return;
+  if (!checkReq(s)) return;
+  const cost = hasSkill("S3") ? Math.max(1, s.cost-1) : s.cost;
+  if (state.insight < cost) return;
   
-  // Floating number effect
-  spawnFloatingQi(e, power);
+  state.insight -= cost;
+  state.skills.push(id);
+  if (s.effect.corruption) state.corruption += s.effect.corruption;
   
+  updateQuestProgress("skills", 1);
+  updateQuestProgress("skills_session", 1);
+  if (s.path === "void") updateQuestProgress("void_skills", 1);
+  if (state.corruption >= 5) updateQuestProgress("corruption", state.corruption);
+  
+  showToast(`Mastered: ${s.name}`);
+  saveGame();
+  if (currentView==="dao") renderDao(document.getElementById("main-content"));
   updateUI();
 }
 
-function spawnFloatingQi(e, amount) {
-  const el = document.createElement('div');
-  el.className = 'float-qi';
-  el.textContent = `+${amount.toLocaleString()}`;
+function useActiveSkill(id) {
+  const as = ACTIVE_SKILLS.find(s=>s.id===id);
+  if (!isSkillUnlocked(as)) return;
+  if (state.skillCooldowns[id] > 0) return;
   
-  // Position near tap/click
-  const rect = coreBtn.getBoundingClientRect();
-  const x = (e.clientX || (rect.left + rect.width/2)) - rect.left;
-  const y = (e.clientY || (rect.top + rect.height/2)) - rect.top;
+  let cd = as.cd;
+  if (hasSkill("SV2")) cd /= 2;
+  state.skillCooldowns[id] = cd;
   
-  el.style.left = `${x}px`;
-  el.style.top = `${y}px`;
-  coreBtn.parentElement.appendChild(el);
+  if (as.effect === "qps_double") state.activeBuffs.qps_double = Date.now() + as.duration*1000;
+  else if (as.effect === "qi_burst") { state.qi += getQPS()*60; state.totalQi += getQPS()*60; }
+  else if (as.effect === "tap_5x") { state.qi *= 0.95; state.activeBuffs.tap_5x = Date.now() + as.duration*1000; }
+  else if (as.effect === "time_fold") { state.qi += getQPS()*600; state.totalQi += getQPS()*600; }
+  else if (as.effect === "insight_gain") { state.insight += 1; }
+  else if (as.effect === "golden_touch") { state.goldenTouchTaps = 10; }
+  else if (as.effect === "surge") { state.activeBuffs.surge = Date.now() + as.duration*1000; }
+  else if (as.effect === "void_step") { state.qi += 100000; state.totalQi += 100000; state.corruption++; }
   
-  setTimeout(() => el.remove(), 800);
+  showToast(`⚡ ${as.name} activated!`);
+  if (currentView==="core") renderCore(document.getElementById("main-content"));
+  updateUI();
 }
 
-function buyUpgrade(upgrade) {
-  const cost = getUpgradeCost(upgrade);
-  if (state.qi >= cost) {
-    state.qi -= cost;
-    state.upgrades[upgrade.id] = (state.upgrades[upgrade.id] || 0) + 1;
-    updateUI();
+function openJadeSlip() {
+  if (state.jadeSlips < 1) return;
+  state.jadeSlips--;
+  const roll = Math.random();
+  let msg = "";
+  if (roll < 0.7) { const q = 500 + Math.floor(Math.random()*1500); state.qi += q; state.totalQi += q; msg = `+${q} Qi`; }
+  else if (roll < 0.9) { const q = 5000 + Math.floor(Math.random()*10000); state.qi += q; state.totalQi += q; msg = `+${formatNum(q)} Qi`; }
+  else if (roll < 0.98) { state.insight++; msg = "+1 Dao Insight"; }
+  else { state.stones++; msg = "+1 Spirit Stone 💎"; }
+  showToast(`🟢 Jade Slip: ${msg}`);
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+  updateUI();
+}
+
+function mergeJadeToVoucher() {
+  if (state.jadeSlips < 5) return;
+  state.jadeSlips -= 5;
+  state.giftVouchers++;
+  state.totalMerges++;
+  updateQuestProgress("merges", 1);
+  showToast("🎁 Merged 5 Jade Slips → 1 Gift Voucher!");
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+}
+
+function mergeVoucherToGolden() {
+  if (state.giftVouchers < 5) return;
+  state.giftVouchers -= 5;
+  state.goldenVouchers++;
+  showToast("✨ Merged 5 Vouchers → 1 Golden Voucher!");
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+}
+
+function splitGolden() {
+  if (state.goldenVouchers < 1) return;
+  state.goldenVouchers--;
+  state.giftVouchers += 5;
+  showToast("↩️ Split 1 Golden → 5 Vouchers");
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+}
+
+function rollVoucher() {
+  if (state.giftVouchers < 1) return;
+  state.giftVouchers--;
+  state.totalRolls++;
+  updateQuestProgress("rolls", 1);
+  updateQuestProgress("rolls_session", 1);
+  
+  const luckBonus = hasSkill("C3") ? 0.1 : 0;
+  const artifactLuck = hasArtifact("lucky_charm") ? 0.05 : 0;
+  const rngMult = hasSkill("H5") ? 2 : (hasSkill("C4") ? 1.5 : 1);
+  
+  let roll = Math.random() - luckBonus - artifactLuck;
+  let msg = "";
+  if (roll < 0.02 * rngMult) { const q = 5000000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=50; unlockRandomSkill(); msg = `MYTHIC! +${formatNum(q)} Qi +50 Insight +Free Skill!`; }
+  else if (roll < 0.08) { const q = 1000000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=15; msg = `LEGENDARY! +${formatNum(q)} Qi +15 Insight`; }
+  else if (roll < 0.20) { const q = 200000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=5; msg = `EPIC! +${formatNum(q)} Qi +5 Insight`; }
+  else if (roll < 0.50) { const q = 50000*rngMult; state.qi+=q; state.totalQi+=q; msg = `RARE! +${formatNum(q)} Qi`; }
+  else { const q = 10000*rngMult; state.qi+=q; state.totalQi+=q; msg = `Common: +${formatNum(q)} Qi`; }
+  
+  showToast(`🎲 ${msg}`);
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+  updateUI();
+}
+
+function rollGolden() {
+  if (state.goldenVouchers < 1) return;
+  state.goldenVouchers--;
+  state.totalRolls++;
+  const rngMult = hasSkill("H5") ? 2 : (hasSkill("C4") ? 1.5 : 1);
+  
+  let roll = Math.random();
+  let msg = "";
+  if (roll < 0.10) { const q = 50000000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=200; state.globalMult+=0.2; msg = `DIVINE! +${formatNum(q)} Qi +200 Insight +20% Global!`; }
+  else if (roll < 0.25) { const q = 10000000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=75; msg = `MYTHIC! +${formatNum(q)} Qi +75 Insight`; }
+  else if (roll < 0.60) { const q = 2000000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=30; msg = `LEGENDARY! +${formatNum(q)} Qi +30 Insight`; }
+  else { const q = 500000*rngMult; state.qi+=q; state.totalQi+=q; state.insight+=10; msg = `EPIC! +${formatNum(q)} Qi +10 Insight`; }
+  
+  showToast(`🌟 ${msg}`);
+  if (currentView==="mystic") renderMystic(document.getElementById("main-content"));
+  updateUI();
+}
+
+function unlockRandomSkill() {
+  const available = SKILL_TREE.filter(s => !state.skills.includes(s.id) && !s.id.startsWith("SV") && checkReq(s));
+  if (available.length > 0) {
+    const pick = available[Math.floor(Math.random()*available.length)];
+    state.skills.push(pick.id);
+    showToast(`🎁 Free Skill: ${pick.name}!`);
+  }
+}
+
+function evolveSpecies(id) {
+  const sp = SPECIES.find(s=>s.id===id);
+  if (state.species === id) return;
+  
+  if (state.unlockedSpecies.includes(id)) {
+    if (state.qi >= 1000) {
+      state.qi -= 1000;
+      state.species = id;
+      showToast(`Switched to ${sp.name}!`);
+    }
+  } else {
+    if (sp.cost.secret && !state.sovereignUnlocked) return;
+    if (!checkSpeciesCost(sp)) return;
+    if (sp.cost.qi) state.qi -= sp.cost.qi;
+    if (sp.cost.insight) state.insight -= sp.cost.insight;
+    state.unlockedSpecies.push(id);
+    state.species = id;
+    state.totalEvolutions++;
+    updateQuestProgress("evolutions", 1);
+    updateQuestProgress("species_count", state.unlockedSpecies.length);
+    showToast(`🧬 Evolved into ${sp.name}!`);
+  }
+  saveGame();
+  if (currentView==="evolution") renderEvolution(document.getElementById("main-content"));
+  if (currentView==="core") renderCore(document.getElementById("main-content"));
+  updateUI();
+}
+
+function checkSpeciesCost(sp) {
+  if (sp.cost.secret) return state.sovereignUnlocked;
+  if (sp.cost.reincarnations) return state.reincarnations >= sp.cost.reincarnations;
+  if (sp.cost.qi && state.qi < sp.cost.qi) return false;
+  if (sp.cost.insight && state.insight < sp.cost.insight) return false;
+  return true;
+}
+
+function formatSpeciesCost(cost) {
+  let parts = [];
+  if (cost.qi) parts.push(`${formatNum(cost.qi)} Qi`);
+  if (cost.insight) parts.push(`${cost.insight} Insight`);
+  if (cost.reincarnations) parts.push(`${cost.reincarnations} Reincarnations`);
+  return parts.join(" + ") || "Free";
+}
+
+function buyShopItem(id) {
+  const item = SHOP_ITEMS.find(i=>i.id===id);
+  if (state.stones < item.cost) return;
+  
+  if (item.type === 'equipment' && state.equipment === id) return;
+  if (item.type === 'artifact' && state.artifacts.includes(id)) return;
+  
+  state.stones -= item.cost;
+  
+  if (item.type === 'consumable') {
+    if (item.effect === 'qps_pill') state.activeBuffs.qps_pill = Date.now() + 300000;
+    else if (item.effect === 'insight_pill') state.insight++;
+    else if (item.effect === 'tap_perm') state.artifacts.push("body_pill_perm");
+    else if (item.effect === 'cleanse') state.corruption = 0;
+    else if (item.effect === 'rebirth_keep') state.rebirthKeepSkills = true;
+    showToast(`Used ${item.name}!`);
+  } else if (item.type === 'equipment') {
+    state.equipment = id;
+    if (item.effect.corruption) state.corruption += item.effect.corruption;
+    showToast(`Equipped ${item.name}!`);
+  } else if (item.type === 'artifact') {
+    state.artifacts.push(id);
+    if (item.effect.unlock_void) showToast("Void Path Unlocked!");
+    showToast(`Acquired ${item.name}!`);
+  }
+  
+  updateQuestProgress("shop_buys", 1);
+  saveGame();
+  if (currentView==="shop") renderShop(document.getElementById("main-content"));
+  updateUI();
+}
+
+// === QUESTS ===
+function getQuestProgress(q) {
+  switch(q.type) {
+    case "clicks": return state.clicks;
+    case "totalQi": return state.totalQi;
+    case "upgrades": return Object.values(state.upgrades).reduce((a,b)=>a+b, 0);
+    case "realm": return state.currentRealm || 0;
+    case "skills": return state.skills.length;
+    case "slips": return state.totalRolls > 0 ? state.jadeSlips + state.totalMerges*5 + state.giftVouchers + state.goldenVouchers*5 : state.jadeSlips;
+    case "rolls": return state.totalRolls;
+    case "merges": return state.totalMerges;
+    case "evolutions": return state.totalEvolutions;
+    case "playtime": return state.playtime;
+    case "reincarnations": return state.reincarnations;
+    case "void_skills": return state.skills.filter(s=>s.startsWith("V")).length;
+    case "clicks_session": return state.sessionClicks;
+    case "qi_session": return state.sessionQi;
+    case "skills_session": return state.sessionSkills;
+    case "rolls_session": return state.sessionRolls;
+    case "species_count": return state.unlockedSpecies.length;
+    case "corruption": return state.corruption;
+    default: return 0;
+  }
+}
+
+function updateQuestProgress(type, amount) {
+  QUESTS.filter(q => q.type === type && !state.questCompleted[q.id]).forEach(q => {
+    if (!state.questProgress[q.id]) state.questProgress[q.id] = 0;
+    state.questProgress[q.id] += amount;
+  });
+}
+
+function claimQuest(id, e) {
+  e.stopPropagation();
+  const q = QUESTS.find(x=>x.id===id);
+  const progress = getQuestProgress(q);
+  if (progress < q.target) return;
+  
+  if (state.questCompleted[q.id] && q.oneTime) return;
+  if (q.repeatable && state.questCooldowns[q.id] && state.questCooldowns[q.id] > Date.now()) return;
+  
+  // Grant rewards
+  if (q.reward.stones) state.stones += q.reward.stones;
+  if (q.reward.skill) state.activeSkills.push(q.reward.skill);
+  if (q.reward.title) state.title = q.reward.title;
+  
+  state.questCompleted[q.id] = true;
+  if (q.repeatable) {
+    state.questCooldowns[q.id] = Date.now() + q.cd * 1000;
+    state.questCompleted[q.id] = false; // Allow repeat
+    // Reset session counters for repeatable
+    if (q.type === "clicks_session") state.sessionClicks = 0;
+    if (q.type === "qi_session") state.sessionQi = 0;
+    if (q.type === "skills_session") state.sessionSkills = 0;
+    if (q.type === "rolls_session") state.sessionRolls = 0;
+  }
+  
+  showToast(`📜 Quest Complete: ${q.name}! +${q.reward.stones||0} 💎`);
+  saveGame();
+  if (currentView==="quests") renderQuests(document.getElementById("main-content"));
+  updateUI();
+}
+
+function formatReward(r) {
+  let parts = [];
+  if (r.stones) parts.push(`${r.stones} 💎`);
+  if (r.skill) parts.push(`Skill: ${r.skill}`);
+  if (r.title) parts.push(`Title: ${r.title}`);
+  return parts.join(", ");
+}
+
+// === REALM & REINCARNATION ===
+function checkRealm() {
+  let newRealm = 0;
+  for (let i = REALMS.length-1; i >= 0; i--) {
+    if (state.totalQi >= REALMS[i].threshold) { newRealm = i; break; }
+  }
+  if (newRealm > (state.currentRealm || 0)) {
+    state.currentRealm = newRealm;
+    const r = REALMS[newRealm];
+    let insightGain = Math.floor(r.insight * getInsightMult());
+    if (hasSkill("SV4")) insightGain += 10;
+    state.insight += insightGain;
+    updateQuestProgress("realm", newRealm);
+    showToast(`🌟 BREAKTHROUGH: ${r.name}! +${insightGain} Insight`);
+  }
+}
+
+function openReincarnateModal() {
+  showModal("🔥 Reincarnate?", 
+    `Sever your cultivation.<br>Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones.<br>Gain <strong>+20% Global Mult</strong>.`,
+    [
+      { text: "Remain", cls: "btn-secondary", action: "closeModal()" },
+      { text: "Reincarnate", cls: "btn-primary", action: "doReincarnate()" }
+    ]);
+}
+
+function doReincarnate() {
+  state.reincarnations++;
+  state.globalMult += 0.2;
+  state.qi = 0; state.totalQi = 0;
+  state.upgrades = {};
+  
+  if (state.rebirthKeepSkills) {
+    state.rebirthKeepSkills = false;
+  } else if (hasArtifact("soul_lantern")) {
+    const keep = state.skills.sort(()=>0.5-Math.random()).slice(0,3);
+    state.skills = keep;
+  } else {
+    state.skills = [];
+  }
+  
+  state.currentRealm = 0;
+  state.corruption = 0;
+  state.species = "human";
+  state.clicksToSlip = 0;
+  state.goldenTouchTaps = 0;
+  state.activeBuffs = {};
+  state.equipment = null;
+  
+  updateQuestProgress("reincarnations", 1);
+  closeModal();
+  showToast(`🔥 Reborn! Global Mult: x${state.globalMult.toFixed(1)}`);
+  saveGame();
+  switchView("core");
+  updateUI();
+}
+
+// === SECRET CODE ===
+function enterSecretCode() {
+  const input = document.getElementById("secret-code-input");
+  const code = input.value.trim().toUpperCase();
+  if (code === SECRET_CODE) {
+    state.sovereignUnlocked = true;
+    showToast("👑 SOVEREIGN'S PATH UNLOCKED! You are the true Sect Leader.");
     saveGame();
+    input.value = "";
+  } else if (code === state.identityCode) {
+    showToast("✅ Identity verified. Save transfer ready.");
+  } else {
+    showToast("❌ Invalid code.");
   }
 }
 
-function resetGame() {
-  if (confirm('Sever your cultivation? All progress will be lost.')) {
-    state = { qi: 0, totalQi: 0, upgrades: {} };
-    UPGRADES.forEach(u => state.upgrades[u.id] = 0);
-    saveGame();
-    updateUI();
-  }
+// === UI HELPERS ===
+function updateUI() {
+  document.getElementById("realm-name").textContent = REALMS[state.currentRealm||0].name;
+  document.getElementById("insight-badge").textContent = `✨ ${state.insight}`;
+  document.getElementById("stones-badge").textContent = `💎 ${state.stones}`;
+  document.getElementById("qi-main").textContent = formatNum(state.qi);
+  document.getElementById("qps-display").textContent = `${formatNum(getQPS())} Qi/sec`;
+  document.getElementById("tap-display").textContent = `${formatNum(getTapPower())} Qi/tap`;
 }
 
-// === AUTO QI TICK ===
-setInterval(() => {
-  const qps = getAutoQiPerSec();
-  if (qps > 0) {
-    const tick = qps / 10; // 100ms intervals
-    state.qi += tick;
-    state.totalQi += tick;
-    updateUI();
-  }
-}, 100);
+function spawnFloat(e, amt) {
+  const el = document.createElement("div");
+  el.className = "float-qi";
+  el.textContent = `+${formatNum(amt)}`;
+  const rect = e.target.getBoundingClientRect();
+  el.style.left = `${(e.clientX||rect.left+rect.width/2)-rect.left}px`;
+  el.style.top = `${(e.clientY||rect.top+rect.height/2)-rect.top}px`;
+  e.target.parentElement.appendChild(el);
+  setTimeout(()=>el.remove(), 800);
+}
 
-// === AUTOSAVE EVERY 3 SECONDS ===
-setInterval(saveGame, 3000);
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 3000);
+}
 
-// === EVENT LISTENERS ===
-coreBtn.addEventListener('pointerdown', tapCore); // pointerdown feels snappier than click on mobile
-resetBtn.addEventListener('click', resetGame);
+function showModal(title, desc, buttons, showInput=false) {
+  document.getElementById("modal-title").innerHTML = title;
+  document.getElementById("modal-desc").innerHTML = desc;
+  document.getElementById("modal-input").style.display = showInput ? "block" : "none";
+  const btns = document.getElementById("modal-btns");
+  btns.innerHTML = buttons.map(b => `<button class="btn ${b.cls}" onclick="${b.action}">${b.text}</button>`).join('');
+  document.getElementById("modal-generic").classList.add("active");
+}
 
-// Prevent double-tap zoom on core
-coreBtn.addEventListener('touchstart', (e) => { e.preventDefault(); }, { passive: false });
+function closeModal() {
+  document.getElementById("modal-generic").classList.remove("active");
+}
 
-// === INIT ===
-loadGame();
-updateUI();
+function formatNum(n) {
+  if (n < 1000) return Math.floor(n).toLocaleString();
+  if (n < 1e6) return (n/1e3).toFixed(1)+"K";
+  if (n < 1e9) return (n/1e6).toFixed(1)+"M";
+  return (n/1e9).toFixed(1)+"B";
+}
 
+function formatTime(s) {
+  if (s < 60) return `${Math.floor(s)}s`;
+  if (s < 3600) return `${Math.floor(s/60)}m ${Math.floor(s%60)}s`;
+  return `${Math.floor(s/3600)}h ${Math.floor((s%3600)/60)}m`;
+}
+
+// === SAVE/LOAD ===
+function saveGame() {
+  try { localStorage.setItem("nexus-dao-matrix-save", JSON.stringify(state)); } catch(e){}
+}
+
+function loadGame() {
+  try {
+    const s = localStorage.getItem("nexus-dao-matrix-save");
+    if (s) {
+      const parsed = JSON.parse(s);
+      state = { ...state, ...parsed };
+      if (!state.upgrades) state.upgrades = {};
+      if (!state.skills) state.skills = [];
+      if (!state.unlockedSpecies) state.unlockedSpecies = ["human"];
+      if (!state.questProgress) state.questProgress = {};
+      if (!state.questCompleted) state.questCompleted = {};
+      if (!state.questCooldowns) state.questCooldowns = {};
+      if (!state.skillCooldowns) state.skillCooldowns = {};
+      if (!state.activeBuffs) state.activeBuffs = {};
+      if (!state.artifacts) state.artifacts = [];
+      if (!state.activeSkills) state.activeSkills = [];
+    }
+  } catch(e){}
+}
+
+// GO
+init();
 </script>
 </body>
 </html>
