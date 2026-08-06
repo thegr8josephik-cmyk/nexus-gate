@@ -699,6 +699,10 @@ function openReincModal(){
 const req=getReincReq();
 if(S.tqi<req){showToast(`❌ Requires ${fN(req)} Total Qi to Reincarnate`);return;}
 showModal("🔥 Reincarnate?",`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.<br><br><strong>Requirement Met:</strong> ${fN(S.tqi)} / ${fN(req)} Total Qi`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);
+}
+const req=getReincReq();
+if(S.tqi<req){showToast(`❌ Requires ${fN(req)} Total Qi to Reincarnate`);return;}
+showModal("🔥 Reincarnate?",`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.<br><br><strong>Requirement Met:</strong> ${fN(S.tqi)} / ${fN(req)} Total Qi`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);
 }`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);}
 function doReinc(){S.reincs++;S.gm+=.2;S.qi=0;S.tqi=0;S.ups={};if(S.rbKeep){S.rbKeep=false;}else if(hasArt("soul_lantern")){S.skills=S.skills.sort(()=>.5-Math.random()).slice(0,3);}else{S.skills=[];}S.currentRealm=0;S.corrupt=0;S.species="human";S.cts=0;S.gtTaps=0;S.buffs={};S.eq=null;uQP("reincs",1);closeModal();showToast(`🔥 Reborn! x${S.gm.toFixed(1)}`);saveGame();switchView("core");updateUI();}
 
