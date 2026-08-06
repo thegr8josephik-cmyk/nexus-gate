@@ -307,7 +307,7 @@ let pendingEncounter=null;
 const CLASSES={
 warrior:{name:'Blade Disciple',baseHp:120,baseMp:30,baseAtk:8,baseDef:6,color:'#ef4444',icon:'⚔',skills:[{name:'Heavy Slash',cost:8,mult:1.3},{name:'War Cry',cost:14,mult:1.7}]},
 mage:{name:'Spirit Weaver',baseHp:70,baseMp:80,baseAtk:12,baseDef:3,color:'#a855f7',icon:'✦',skills:[{name:'Arcane Bolt',cost:6,mult:1.2},{name:'Flame Wave',cost:18,mult:1.7}]},
-rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,color:'#22c55e',icon:'◆',skills:[{name:'Quick Stab',cost:5,mult:1.1},{name:'Poison Blade',cost:12,mult:1.5}]},
+rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,color:'#22c55e',icon:'◆',skills:[{name:'Quick Stab',cost:5,mult:1.1},{name:'Poison Blade',cost:12,mult:1.5}]}
 };
 
 // ===== MONSTERS =====
@@ -359,13 +359,13 @@ const TUTORIAL_STEPS=[
 let tutorialStep=0;
 
 // ===== HELPERS =====
-function getPlayerAtk(){const c=CLASSES[G.class];return c.baseAtk+Math.floor(G.level*1.5);}
-function getPlayerDef(){const c=CLASSES[G.class];return c.baseDef+Math.floor(G.level*0.5);}
+function getPlayerAtk(){const c=CLASSES[G.class];return pcls.baseAtk+Math.floor(G.level*1.5);}
+function getPlayerDef(){const c=CLASSES[G.class];return pcls.baseDef+Math.floor(G.level*0.5);}
 function getMonsterStats(id,lvl){const m=MONSTERS[id];return{name:m.name,lvl:lvl,hp:m.baseHp+Math.floor(lvl*m.hpG),maxHp:m.baseHp+Math.floor(lvl*m.hpG),atk:m.baseAtk+Math.floor(lvl*m.atkG),def:m.baseDef+Math.floor(lvl*m.defG),xp:m.baseXp+Math.floor(lvl*m.xpG),gold:m.baseGold+Math.floor(lvl*m.goldG),color:m.color,icon:m.icon};}
 
 // ===== CLASS SELECT =====
-function selectClass(cls){selectedClass=cls;document.querySelectorAll('.class-card').forEach(c=>c.classList.remove('selected'));event.currentTarget.classList.add('selected');const b=document.getElementById('btn-start');b.disabled=false;b.textContent='Begin as '+CLASSES[cls].name;}
-function startGame(){if(!selectedClass)return;G.class=selectedClass;const c=CLASSES[selectedClass];G.maxHp=c.baseHp;G.hp=c.maxHp;G.maxMp=c.baseMp;G.mp=c.maxMp;showToast('Welcome, '+c.name);setTimeout(openTutorial,600);}
+function selectClass(cls){selectedClass=cls;document.querySelectorAll('.class-card').forEach(c=>pcls.classList.remove('selected'));event.currentTarget.classList.add('selected');const b=document.getElementById('btn-start');b.disabled=false;b.textContent='Begin as '+CLASSES[cls].name;}
+function startGame(){if(!selectedClass)return;G.class=selectedClass;const c=CLASSES[selectedClass];G.maxHp=pcls.baseHp;G.hp=pcls.maxHp;G.maxMp=pcls.baseMp;G.mp=pcls.maxMp;showToast('Welcome, '+pcls.name);setTimeout(openTutorial,600);}
 
 // ===== TUTORIAL =====
 function openTutorial(){tutorialStep=0;renderTutorialStep();document.getElementById('tutorial-overlay').classList.add('active');}
@@ -380,10 +380,10 @@ function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classL
 function updateTownUI(){const z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;const pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
 function renderZoneProgress(){const el=document.getElementById('zone-progress');let html='';if(G.zone<ZONES.length-1){const next=ZONES[G.zone+1];const lvlMet=G.level>=next.levelReq;const killMet=G.kills>=next.killReq;html+=`<div class="zone-progress-title">Next Zone: ${next.name}</div>`;html+=`<div class="zone-req ${lvlMet?'met':''}"><span>Level Requirement</span><span>${G.level} / ${next.levelReq} ${lvlMet?'✓':''}</span></div>`;html+=`<div class="zone-req ${killMet?'met':''}"><span>Kill Requirement</span><span>${G.kills} / ${next.killReq} ${killMet?'✓':''}</span></div>`;if(lvlMet&&killMet){html+=`<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to ${next.name}</button>`;}}else{html+=`<div class="zone-progress-title">You have reached the final zone.</div>`;}el.innerHTML=html;}
 function advanceZone(){if(G.zone<ZONES.length-1){G.zone++;G.playerX=1;G.playerY=1;showToast('Arrived at '+ZONES[G.zone].name+'!');updateTownUI();}}
-function doRest(){if(G.resting)return;G.resting=true;const btn=document.getElementById('btn-rest');const desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';let t=3;const iv=setInterval(()=>{t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=G.maxHp;G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP';updateTownUI();showToast('You feel fully restored.');}},1000);}
+function doRest(){if(G.resting)return;G.resting=true;const btn=document.getElementById('btn-rest');const desc=document.getElementById('rest-desc');btn.classList.add('disabled');despcls.textContent='Resting...';let t=3;const iv=setInterval(()=>{t--;despcls.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=G.maxHp;G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');despcls.textContent='Restore HP/MP';updateTownUI();showToast('You feel fully restored.');}},1000);}
 
 // ===== SHOP =====
-function renderShop(){document.getElementById('s-gold').textContent=G.gold;const c=document.getElementById('shop-items');c.innerHTML='';SHOP_ITEMS.forEach(item=>{const can=G.gold>=item.price;const d=document.createElement('div');d.className='shop-item';d.innerHTML=`<div class="shop-item-icon">${item.icon}</div><div class="shop-item-info"><div class="shop-item-name">${item.name}</div><div class="shop-item-desc">${item.desc}</div></div><button class="shop-item-price ${can?'':'cant-afford'}" onclick="buyItem('${item.id}')">${item.price}g</button>`;c.appendChild(d);});}
+function renderShop(){document.getElementById('s-gold').textContent=G.gold;const c=document.getElementById('shop-items');pcls.innerHTML='';SHOP_ITEMS.forEach(item=>{const can=G.gold>=item.price;const d=document.createElement('div');d.className='shop-item';d.innerHTML=`<div class="shop-item-icon">${item.icon}</div><div class="shop-item-info"><div class="shop-item-name">${item.name}</div><div class="shop-item-desc">${item.desc}</div></div><button class="shop-item-price ${can?'':'cant-afford'}" onclick="buyItem('${item.id}')">${item.price}g</button>`;pcls.appendChild(d);});}
 function buyItem(id){const item=SHOP_ITEMS.find(i=>i.id===id);if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=G.maxHp;G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
 
 // ===== EXPLORATION =====
@@ -398,16 +398,16 @@ function fleeEncounter(){document.getElementById('encounter-overlay').classList.
 
 // ===== COMBAT =====
 function startCombat(enemy){combatState.active=true;combatState.enemy={...enemy,currentHp:enemy.hp};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
-function updateCombatUI(){const e=combatState.enemy,c=CLASSES[G.class];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle,${e.color},#000)`;document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=c.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background=`radial-gradient(circle,${c.color},#000)`;document.getElementById('c-player-portrait').style.color=c.color;document.getElementById('c-player-portrait').textContent=c.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;
+function updateCombatUI(){const e=combatState.enemy;const pcls=CLASSES[G.class];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle,${e.color},#000)`;document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=pcls.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background=`radial-gradient(circle,${pcls.color},#000)`;document.getElementById('c-player-portrait').style.color=pcls.color;document.getElementById('c-player-portrait').textContent=pcls.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;
 const c=CLASSES[G.class];
-if(c.skills[0])document.getElementById('skill-btn-0').textContent=c.skills[0].name+' ('+c.skills[0].cost+' MP)';
-if(c.skills[1]){document.getElementById('skill-btn-1').textContent=c.skills[1].name+' ('+c.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}
+if(pcls.skills[0])document.getElementById('skill-btn-0').textContent=pcls.skills[0].name+' ('+pcls.skills[0].cost+' MP)';
+if(pcls.skills[1]){document.getElementById('skill-btn-1').textContent=pcls.skills[1].name+' ('+pcls.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}
 else{document.getElementById('skill-btn-1-wrap').style.display='none';}const log=document.getElementById('c-log');log.innerHTML=combatState.log.join('<br>');log.scrollTop=log.scrollHeight;}
 function logCombat(m){combatState.log.push('> '+m);if(combatState.log.length>6)combatState.log.shift();updateCombatUI();}
 function useSkill(idx){
 if(!combatState.active||combatState.turn!=='player')return;
 const c=CLASSES[G.class],e=combatState.enemy;
-const sk=c.skills[idx];
+const sk=pcls.skills[idx];
 if(!sk){showToast('No such skill!');return;}
 if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}
 G.mp-=sk.cost;
