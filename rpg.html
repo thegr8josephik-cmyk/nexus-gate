@@ -246,7 +246,8 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 <div class="combat-actions">
 <button class="action-btn" onclick="playerAction('attack')"><div class="action-icon">⚔</div><div class="action-label">Attack</div></button>
-<button class="action-btn" onclick="playerAction('skill')"><div class="action-icon">✨</div><div class="action-label">Skill</div></button>
+<button class="action-btn" onclick="useSkill(0)"><div class="action-icon">✨</div><div class="action-label" id="skill-btn-0">Skill 1</div></button>
+<button class="action-btn" onclick="useSkill(1)" id="skill-btn-1-wrap"><div class="action-icon">🌟</div><div class="action-label" id="skill-btn-1">Skill 2</div></button>
 <button class="action-btn" onclick="playerAction('item')"><div class="action-icon">🧪</div><div class="action-label">Potion (<span id="c-pot-count">3</span>)</div></button>
 <button class="action-btn" onclick="playerAction('flee')"><div class="action-icon">🏃</div><div class="action-label">Flee</div></button>
 </div>
@@ -303,9 +304,9 @@ let pendingEncounter=null;
 
 // ===== CLASSES =====
 const CLASSES={
-warrior:{name:'Blade Disciple',baseHp:120,baseMp:30,baseAtk:8,baseDef:6,color:'#ef4444',icon:'⚔',skills:[{name:'Heavy Slash',cost:0,mult:1.3}]},
-mage:{name:'Spirit Weaver',baseHp:70,baseMp:80,baseAtk:12,baseDef:3,color:'#a855f7',icon:'✦',skills:[{name:'Arcane Bolt',cost:0,mult:1.1},{name:'Flame Wave',cost:15,mult:1.6}]},
-rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,color:'#22c55e',icon:'◆',skills:[{name:'Quick Stab',cost:0,mult:1.0},{name:'Poison Blade',cost:10,mult:1.4}]},
+warrior:{name:'Blade Disciple',baseHp:120,baseMp:30,baseAtk:8,baseDef:6,color:'#ef4444',icon:'⚔',skills:[{name:'Heavy Slash',cost:8,mult:1.3},{name:'War Cry',cost:14,mult:1.7}]},
+mage:{name:'Spirit Weaver',baseHp:70,baseMp:80,baseAtk:12,baseDef:3,color:'#a855f7',icon:'✦',skills:[{name:'Arcane Bolt',cost:6,mult:1.2},{name:'Flame Wave',cost:18,mult:1.7}]},
+rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,color:'#22c55e',icon:'◆',skills:[{name:'Quick Stab',cost:5,mult:1.1},{name:'Poison Blade',cost:12,mult:1.5}]},
 };
 
 // ===== MONSTERS =====
@@ -396,9 +397,27 @@ function fleeEncounter(){document.getElementById('encounter-overlay').classList.
 
 // ===== COMBAT =====
 function startCombat(enemy){combatState.active=true;combatState.enemy={...enemy,currentHp:enemy.hp};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
-function updateCombatUI(){const e=combatState.enemy,c=CLASSES[G.class];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle,${e.color},#000)`;document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=c.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background=`radial-gradient(circle,${c.color},#000)`;document.getElementById('c-player-portrait').style.color=c.color;document.getElementById('c-player-portrait').textContent=c.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;const log=document.getElementById('c-log');log.innerHTML=combatState.log.join('<br>');log.scrollTop=log.scrollHeight;}
+function updateCombatUI(){const e=combatState.enemy,c=CLASSES[G.class];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle,${e.color},#000)`;document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=c.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background=`radial-gradient(circle,${c.color},#000)`;document.getElementById('c-player-portrait').style.color=c.color;document.getElementById('c-player-portrait').textContent=c.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;
+const c=CLASSES[G.class];
+if(c.skills[0])document.getElementById('skill-btn-0').textContent=c.skills[0].name+' ('+c.skills[0].cost+' MP)';
+if(c.skills[1]){document.getElementById('skill-btn-1').textContent=c.skills[1].name+' ('+c.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}
+else{document.getElementById('skill-btn-1-wrap').style.display='none';}const log=document.getElementById('c-log');log.innerHTML=combatState.log.join('<br>');log.scrollTop=log.scrollHeight;}
 function logCombat(m){combatState.log.push('> '+m);if(combatState.log.length>6)combatState.log.shift();updateCombatUI();}
-function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;const c=CLASSES[G.class],e=combatState.enemy;let dmg=0;if(type==='attack'){dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));e.currentHp-=dmg;logCombat(`You strike ${e.name} for ${dmg} dmg.`);}else if(type==='skill'){const sk=c.skills[0];if(G.mp>=sk.cost){G.mp-=sk.cost;dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;logCombat(`You cast ${sk.name} for ${dmg} dmg!`);}else{showToast('Not enough MP!');return;}}else if(type==='item'){if(G.potions>0){G.potions--;const heal=Math.floor(G.maxHp*0.5);G.hp=Math.min(G.maxHp,G.hp+heal);logCombat(`You drink a potion (+${heal} HP).`);}else{showToast('No potions!');return;}}else if(type==='flee'){logCombat('You fled!');combatState.active=false;setTimeout(()=>showScreen('explore'),800);return;}updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
+function useSkill(idx){
+if(!combatState.active||combatState.turn!=='player')return;
+const c=CLASSES[G.class],e=combatState.enemy;
+const sk=c.skills[idx];
+if(!sk){showToast('No such skill!');return;}
+if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}
+G.mp-=sk.cost;
+const dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);
+e.currentHp-=dmg;
+logCombat(`You cast ${sk.name} for ${dmg} dmg! (-${sk.cost} MP)`);
+updateCombatUI();
+if(e.currentHp<=0){winBattle();}
+else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}
+}
+function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;const c=CLASSES[G.class],e=combatState.enemy;let dmg=0;if(type==='attack'){dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));e.currentHp-=dmg;logCombat(`You strike ${e.name} for ${dmg} dmg.`);}else if(type==='skill'){useSkill(0);return;}else if(type==='item'){if(G.potions>0){G.potions--;const heal=Math.floor(G.maxHp*0.5);G.hp=Math.min(G.maxHp,G.hp+heal);logCombat(`You drink a potion (+${heal} HP).`);}else{showToast('No potions!');return;}}else if(type==='flee'){logCombat('You fled!');combatState.active=false;setTimeout(()=>showScreen('explore'),800);return;}updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
 function enemyTurn(){if(!combatState.active)return;const e=combatState.enemy;const dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(`${e.name} hits you for ${dmg} dmg.`);updateCombatUI();if(G.hp<=0){loseBattle();}else{combatState.turn='player';}}
 function winBattle(){const e=combatState.enemy;G.xp+=e.xp;G.gold+=e.gold;G.kills++;combatState.active=false;const p=document.createElement('div');p.className='xp-popup';p.innerHTML=`<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+${e.xp} XP<br>+${e.gold} Gold</div>`;document.body.appendChild(p);setTimeout(()=>p.remove(),2200);let leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp+=12;G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(()=>{if(leveled)showToast('LEVEL UP! You are now level '+G.level);showScreen('explore');},2300);}
 function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(G.maxHp*0.5);combatState.active=false;setTimeout(()=>{showToast('You wake up in town...');showScreen('town');},1800);}
