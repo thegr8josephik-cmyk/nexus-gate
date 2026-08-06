@@ -354,7 +354,7 @@ function resizeCvs(){cvs.width=window.innerWidth;cvs.height=window.innerHeight;}
 window.addEventListener("resize",resizeCvs);resizeCvs();
 function spawnParts(x,y,color,count){for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,sp=1+Math.random()*3;parts.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1,life:1,color,size:2+Math.random()*3});}}
 function updateParts(){ctx.clearRect(0,0,cvs.width,cvs.height);for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.05;p.life-=0.02;if(p.life<=0){parts.splice(i,1);continue;}ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;}
-function getPartColor(){const m={"human":"#6366f1","fox":"#f97316","golem":"#78716c","dragon":"#eab308","phoenix":"#ef4444","celestial":"#fbbf24","voidwalker":"#6b7280","nexus":"#ffffff"};return m[S.species]||"#6366f1";}
+function getPartColor(){return "#ffffff";}
 setInterval(updateParts,16);
 
 // =============================================
@@ -406,7 +406,7 @@ setTimeout(()=>openTutorial(),500);
 init();
 }
 
-function genCode(){const c="ABCDEFGHIJKLMNOPQRSTUVWXYZ";let s="";for(let i=0;i<10;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+function genCode(){const c="ABCDEFGHIJKLMNOPQRSTUVWXYZ";let s="";for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
 
 // === DRAWER ===
 function setupDrawer(){document.querySelectorAll(".di").forEach(i=>{i.addEventListener("click",()=>{switchView(i.dataset.view);toggleDrawer();});});}
@@ -694,7 +694,12 @@ function fRW(r){let p=[];if(r.st)p.push(`${r.st} 💎`);if(r.sk)p.push("Skill");
 
 // === REALM & REINC ===
 function chkRealm(){let nr=0;for(let i=REALMS.length-1;i>=0;i--){if(S.tqi>=REALMS[i].t){nr=i;break;}}if(nr>(S.currentRealm||0)){S.currentRealm=nr;const r=REALMS[nr];let ig=Math.floor(r.i*getIM());if(hasSk("SV4"))ig+=10;S.ins+=ig;uQP("realm",nr);showToast(`🌟 ${r.n}! +${ig} Insight`);}}
-function openReincModal(){showModal("🔥 Reincarnate?",`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);}
+function getReincReq(){return 1e9*Math.pow(10,S.reincs);}
+function openReincModal(){
+const req=getReincReq();
+if(S.tqi<req){showToast(`❌ Requires ${fN(req)} Total Qi to Reincarnate`);return;}
+showModal("🔥 Reincarnate?",`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.<br><br><strong>Requirement Met:</strong> ${fN(S.tqi)} / ${fN(req)} Total Qi`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);
+}`Sever cultivation. Lose Qi, Upgrades, Skills.<br>Keep Insight & Stones. Gain <strong>+20% Global Mult</strong>.`,[{t:"Remain",c:"bs",a:"closeModal()"},{t:"Reincarnate",c:"bp",a:"doReinc()"}]);}
 function doReinc(){S.reincs++;S.gm+=.2;S.qi=0;S.tqi=0;S.ups={};if(S.rbKeep){S.rbKeep=false;}else if(hasArt("soul_lantern")){S.skills=S.skills.sort(()=>.5-Math.random()).slice(0,3);}else{S.skills=[];}S.currentRealm=0;S.corrupt=0;S.species="human";S.cts=0;S.gtTaps=0;S.buffs={};S.eq=null;uQP("reincs",1);closeModal();showToast(`🔥 Reborn! x${S.gm.toFixed(1)}`);saveGame();switchView("core");updateUI();}
 
 // === ADMIN ===
@@ -703,7 +708,7 @@ function adminGrant(cur){const amt=parseInt(document.getElementById("grant-amt")
 function adminUnlockAll(){SKILLS.forEach(s=>{if(!S.skills.includes(s.id))S.skills.push(s.id);});WAR_ARTS.forEach(w=>{if(!S.warArts.includes(w.id))S.warArts.push(w.id);});showToast("All skills unlocked!");saveGame();}
 function adminUnlockSpecies(){SPECIES.forEach(sp=>{if(!S.usp.includes(sp.id))S.usp.push(sp.id);});showToast("All species unlocked!");saveGame();}
 function adminToggleSov(){S.sovUnlocked=!S.sovUnlocked;showToast(S.sovUnlocked?"Sovereign ON":"Sovereign OFF");saveGame();}
-function adminExport(){const data=btoa(JSON.stringify(S));showModal("Export Save",`<div style="font-size:.7rem;color:var(--dim);margin-bottom:8px">Username: ${S.username} | Code: ${S.saveCode}</div><textarea style="width:100%;height:80px;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-size:.6rem;resize:none" readonly>${data}</textarea>`,[{t:"Close",c:"bs",a:"closeModal()"}]);}
+function adminExport(){const cleanS={...S};delete cleanS.scd;delete cleanS.csCd;delete cleanS.debuffCd;delete cleanS.buffs;delete cleanS.dbWeak;delete cleanS.dbPoison;delete cleanS.waveOn;const data=btoa(JSON.stringify(cleanS));showModal("Export Save",`<div style="font-size:.7rem;color:var(--dim);margin-bottom:8px">Username: ${S.username} | Code: ${S.saveCode}</div><textarea style="width:100%;height:80px;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-size:.6rem;resize:none" readonly>${data}</textarea>`,[{t:"Close",c:"bs",a:"closeModal()"}]);}
 function adminImportPrompt(){showModal("Import Save","Paste save data below:",[{t:"Cancel",c:"bs",a:"closeModal()"},{t:"Import",c:"bp",a:"doImport()"}],true);document.getElementById("moi").placeholder="Paste base64 save data...";}
 function doImport(){try{const data=document.getElementById("moi").value;const parsed=JSON.parse(atob(data));S={...S,...parsed};saveGame();closeModal();showToast("Save imported!");switchView("core");updateUI();}catch(e){showToast("❌ Invalid save data");}}
 function adminReset(){showModal("⚠️ RESET ALL?","This cannot be undone. All progress will be lost.",[{t:"Cancel",c:"bs",a:"closeModal()"},{t:"RESET",c:"br",a:"doReset()"}]);}
