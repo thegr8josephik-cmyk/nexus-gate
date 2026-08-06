@@ -40,7 +40,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .btn-secondary:hover{background:var(--panel-h)}
 .btn-danger{background:var(--red);color:#fff}
 .btn-sm{padding:8px 16px;font-size:.8rem;min-width:auto}
-/* === STAT PILLS & XP BAR === */
 .stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .stat-pill{flex:1;min-width:80px;padding:8px;background:rgba(0,0,0,.2);border-radius:8px;font-size:.78rem;display:flex;justify-content:space-between;align-items:center}
 .stat-pill-label{color:var(--dim);text-transform:uppercase;font-size:.65rem;letter-spacing:1px}
@@ -49,7 +48,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .xp-bar-label{display:flex;justify-content:space-between;font-size:.7rem;color:var(--dim);margin-bottom:4px}
 .xp-bar-outer{width:100%;height:10px;background:rgba(255,255,255,.08);border-radius:5px;overflow:hidden}
 .xp-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--accent));border-radius:5px;transition:width .4s ease}
-/* === TOWN ACTIONS === */
 .town-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:500px}
 .town-btn{padding:18px;background:var(--panel);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
 .town-btn:hover{background:var(--panel-h);border-color:var(--accent);transform:translateY(-2px)}
@@ -61,7 +59,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .zone-progress-title{font-size:.85rem;font-weight:700;color:var(--accent);margin-bottom:8px}
 .zone-req{display:flex;justify-content:space-between;font-size:.75rem;color:var(--dim);padding:4px 0}
 .zone-req.met{color:var(--green)}
-/* === SHOP === */
 .shop-gold{font-size:1.1rem;font-weight:800;color:var(--gold);text-align:center;margin-top:6px}
 .shop-items{display:flex;flex-direction:column;gap:10px;width:100%;max-width:500px}
 .shop-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;transition:all .2s}
@@ -73,7 +70,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .shop-item-price{padding:8px 14px;background:var(--panel);border:1px solid var(--border);border-radius:8px;font-weight:700;font-size:.82rem;color:var(--gold);cursor:pointer;transition:all .2s;white-space:nowrap}
 .shop-item-price:hover{background:var(--gold);color:#000;border-color:var(--gold)}
 .shop-item-price.cant-afford{opacity:.4;cursor:not-allowed}
-/* === EXPLORATION === */
 .explore-wrap{width:100%;max-width:500px;display:flex;flex-direction:column;align-items:center;gap:12px}
 .explore-zone-name{font-size:1rem;font-weight:700;color:var(--accent)}
 .explore-grid{display:grid;gap:2px;padding:8px;background:rgba(0,0,0,.3);border-radius:12px;border:1px solid var(--border)}
@@ -92,7 +88,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .dpad-btn:active{transform:scale(.92)}
 .dpad-empty{background:transparent;border:none}
 .explore-hint{font-size:.72rem;color:var(--dim);text-align:center}
-/* === ENCOUNTER OVERLAY === */
 .encounter-overlay{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
 .encounter-overlay.active{display:flex}
 .encounter-box{background:#13151a;border:1px solid var(--red);border-radius:16px;padding:24px;max-width:360px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -100,7 +95,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .encounter-title{font-size:1.1rem;font-weight:800;color:var(--red);margin-bottom:6px}
 .encounter-desc{font-size:.85rem;color:var(--dim);margin-bottom:18px}
 .encounter-actions{display:flex;gap:12px;justify-content:center}
-/* === COMBAT === */
 .combat-container{width:100%;max-width:500px;display:flex;flex-direction:column;gap:14px}
 .combat-arena{display:flex;flex-direction:column;justify-content:space-between;gap:16px;padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:14px;min-height:280px}
 .entity-card{display:flex;align-items:center;gap:14px;padding:10px;background:rgba(0,0,0,.2);border-radius:12px;border:1px solid var(--border)}
@@ -110,9 +104,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .entity-lvl{font-size:.7rem;color:var(--gold);font-weight:700}
 .bar-container{width:100%;height:7px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
 .bar-fill{height:100%;transition:width .3s ease}
-.bar-hp{background:var(--red)}
-.bar-mp{background:var(--blue)}
-.bar-enemy{background:var(--red)}
+.bar-hp{background:var(--red)}.bar-mp{background:var(--blue)}.bar-enemy{background:var(--red)}
 .combat-log{height:70px;overflow-y:auto;padding:8px;background:rgba(0,0,0,.4);border-radius:8px;font-family:monospace;font-size:.75rem;color:var(--dim);line-height:1.4;border:1px solid var(--border)}
 .combat-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 .action-btn{padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:inherit;font-weight:700;color:var(--text);transition:all .2s;display:flex;flex-direction:column;align-items:center}
@@ -120,7 +112,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .action-btn:disabled{opacity:.4;cursor:not-allowed}
 .action-icon{font-size:1.1rem;margin-bottom:2px}
 .action-label{font-size:.78rem}
-/* === TUTORIAL === */
 .tutorial-overlay{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:20px}
 .tutorial-overlay.active{display:flex}
 .tutorial-box{background:#13151a;border:1px solid var(--accent);border-radius:18px;padding:24px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -132,7 +123,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .tutorial-text{font-size:.88rem;color:var(--dim);line-height:1.7;margin-bottom:20px}
 .tutorial-text strong{color:var(--text)}
 .tutorial-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-/* === TOAST & POPUP === */
 .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--panel);border:1px solid var(--accent);backdrop-filter:blur(10px);padding:12px 24px;border-radius:12px;font-weight:700;color:var(--accent);opacity:0;pointer-events:none;transition:all .3s;z-index:500;text-align:center;font-size:.88rem;max-width:90%}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .xp-popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.92);border:2px solid var(--gold);border-radius:16px;padding:22px 36px;text-align:center;z-index:400;animation:xpPop .5s ease-out}
@@ -206,15 +196,9 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <div class="explore-zone-name" id="explore-zone">Verdant Woods</div>
 <div class="explore-grid" id="explore-grid"></div>
 <div class="dpad">
-<div class="dpad-empty"></div>
-<button class="dpad-btn" onclick="movePlayer(0,-1)">▲</button>
-<div class="dpad-empty"></div>
-<button class="dpad-btn" onclick="movePlayer(-1,0)">◀</button>
-<div class="dpad-empty"></div>
-<button class="dpad-btn" onclick="movePlayer(1,0)">▶</button>
-<div class="dpad-empty"></div>
-<button class="dpad-btn" onclick="movePlayer(0,1)">▼</button>
-<div class="dpad-empty"></div>
+<div class="dpad-empty"></div><button class="dpad-btn" onclick="movePlayer(0,-1)">▲</button><div class="dpad-empty"></div>
+<button class="dpad-btn" onclick="movePlayer(-1,0)">◀</button><div class="dpad-empty"></div><button class="dpad-btn" onclick="movePlayer(1,0)">▶</button>
+<div class="dpad-empty"></div><button class="dpad-btn" onclick="movePlayer(0,1)">▼</button><div class="dpad-empty"></div>
 </div>
 <div class="explore-hint">Walk through tall grass to find monsters. Reach the glowing tile to advance.</div>
 <button class="btn btn-secondary btn-sm" onclick="showScreen('town')">← Return to Town</button>
@@ -268,18 +252,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 
-<!-- TUTORIAL -->
-<div class="tutorial-overlay" id="tutorial-overlay">
-<div class="tutorial-box">
-<div class="tutorial-step-indicator" id="tutorial-dots"></div>
-<div class="tutorial-title" id="tutorial-title">Welcome</div>
-<div class="tutorial-text" id="tutorial-text"></div>
-<div class="tutorial-actions">
-<button class="btn btn-secondary" onclick="skipTutorial()">Skip</button>
-<button class="btn btn-primary" id="btn-tutorial-next" onclick="nextTutorialStep()">Next</button>
-</div>
-</div>
-</div>
 <!-- SAVE CODE MODAL -->
 <div class="encounter-overlay" id="savecode-overlay">
 <div class="encounter-box" style="max-width:420px">
@@ -293,12 +265,25 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <div style="margin-top:14px"><button class="btn btn-secondary btn-sm" onclick="document.getElementById('savecode-overlay').classList.remove('active')">Close</button></div>
 </div>
 </div>
-  
+
+<!-- TUTORIAL -->
+<div class="tutorial-overlay" id="tutorial-overlay">
+<div class="tutorial-box">
+<div class="tutorial-step-indicator" id="tutorial-dots"></div>
+<div class="tutorial-title" id="tutorial-title">Welcome</div>
+<div class="tutorial-text" id="tutorial-text"></div>
+<div class="tutorial-actions">
+<button class="btn btn-secondary" onclick="skipTutorial()">Skip</button>
+<button class="btn btn-primary" id="btn-tutorial-next" onclick="nextTutorialStep()">Next</button>
+</div>
+</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ===== STATE =====
-let G={class:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false};
+let G={cls:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false};
 let selectedClass=null;
 let combatState={active:false,enemy:null,turn:'player',log:[]};
 let pendingEncounter=null;
@@ -319,7 +304,7 @@ spider:{name:'Venom Spider',baseHp:55,baseAtk:8,baseDef:4,baseXp:35,baseGold:22,
 golem:{name:'Crystal Golem',baseHp:80,baseAtk:10,baseDef:6,baseXp:50,baseGold:32,hpG:12,atkG:2.5,defG:1.8,xpG:12,goldG:7,color:'#06b6d4',icon:'🗿'},
 knight:{name:'Bone Knight',baseHp:95,baseAtk:12,baseDef:7,baseXp:65,baseGold:40,hpG:13,atkG:3,defG:2,xpG:14,goldG:8,color:'#94a3b8',icon:'💀'},
 elemental:{name:'Storm Elemental',baseHp:110,baseAtk:14,baseDef:6,baseXp:80,baseGold:50,hpG:14,atkG:3.2,defG:1.8,xpG:16,goldG:10,color:'#3b82f6',icon:'⚡'},
-wraith:{name:'Void Wraith',baseHp:130,baseAtk:16,baseDef:8,baseXp:100,baseGold:65,hpG:16,atkG:3.5,defG:2.2,xpG:20,goldG:12,color:'#a855f7',icon:'👻'},
+wraith:{name:'Void Wraith',baseHp:130,baseAtk:16,baseDef:8,baseXp:100,baseGold:65,hpG:16,atkG:3.5,defG:2.2,xpG:20,goldG:12,color:'#a855f7',icon:'👻'}
 };
 
 // ===== ZONES =====
@@ -327,10 +312,10 @@ const ZONES=[
 {id:'woods',name:'Verdant Woods',town:'Haven',levelReq:1,killReq:0,monsters:['imp','wolf'],minLvl:1,maxLvl:5,desc:'A peaceful forest on the edge of civilization.'},
 {id:'caverns',name:'Crystal Caverns',town:'Deephold',levelReq:5,killReq:15,monsters:['sprite','spider','golem'],minLvl:5,maxLvl:10,desc:'Glittering caves filled with danger.'},
 {id:'wastes',name:'Bone Wastes',town:'Ashen Rest',levelReq:10,killReq:40,monsters:['knight','elemental'],minLvl:10,maxLvl:16,desc:'A desolate graveyard of forgotten wars.'},
-{id:'depths',name:'Void Depths',town:'Last Light',levelReq:16,killReq:80,monsters:['wraith'],minLvl:16,maxLvl:25,desc:'Where reality frays at the seams.'},
+{id:'depths',name:'Void Depths',town:'Last Light',levelReq:16,killReq:80,monsters:['wraith'],minLvl:16,maxLvl:25,desc:'Where reality frays at the seams.'}
 ];
 
-// ===== MAP (0=grass,1=wall,2=path,3=exit) =====
+// ===== MAP =====
 const MAP=[
 [1,1,1,1,1,1,1,1,1],
 [1,2,0,0,0,0,0,0,1],
@@ -338,14 +323,14 @@ const MAP=[
 [1,0,0,1,0,0,0,0,1],
 [1,0,0,0,0,0,1,0,1],
 [1,0,0,0,0,0,0,3,1],
-[1,1,1,1,1,1,1,1,1],
+[1,1,1,1,1,1,1,1,1]
 ];
 
 // ===== SHOP =====
 const SHOP_ITEMS=[
 {id:'potion',name:'Health Potion',desc:'Restores 50% HP',price:25,icon:'🧪'},
 {id:'manaPotion',name:'Mana Potion',desc:'Restores 50% MP',price:20,icon:'💧'},
-{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗'},
+{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗'}
 ];
 
 // ===== TUTORIAL =====
@@ -354,88 +339,70 @@ const TUTORIAL_STEPS=[
 {title:'Your Class',text:'You are a <strong><span id="tut-class-name"></span></strong>.<br>• <strong>VIT</strong>: Health<br>• <strong>ATK</strong>: Damage<br>• <strong>DEF</strong>: Damage reduction'},
 {title:'Exploration',text:'Use <strong>Explore</strong> to walk through the wilds. Stepping on <strong>tall grass</strong> may trigger an encounter. Reach the <strong>glowing tile</strong> to find the path forward.'},
 {title:'Combat',text:'Battles are <strong>turn-based</strong>. Attack, use Skills (cost MP), drink Potions, or Flee. Defeat enemies to earn <strong>XP</strong> and <strong>Gold</strong>.'},
-{title:'Progression',text:'Level up to grow stronger. Unlock new <strong>Zones</strong> by reaching level and kill thresholds. Rest in town to recover.'},
+{title:'Progression',text:'Level up to grow stronger. Unlock new <strong>Zones</strong> by reaching level and kill thresholds. Rest in town to recover.'}
 ];
 let tutorialStep=0;
 
 // ===== HELPERS =====
-function getPlayerAtk(){const c=CLASSES[G.class];return pcls.baseAtk+Math.floor(G.level*1.5);}
-function getPlayerDef(){const c=CLASSES[G.class];return pcls.baseDef+Math.floor(G.level*0.5);}
-function getMonsterStats(id,lvl){const m=MONSTERS[id];return{name:m.name,lvl:lvl,hp:m.baseHp+Math.floor(lvl*m.hpG),maxHp:m.baseHp+Math.floor(lvl*m.hpG),atk:m.baseAtk+Math.floor(lvl*m.atkG),def:m.baseDef+Math.floor(lvl*m.defG),xp:m.baseXp+Math.floor(lvl*m.xpG),gold:m.baseGold+Math.floor(lvl*m.goldG),color:m.color,icon:m.icon};}
+function getPlayerAtk(){return CLASSES[G.cls].baseAtk+Math.floor(G.level*1.5);}
+function getPlayerDef(){return CLASSES[G.cls].baseDef+Math.floor(G.level*0.5);}
+function getMonsterStats(id,lvl){var m=MONSTERS[id];return{name:m.name,lvl:lvl,hp:m.baseHp+Math.floor(lvl*m.hpG),maxHp:m.baseHp+Math.floor(lvl*m.hpG),atk:m.baseAtk+Math.floor(lvl*m.atkG),def:m.baseDef+Math.floor(lvl*m.defG),xp:m.baseXp+Math.floor(lvl*m.xpG),gold:m.baseGold+Math.floor(lvl*m.goldG),color:m.color,icon:m.icon};}
 
 // ===== CLASS SELECT =====
-function selectClass(cls){selectedClass=cls;document.querySelectorAll('.class-card').forEach(c=>pcls.classList.remove('selected'));event.currentTarget.classList.add('selected');const b=document.getElementById('btn-start');b.disabled=false;b.textContent='Begin as '+CLASSES[cls].name;}
-function startGame(){if(!selectedClass)return;G.class=selectedClass;const c=CLASSES[selectedClass];G.maxHp=pcls.baseHp;G.hp=pcls.maxHp;G.maxMp=pcls.baseMp;G.mp=pcls.maxMp;showToast('Welcome, '+pcls.name);setTimeout(openTutorial,600);}
+function selectClass(cls){selectedClass=cls;document.querySelectorAll('.class-card').forEach(function(el){el.classList.remove('selected');});event.currentTarget.classList.add('selected');var b=document.getElementById('btn-start');b.disabled=false;b.textContent='Begin as '+CLASSES[cls].name;}
+function startGame(){if(!selectedClass)return;G.cls=selectedClass;var cl=CLASSES[selectedClass];G.maxHp=cl.baseHp;G.hp=G.maxHp;G.maxMp=cl.baseMp;G.mp=G.maxMp;showToast('Welcome, '+cl.name);setTimeout(openTutorial,600);}
 
 // ===== TUTORIAL =====
 function openTutorial(){tutorialStep=0;renderTutorialStep();document.getElementById('tutorial-overlay').classList.add('active');}
-function renderTutorialStep(){const s=TUTORIAL_STEPS[tutorialStep];document.getElementById('tutorial-title').textContent=s.title;let t=s.text;if(t.includes('tut-class-name'))t=t.replace('<span id="tut-class-name"></span>',CLASSES[G.class].name);document.getElementById('tutorial-text').innerHTML=t;const d=document.getElementById('tutorial-dots');d.innerHTML='';TUTORIAL_STEPS.forEach((x,i)=>{const dot=document.createElement('div');dot.className='tutorial-dot';if(i===tutorialStep)dot.classList.add('active');if(i<tutorialStep)dot.classList.add('completed');d.appendChild(dot);});document.getElementById('btn-tutorial-next').textContent=(tutorialStep===TUTORIAL_STEPS.length-1)?'Enter the World':'Next';}
+function renderTutorialStep(){var s=TUTORIAL_STEPS[tutorialStep];document.getElementById('tutorial-title').textContent=s.title;var t=s.text;if(t.includes('tut-class-name'))t=t.replace('<span id="tut-class-name"></span>',CLASSES[G.cls].name);document.getElementById('tutorial-text').innerHTML=t;var d=document.getElementById('tutorial-dots');d.innerHTML='';TUTORIAL_STEPS.forEach(function(x,i){var dot=document.createElement('div');dot.className='tutorial-dot';if(i===tutorialStep)dot.classList.add('active');if(i<tutorialStep)dot.classList.add('completed');d.appendChild(dot);});document.getElementById('btn-tutorial-next').textContent=(tutorialStep===TUTORIAL_STEPS.length-1)?'Enter the World':'Next';}
 function nextTutorialStep(){tutorialStep++;if(tutorialStep>=TUTORIAL_STEPS.length){document.getElementById('tutorial-overlay').classList.remove('active');G.tutorialCompleted=true;showScreen('town');saveGame();return;}renderTutorialStep();}
 function skipTutorial(){tutorialStep=TUTORIAL_STEPS.length-1;nextTutorialStep();}
 
 // ===== SCREENS =====
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();}
 
 // ===== TOWN =====
-function updateTownUI(){const z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;const pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
-function renderZoneProgress(){const el=document.getElementById('zone-progress');let html='';if(G.zone<ZONES.length-1){const next=ZONES[G.zone+1];const lvlMet=G.level>=next.levelReq;const killMet=G.kills>=next.killReq;html+=`<div class="zone-progress-title">Next Zone: ${next.name}</div>`;html+=`<div class="zone-req ${lvlMet?'met':''}"><span>Level Requirement</span><span>${G.level} / ${next.levelReq} ${lvlMet?'✓':''}</span></div>`;html+=`<div class="zone-req ${killMet?'met':''}"><span>Kill Requirement</span><span>${G.kills} / ${next.killReq} ${killMet?'✓':''}</span></div>`;if(lvlMet&&killMet){html+=`<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to ${next.name}</button>`;}}else{html+=`<div class="zone-progress-title">You have reached the final zone.</div>`;}el.innerHTML=html;}
+function updateTownUI(){var z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;var pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
+function renderZoneProgress(){var el=document.getElementById('zone-progress');var html='';if(G.zone<ZONES.length-1){var next=ZONES[G.zone+1];var lvlMet=G.level>=next.levelReq;var killMet=G.kills>=next.killReq;html+='<div class="zone-progress-title">Next Zone: '+next.name+'</div>';html+='<div class="zone-req '+(lvlMet?'met':'')+'"><span>Level Requirement</span><span>'+G.level+' / '+next.levelReq+(lvlMet?' ✓':'')+'</span></div>';html+='<div class="zone-req '+(killMet?'met':'')+'"><span>Kill Requirement</span><span>'+G.kills+' / '+next.killReq+(killMet?' ✓':'')+'</span></div>';if(lvlMet&&killMet){html+='<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to '+next.name+'</button>';}}else{html+='<div class="zone-progress-title">You have reached the final zone.</div>';}el.innerHTML=html;}
 function advanceZone(){if(G.zone<ZONES.length-1){G.zone++;G.playerX=1;G.playerY=1;showToast('Arrived at '+ZONES[G.zone].name+'!');updateTownUI();}}
-function doRest(){if(G.resting)return;G.resting=true;const btn=document.getElementById('btn-rest');const desc=document.getElementById('rest-desc');btn.classList.add('disabled');despcls.textContent='Resting...';let t=3;const iv=setInterval(()=>{t--;despcls.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=G.maxHp;G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');despcls.textContent='Restore HP/MP';updateTownUI();showToast('You feel fully restored.');}},1000);}
+function doRest(){if(G.resting)return;G.resting=true;var btn=document.getElementById('btn-rest');var desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';var t=3;var iv=setInterval(function(){t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=G.maxHp;G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP';updateTownUI();showToast('You feel fully restored.');}},1000);}
 
 // ===== SHOP =====
-function renderShop(){document.getElementById('s-gold').textContent=G.gold;const c=document.getElementById('shop-items');pcls.innerHTML='';SHOP_ITEMS.forEach(item=>{const can=G.gold>=item.price;const d=document.createElement('div');d.className='shop-item';d.innerHTML=`<div class="shop-item-icon">${item.icon}</div><div class="shop-item-info"><div class="shop-item-name">${item.name}</div><div class="shop-item-desc">${item.desc}</div></div><button class="shop-item-price ${can?'':'cant-afford'}" onclick="buyItem('${item.id}')">${item.price}g</button>`;pcls.appendChild(d);});}
-function buyItem(id){const item=SHOP_ITEMS.find(i=>i.id===id);if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=G.maxHp;G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
+function renderShop(){document.getElementById('s-gold').textContent=G.gold;var container=document.getElementById('shop-items');container.innerHTML='';SHOP_ITEMS.forEach(function(item){var can=G.gold>=item.price;var d=document.createElement('div');d.className='shop-item';d.innerHTML='<div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-info"><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div></div><button class="shop-item-price '+(can?'':'cant-afford')+'" onclick="buyItem(\''+item.id+'\')">'+item.price+'g</button>';container.appendChild(d);});}
+function buyItem(id){var item=SHOP_ITEMS.find(function(i){return i.id===id;});if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=G.maxHp;G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
 
 // ===== EXPLORATION =====
 function openExplore(){G.playerX=1;G.playerY=1;renderExplore();showScreen('explore');document.getElementById('explore-zone').textContent=ZONES[G.zone].name;}
-function renderExplore(){const grid=document.getElementById('explore-grid');grid.style.gridTemplateColumns=`repeat(${MAP[0].length},34px)`;grid.innerHTML='';for(let y=0;y<MAP.length;y++){for(let x=0;x<MAP[y].length;x++){const cell=document.createElement('div');const t=MAP[y][x];let cls='explore-cell ';if(t===1)cls+='wall';else if(t===0)cls+='grass';else if(t===2)cls+='path';else if(t===3)cls+='exit';if(x===G.playerX&&y===G.playerY)cls+=' player';cell.className=cls;cell.onclick=()=>tryMoveTo(x,y);grid.appendChild(cell);}}}
-function movePlayer(dx,dy){const nx=G.playerX+dx,ny=G.playerY+dy;if(ny<0||ny>=MAP.length||nx<0||nx>=MAP[0].length)return;if(MAP[ny][nx]===1)return;G.playerX=nx;G.playerY=ny;renderExplore();checkTile();}
-function tryMoveTo(x,y){const dx=x-G.playerX,dy=y-G.playerY;if(Math.abs(dx)+Math.abs(dy)===1){movePlayer(dx,dy);}}
-function checkTile(){const t=MAP[G.playerY][G.playerX];if(t===3){showToast('You found the path forward! Return to town to advance.');return;}if(t===0){if(Math.random()<0.22){triggerEncounter();}}}
-function triggerEncounter(){const z=ZONES[G.zone];const mid=z.monsters[Math.floor(Math.random()*z.monsters.length)];const lvl=Math.max(z.minLvl,Math.min(z.maxLvl,G.level+Math.floor(Math.random()*3)-1));const stats=getMonsterStats(mid,lvl);pendingEncounter=stats;const ov=document.getElementById('encounter-overlay');document.getElementById('enc-icon').textContent=stats.icon;document.getElementById('enc-icon').style.background=`radial-gradient(circle,${stats.color},#000)`;document.getElementById('enc-icon').style.color=stats.color;document.getElementById('enc-title').textContent='A wild '+stats.name+' appears!';document.getElementById('enc-desc').textContent='Level '+stats.lvl+' — Prepare for battle.';ov.classList.add('active');}
+function renderExplore(){var grid=document.getElementById('explore-grid');grid.style.gridTemplateColumns='repeat('+MAP[0].length+',34px)';grid.innerHTML='';for(var y=0;y<MAP.length;y++){for(var x=0;x<MAP[y].length;x++){var cell=document.createElement('div');var t=MAP[y][x];var cls='explore-cell ';if(t===1)cls+='wall';else if(t===0)cls+='grass';else if(t===2)cls+='path';else if(t===3)cls+='exit';if(x===G.playerX&&y===G.playerY)cls+=' player';cell.className=cls;cell.setAttribute('data-x',x);cell.setAttribute('data-y',y);cell.onclick=function(){tryMoveTo(parseInt(this.getAttribute('data-x')),parseInt(this.getAttribute('data-y')));};grid.appendChild(cell);}}}
+function movePlayer(dx,dy){var nx=G.playerX+dx,ny=G.playerY+dy;if(ny<0||ny>=MAP.length||nx<0||nx>=MAP[0].length)return;if(MAP[ny][nx]===1)return;G.playerX=nx;G.playerY=ny;renderExplore();checkTile();}
+function tryMoveTo(x,y){var dx=x-G.playerX,dy=y-G.playerY;if(Math.abs(dx)+Math.abs(dy)===1){movePlayer(dx,dy);}}
+function checkTile(){var t=MAP[G.playerY][G.playerX];if(t===3){showToast('You found the path forward! Return to town to advance.');return;}if(t===0){if(Math.random()<0.22){triggerEncounter();}}}
+function triggerEncounter(){var z=ZONES[G.zone];var mid=z.monsters[Math.floor(Math.random()*z.monsters.length)];var lvl=Math.max(z.minLvl,Math.min(z.maxLvl,G.level+Math.floor(Math.random()*3)-1));var stats=getMonsterStats(mid,lvl);pendingEncounter=stats;var ov=document.getElementById('encounter-overlay');document.getElementById('enc-icon').textContent=stats.icon;document.getElementById('enc-icon').style.background='radial-gradient(circle,'+stats.color+',#000)';document.getElementById('enc-icon').style.color=stats.color;document.getElementById('enc-title').textContent='A wild '+stats.name+' appears!';document.getElementById('enc-desc').textContent='Level '+stats.lvl+' — Prepare for battle.';ov.classList.add('active');}
 function startCombatFromEncounter(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;startCombat(pendingEncounter);pendingEncounter=null;}
 function fleeEncounter(){document.getElementById('encounter-overlay').classList.remove('active');pendingEncounter=null;showToast('You slipped away safely.');}
 
 // ===== COMBAT =====
-function startCombat(enemy){combatState.active=true;combatState.enemy={...enemy,currentHp:enemy.hp};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
-function updateCombatUI(){const e=combatState.enemy;const pcls=CLASSES[G.class];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle,${e.color},#000)`;document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=pcls.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background=`radial-gradient(circle,${pcls.color},#000)`;document.getElementById('c-player-portrait').style.color=pcls.color;document.getElementById('c-player-portrait').textContent=pcls.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;
-const c=CLASSES[G.class];
-if(pcls.skills[0])document.getElementById('skill-btn-0').textContent=pcls.skills[0].name+' ('+pcls.skills[0].cost+' MP)';
-if(pcls.skills[1]){document.getElementById('skill-btn-1').textContent=pcls.skills[1].name+' ('+pcls.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}
-else{document.getElementById('skill-btn-1-wrap').style.display='none';}const log=document.getElementById('c-log');log.innerHTML=combatState.log.join('<br>');log.scrollTop=log.scrollHeight;}
+function startCombat(enemy){combatState.active=true;combatState.enemy={hp:enemy.hp,maxHp:enemy.maxHp,atk:enemy.atk,def:enemy.def,xp:enemy.xp,gold:enemy.gold,name:enemy.name,lvl:enemy.lvl,color:enemy.color,icon:enemy.icon,currentHp:enemy.hp};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
+function updateCombatUI(){var e=combatState.enemy;var pcls=CLASSES[G.cls];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background='radial-gradient(circle,'+e.color+',#000)';document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=pcls.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background='radial-gradient(circle,'+pcls.color+',#000)';document.getElementById('c-player-portrait').style.color=pcls.color;document.getElementById('c-player-portrait').textContent=pcls.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;if(pcls.skills[0])document.getElementById('skill-btn-0').textContent=pcls.skills[0].name+' ('+pcls.skills[0].cost+' MP)';if(pcls.skills[1]){document.getElementById('skill-btn-1').textContent=pcls.skills[1].name+' ('+pcls.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}else{document.getElementById('skill-btn-1-wrap').style.display='none';}var logEl=document.getElementById('c-log');logEl.innerHTML=combatState.log.join('<br>');logEl.scrollTop=logEl.scrollHeight;}
 function logCombat(m){combatState.log.push('> '+m);if(combatState.log.length>6)combatState.log.shift();updateCombatUI();}
-function useSkill(idx){
-if(!combatState.active||combatState.turn!=='player')return;
-const c=CLASSES[G.class],e=combatState.enemy;
-const sk=pcls.skills[idx];
-if(!sk){showToast('No such skill!');return;}
-if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}
-G.mp-=sk.cost;
-const dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);
-e.currentHp-=dmg;
-logCombat(`You cast ${sk.name} for ${dmg} dmg! (-${sk.cost} MP)`);
-updateCombatUI();
-if(e.currentHp<=0){winBattle();}
-else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}
-}
-function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;const c=CLASSES[G.class],e=combatState.enemy;let dmg=0;if(type==='attack'){dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));e.currentHp-=dmg;logCombat(`You strike ${e.name} for ${dmg} dmg.`);}else if(type==='skill'){useSkill(0);return;}else if(type==='item'){if(G.potions>0){G.potions--;const heal=Math.floor(G.maxHp*0.5);G.hp=Math.min(G.maxHp,G.hp+heal);logCombat(`You drink a potion (+${heal} HP).`);}else{showToast('No potions!');return;}}else if(type==='flee'){logCombat('You fled!');combatState.active=false;setTimeout(()=>showScreen('explore'),800);return;}updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
-function enemyTurn(){if(!combatState.active)return;const e=combatState.enemy;const dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(`${e.name} hits you for ${dmg} dmg.`);updateCombatUI();if(G.hp<=0){loseBattle();}else{combatState.turn='player';}}
-function winBattle(){const e=combatState.enemy;G.xp+=e.xp;G.gold+=e.gold;G.kills++;combatState.active=false;const p=document.createElement('div');p.className='xp-popup';p.innerHTML=`<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+${e.xp} XP<br>+${e.gold} Gold</div>`;document.body.appendChild(p);setTimeout(()=>p.remove(),2200);let leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp+=12;G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(()=>{if(leveled)showToast('LEVEL UP! You are now level '+G.level);showScreen('explore');},2300);}
-function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(G.maxHp*0.5);combatState.active=false;setTimeout(()=>{showToast('You wake up in town...');showScreen('town');},1800);}
+function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;var e=combatState.enemy;var dmg=0;if(type==='attack'){dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));e.currentHp-=dmg;logCombat('You strike '+e.name+' for '+dmg+' dmg.');}else if(type==='item'){if(G.potions>0){G.potions--;var heal=Math.floor(G.maxHp*0.5);G.hp=Math.min(G.maxHp,G.hp+heal);logCombat('You drink a potion (+'+heal+' HP).');}else{showToast('No potions!');return;}}else if(type==='flee'){logCombat('You fled!');combatState.active=false;setTimeout(function(){showScreen('explore');},800);return;}updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
+function useSkill(idx){if(!combatState.active||combatState.turn!=='player')return;var pcls=CLASSES[G.cls];var e=combatState.enemy;var sk=pcls.skills[idx];if(!sk){showToast('No such skill!');return;}if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}G.mp-=sk.cost;var dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;logCombat('You cast '+sk.name+' for '+dmg+' dmg! (-'+sk.cost+' MP)');updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
+function enemyTurn(){if(!combatState.active)return;var e=combatState.enemy;var dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(e.name+' hits you for '+dmg+' dmg.');updateCombatUI();if(G.hp<=0){loseBattle();}else{combatState.turn='player';}}
+function winBattle(){var e=combatState.enemy;G.xp+=e.xp;G.gold+=e.gold;G.kills++;combatState.active=false;var p=document.createElement('div');p.className='xp-popup';p.innerHTML='<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+'+e.xp+' XP<br>+'+e.gold+' Gold</div>';document.body.appendChild(p);setTimeout(function(){p.remove();},2200);var leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp+=12;G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(function(){if(leveled)showToast('LEVEL UP! You are now level '+G.level);showScreen('explore');},2300);}
+function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(G.maxHp*0.5);combatState.active=false;setTimeout(function(){showToast('You wake up in town...');showScreen('town');},1800);}
 
-// ===== SAVE/LOAD =====
-function saveGame(){try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(e){}}
-function loadGame(){try{const s=localStorage.getItem('nexus-pocket-rpg-save');if(s)G={...G,...JSON.parse(s)};}catch(e){}}
-function exportRpgSave(){const data=btoa(JSON.stringify(G));const ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied to clipboard!');}catch(e){showToast('Code shown below — long-press to copy.');}}
-function resetRpg(){
-if(!confirm('Are you sure you want to reset ALL progress? This cannot be undone.'))return;
-localStorage.removeItem('nexus-pocket-rpg-save');
-location.reload();
-}
-function importRpgSave(){const ta=document.getElementById('savecode-input');const code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{const parsed=JSON.parse(atob(code));G={...G,...parsed};saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported! Welcome back.');showScreen('town');updateTownUI();}catch(e){showToast('Invalid save code!');}}
-function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+// ===== SAVE/LOAD/RESET =====
+function saveGame(){try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(ex){}}
+function loadGame(){try{var s=localStorage.getItem('nexus-pocket-rpg-save');if(s)G=Object.assign({},G,JSON.parse(s));}catch(ex){}}
+function resetRpg(){if(!confirm('Are you sure you want to reset ALL progress? This cannot be undone.'))return;localStorage.removeItem('nexus-pocket-rpg-save');location.reload();}
+function exportRpgSave(){var data=btoa(JSON.stringify(G));var ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied to clipboard!');}catch(ex){showToast('Code shown below — long-press to copy.');}}
+function importRpgSave(){var ta=document.getElementById('savecode-input');var code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{var parsed=JSON.parse(atob(code));G=Object.assign({},G,parsed);saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported! Welcome back.');showScreen('town');updateTownUI();}catch(ex){showToast('Invalid save code!');}}
 
-function init(){loadGame();if(G.class&&G.tutorialCompleted){showScreen('town');showToast('Welcome back, '+CLASSES[G.class].name);}}
+// ===== UI =====
+function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
+
+// ===== INIT =====
+function init(){loadGame();if(G.cls&&G.tutorialCompleted){showScreen('town');showToast('Welcome back, '+CLASSES[G.cls].name);}}
 init();
 </script>
 </body>
