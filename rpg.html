@@ -19,7 +19,6 @@ font-family:Georgia,'Times New Roman',serif;
 height:100dvh;display:flex;flex-direction:column;
 overflow:hidden;position:relative;
 }
-/* === BACKGROUND === */
 .bg-layer{
 position:fixed;inset:0;z-index:0;
 background:
@@ -28,7 +27,6 @@ radial-gradient(circle at 80% 70%,rgba(168,85,247,.06) 0%,transparent 50%),
 var(--bg);
 pointer-events:none;
 }
-/* === NAVIGATION === */
 .close-sigil{
 position:fixed;top:max(env(safe-area-inset-top),12px);right:16px;z-index:200;
 width:40px;height:40px;background:var(--panel);backdrop-filter:blur(12px);
@@ -38,15 +36,14 @@ text-decoration:none;color:var(--dim);font-size:1.1rem;
 transition:all .2s;
 }
 .close-sigil:hover{background:var(--panel-h);color:var(--text)}
-/* === SCREENS === */
 .screen{
 display:none;flex:1;flex-direction:column;
-align-items:center;justify-content:center;
+align-items:center;justify-content:flex-start;
 padding:20px;overflow-y:auto;gap:20px;
 position:relative;z-index:1;
+padding-top:60px;
 }
 .screen.active{display:flex}
-/* === TYPOGRAPHY === */
 .game-title{
 font-size:2.2rem;font-weight:800;text-align:center;
 background:linear-gradient(135deg,var(--accent),var(--purple),var(--gold));
@@ -63,7 +60,6 @@ max-width:400px;line-height:1.6;
 font-size:.75rem;text-transform:uppercase;letter-spacing:2px;
 color:var(--dim);margin-bottom:12px;text-align:center;
 }
-/* === CLASS CARDS === */
 .class-grid{
 display:flex;flex-direction:column;gap:14px;
 width:100%;max-width:420px;
@@ -127,7 +123,6 @@ color:var(--dim);margin-bottom:4px;
 font-size:.95rem;font-weight:700;
 color:var(--card-accent,#6366f1);
 }
-/* === BUTTONS === */
 .btn{
 padding:14px 28px;border-radius:12px;border:none;
 font-family:inherit;font-weight:700;font-size:.95rem;
@@ -149,7 +144,84 @@ background:var(--panel);color:var(--text);
 border:1px solid var(--border);
 }
 .btn-secondary:hover{background:var(--panel-h)}
-/* === TUTORIAL OVERLAY === */
+
+/* === TOWN === */
+.town-container{
+width:100%;max-width:500px;display:flex;flex-direction:column;gap:16px;
+}
+.town-header{
+text-align:center;padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;
+}
+.town-stats{
+display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;
+}
+.stat-pill{
+padding:8px;background:rgba(0,0,0,.2);border-radius:8px;font-size:.8rem;
+display:flex;justify-content:space-between;align-items:center;
+}
+.stat-pill-label{color:var(--dim);text-transform:uppercase;font-size:.7rem;letter-spacing:1px;}
+.stat-pill-val{font-weight:700;color:var(--text);}
+.town-actions{
+display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.town-btn{
+padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:12px;
+cursor:pointer;transition:all .2s;text-align:center;
+display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+.town-btn:hover{background:var(--panel-h);border-color:var(--accent);transform:translateY(-2px)}
+.town-btn-icon{font-size:1.5rem;color:var(--accent)}
+.town-btn-text{font-weight:700;font-size:.9rem}
+.town-btn-desc{font-size:.7rem;color:var(--dim)}
+
+/* === COMBAT === */
+.combat-container{
+width:100%;max-width:500px;display:flex;flex-direction:column;gap:16px;height:100%;
+}
+.combat-arena{
+flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:20px;
+padding:20px;background:var(--panel);border:1px solid var(--border);border-radius:14px;
+min-height:300px;
+}
+.entity-card{
+display:flex;align-items:center;gap:16px;padding:12px;
+background:rgba(0,0,0,.2);border-radius:12px;border:1px solid var(--border);
+}
+.entity-portrait{
+width:60px;height:60px;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:1.5rem;color:#fff;
+box-shadow:0 0 15px currentColor;
+flex-shrink:0;
+}
+.entity-info{flex:1;display:flex;flex-direction:column;gap:6px}
+.entity-name{font-weight:700;font-size:1rem}
+.bar-container{
+width:100%;height:8px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden;
+}
+.bar-fill{height:100%;transition:width .3s ease}
+.bar-hp{background:var(--red)}
+.bar-mp{background:var(--blue)}
+.bar-enemy{background:var(--red)}
+.combat-log{
+height:80px;overflow-y:auto;padding:10px;background:rgba(0,0,0,.4);border-radius:8px;
+font-family:monospace;font-size:.8rem;color:var(--dim);line-height:1.4;
+border:1px solid var(--border);
+}
+.combat-actions{
+display:grid;grid-template-columns:repeat(2,1fr);gap:10px;
+}
+.action-btn{
+padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;
+cursor:pointer;font-family:inherit;font-weight:700;color:var(--text);
+transition:all .2s;display:flex;flex-direction:column;align-items:center;
+}
+.action-btn:hover{background:var(--panel-h);border-color:var(--accent)}
+.action-btn:disabled{opacity:.4;cursor:not-allowed}
+.action-icon{font-size:1.2rem;margin-bottom:4px}
+.action-label{font-size:.8rem}
+
+/* === TUTORIAL === */
 .tutorial-overlay{
 position:fixed;inset:0;z-index:300;
 background:rgba(0,0,0,.85);backdrop-filter:blur(8px);
@@ -188,7 +260,6 @@ margin-bottom:24px;
 .tutorial-actions{
 display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
 }
-/* === TOAST === */
 .toast{
 position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);
 background:var(--panel);border:1px solid var(--accent);
@@ -198,7 +269,6 @@ opacity:0;pointer-events:none;transition:all .3s;z-index:500;
 text-align:center;font-size:.9rem;max-width:90%;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* === RESPONSIVE === */
 @media(max-width:480px){
 .game-title{font-size:1.8rem}
 .class-grid{max-width:100%}
@@ -209,7 +279,6 @@ text-align:center;font-size:.9rem;max-width:90%;
 <body>
 
 <div class="bg-layer"></div>
-
 <a href="./index.html" class="close-sigil" title="Return to Nexus Gate">✕</a>
 
 <!-- === CLASS SELECTION SCREEN === -->
@@ -219,71 +288,84 @@ text-align:center;font-size:.9rem;max-width:90%;
 The Nexus Gate has opened, casting you into a fractured realm.
 Choose your path, cultivate your strength, and survive the depths.
 </p>
-
 <div class="section-label">Choose Your Class</div>
-
 <div class="class-grid">
-<!-- WARRIOR -->
 <div class="class-card" style="--card-accent:#ef4444" onclick="selectClass('warrior')">
-<div class="class-header">
-<div class="class-icon">⚔</div>
-<div>
-<div class="class-name">Blade Disciple</div>
-<div class="class-role">Tank / Melee</div>
+<div class="class-header"><div class="class-icon">⚔</div><div><div class="class-name">Blade Disciple</div><div class="class-role">Tank / Melee</div></div></div>
+<div class="class-desc">A frontline warrior forged in iron and discipline. High vitality and defense, capable of absorbing punishing blows while cleaving through enemies with heavy strikes.</div>
+<div class="class-stats"><div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">9</div></div><div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">6</div></div><div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">3</div></div></div>
 </div>
-</div>
-<div class="class-desc">
-A frontline warrior forged in iron and discipline. High vitality and defense, capable of absorbing punishing blows while cleaving through enemies with heavy strikes.
-</div>
-<div class="class-stats">
-<div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">9</div></div>
-<div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">6</div></div>
-<div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">3</div></div>
-</div>
-</div>
-
-<!-- MAGE -->
 <div class="class-card" style="--card-accent:#a855f7" onclick="selectClass('mage')">
-<div class="class-header">
-<div class="class-icon">✦</div>
-<div>
-<div class="class-name">Spirit Weaver</div>
-<div class="class-role">DPS / Magic</div>
+<div class="class-header"><div class="class-icon">✦</div><div><div class="class-name">Spirit Weaver</div><div class="class-role">DPS / Magic</div></div></div>
+<div class="class-desc">A conduit of raw elemental force. Fragile in body but devastating in power, unleashing area-of-effect spells that can annihilate entire enemy formations in a single turn.</div>
+<div class="class-stats"><div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">4</div></div><div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">9</div></div><div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">5</div></div></div>
 </div>
-</div>
-<div class="class-desc">
-A conduit of raw elemental force. Fragile in body but devastating in power, unleashing area-of-effect spells that can annihilate entire enemy formations in a single turn.
-</div>
-<div class="class-stats">
-<div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">4</div></div>
-<div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">9</div></div>
-<div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">5</div></div>
-</div>
-</div>
-
-<!-- ROGUE -->
 <div class="class-card" style="--card-accent:#22c55e" onclick="selectClass('rogue')">
-<div class="class-header">
-<div class="class-icon">◆</div>
-<div>
-<div class="class-name">Shadow Step</div>
-<div class="class-role">Speed / Crit</div>
+<div class="class-header"><div class="class-icon">◆</div><div><div class="class-name">Shadow Step</div><div class="class-role">Speed / Crit</div></div></div>
+<div class="class-desc">A phantom of the battlefield. Strikes first, strikes hard, and vanishes before the enemy can retaliate. Relies on critical hits, evasion, and poison to dismantle foes.</div>
+<div class="class-stats"><div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">5</div></div><div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">7</div></div><div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">9</div></div></div>
 </div>
 </div>
-<div class="class-desc">
-A phantom of the battlefield. Strikes first, strikes hard, and vanishes before the enemy can retaliate. Relies on critical hits, evasion, and poison to dismantle foes.
+<button class="btn btn-primary" id="btn-start" disabled onclick="startGame()">Select a Class to Begin</button>
 </div>
-<div class="class-stats">
-<div class="stat-box"><div class="stat-label">VIT</div><div class="stat-value">5</div></div>
-<div class="stat-box"><div class="stat-label">ATK</div><div class="stat-value">7</div></div>
-<div class="stat-box"><div class="stat-label">SPD</div><div class="stat-value">9</div></div>
+
+<!-- === TOWN SCREEN === -->
+<div class="screen" id="screen-town">
+<div class="town-container">
+<div class="town-header">
+<h2 style="color:var(--accent);margin-bottom:4px">The Town of Haven</h2>
+<p style="font-size:.8rem;color:var(--dim)">A safe bastion in the fractured realm.</p>
+<div class="town-stats">
+<div class="stat-pill"><span class="stat-pill-label">Level</span><span class="stat-pill-val" id="t-level">1</span></div>
+<div class="stat-pill"><span class="stat-pill-label">Gold</span><span class="stat-pill-val" id="t-gold">50</span></div>
+<div class="stat-pill"><span class="stat-pill-label">HP</span><span class="stat-pill-val" id="t-hp">100/100</span></div>
+<div class="stat-pill"><span class="stat-pill-label">MP</span><span class="stat-pill-val" id="t-mp">50/50</span></div>
+</div>
+</div>
+<div class="town-actions">
+<div class="town-btn" onclick="doRest()"><div class="town-btn-icon">🛌</div><div class="town-btn-text">Rest</div><div class="town-btn-desc">Restore HP/MP</div></div>
+<div class="town-btn" onclick="doShop()"><div class="town-btn-icon">🛒</div><div class="town-btn-text">Shop</div><div class="town-btn-desc">Buy Potions</div></div>
+<div class="town-btn" onclick="startAdventure()"><div class="town-btn-icon">⚔</div><div class="town-btn-text">Adventure</div><div class="town-btn-desc">Enter the Depths</div></div>
+<div class="town-btn" onclick="saveGame();showToast('Game Saved!')"><div class="town-btn-icon">💾</div><div class="town-btn-text">Save</div><div class="town-btn-desc">Secure progress</div></div>
 </div>
 </div>
 </div>
 
-<button class="btn btn-primary" id="btn-start" disabled onclick="startGame()">
-Select a Class to Begin
-</button>
+<!-- === COMBAT SCREEN === -->
+<div class="screen" id="screen-combat">
+<div class="combat-container">
+<div class="combat-arena">
+<!-- Enemy -->
+<div class="entity-card">
+<div class="entity-portrait" id="c-enemy-portrait" style="background:radial-gradient(circle, #ef4444, #450a0a);color:#ef4444">👹</div>
+<div class="entity-info">
+<div class="entity-name" id="c-enemy-name">Enemy</div>
+<div class="bar-container"><div class="bar-fill bar-enemy" id="c-enemy-hp" style="width:100%"></div></div>
+<div style="font-size:.7rem;color:var(--dim)" id="c-enemy-hp-text">100/100</div>
+</div>
+</div>
+<!-- Log -->
+<div class="combat-log" id="c-log">Battle Start...</div>
+<!-- Player -->
+<div class="entity-card">
+<div class="entity-portrait" id="c-player-portrait" style="background:radial-gradient(circle, #6366f1, #312e81);color:#6366f1">⚔</div>
+<div class="entity-info">
+<div class="entity-name" id="c-player-name">Hero</div>
+<div class="bar-container" style="margin-bottom:4px"><div class="bar-fill bar-hp" id="c-player-hp" style="width:100%"></div></div>
+<div style="font-size:.7rem;color:var(--dim)" id="c-player-hp-text">100/100</div>
+<div class="bar-container"><div class="bar-fill bar-mp" id="c-player-mp" style="width:100%"></div></div>
+<div style="font-size:.7rem;color:var(--dim)" id="c-player-mp-text">50/50</div>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="combat-actions" id="c-actions">
+<button class="action-btn" onclick="playerAction('attack')"><div class="action-icon">⚔</div><div class="action-label">Attack</div></button>
+<button class="action-btn" onclick="playerAction('skill')"><div class="action-icon">✨</div><div class="action-label">Skill</div></button>
+<button class="action-btn" onclick="playerAction('item')"><div class="action-icon">🧪</div><div class="action-label">Potion (<span id="c-pot-count">3</span>)</div></button>
+<button class="action-btn" onclick="playerAction('flee')"><div class="action-icon">🏃</div><div class="action-label">Flee</div></button>
+</div>
+</div>
 </div>
 
 <!-- === TUTORIAL OVERLAY === -->
@@ -299,121 +381,63 @@ Select a Class to Begin
 </div>
 </div>
 
-<!-- === TOAST === -->
 <div class="toast" id="toast"></div>
 
 <script>
-// =============================================
-// POCKET RPG — ENGINE CORE
-// =============================================
-
 // === GAME STATE ===
 let G={
-class:null,
-level:1,
-xp:0,
-xpToNext:100,
-hp:100,
-maxHp:100,
-mp:50,
-maxMp:50,
-gold:50,
-potions:3,
-inventory:[],
-tutorialCompleted:false,
-currentScreen:'class',
+class:null,level:1,xp:0,xpNext:100,
+hp:100,maxHp:100,mp:50,maxMp:50,
+gold:50,potions:3,
+tutorialCompleted:false,currentScreen:'class',
 };
-
 let selectedClass=null;
+let combatState={active:false, enemy:null, turn:'player', log:[]};
 
-// === CLASS DATA ===
+// === DATA ===
 const CLASSES={
-warrior:{
-name:'Blade Disciple',
-baseHp:120,baseMp:30,baseAtk:8,baseDef:6,baseSpd:4,
-skills:[
-{name:'Heavy Slash',cost:0,desc:'A powerful melee strike',dmgMult:1.2},
-{name:'Shield Bash',cost:8,desc:'Stun enemy for 1 turn',dmgMult:0.8,effect:'stun'},
-{name:'War Cry',cost:12,desc:'Boost ATK for 3 turns',dmgMult:0,effect:'buff_atk'},
-]
-},
-mage:{
-name:'Spirit Weaver',
-baseHp:70,baseMp:80,baseAtk:12,baseDef:3,baseSpd:6,
-skills:[
-{name:'Arcane Bolt',cost:0,desc:'A focused magic projectile',dmgMult:1.0},
-{name:'Flame Wave',cost:15,desc:'AoE fire damage',dmgMult:1.5,effect:'aoe'},
-{name:'Frost Nova',cost:20,desc:'Freeze all enemies',dmgMult:0.8,effect:'freeze'},
-]
-},
-rogue:{
-name:'Shadow Step',
-baseHp:85,baseMp:50,baseAtk:10,baseDef:4,baseSpd:10,
-skills:[
-{name:'Quick Stab',cost:0,desc:'Fast strike, high crit chance',dmgMult:0.9,critBonus:.2},
-{name:'Poison Blade',cost:10,desc:'Apply poison for 3 turns',dmgMult:0.7,effect:'poison'},
-{name:'Shadow Dodge',cost:12,desc:'Evade next attack',dmgMult:0,effect:'dodge'},
-]
-},
+warrior:{name:'Blade Disciple',baseHp:120,baseMp:30,baseAtk:8,baseDef:6,baseSpd:4,color:'#ef4444',icon:'⚔',
+skills:[{name:'Heavy Slash',cost:0,desc:'Powerful strike',mult:1.2},{name:'Shield Bash',cost:8,desc:'Stun enemy',mult:0.8,effect:'stun'},{name:'War Cry',cost:12,desc:'+ATK 3 turns',mult:0,effect:'buff'}]},
+mage:{name:'Spirit Weaver',baseHp:70,baseMp:80,baseAtk:12,baseDef:3,baseSpd:6,color:'#a855f7',icon:'✦',
+skills:[{name:'Arcane Bolt',cost:0,desc:'Magic shot',mult:1.0},{name:'Flame Wave',cost:15,desc:'AoE Fire',mult:1.5},{name:'Frost Nova',cost:20,desc:'Freeze',mult:0.8,effect:'freeze'}]},
+rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,baseSpd:10,color:'#22c55e',icon:'◆',
+skills:[{name:'Quick Stab',cost:0,desc:'Fast strike',mult:0.9,crit:.2},{name:'Poison Blade',cost:10,desc:'Poison 3t',mult:0.7,effect:'poison'},{name:'Shadow Dodge',cost:12,desc:'Evade next',mult:0,effect:'dodge'}]},
 };
 
-// === TUTORIAL DATA ===
-const TUTORIAL_STEPS=[
-{
-title:'Welcome, Wanderer',
-text:'You have been pulled through the <strong>Nexus Gate</strong> into a fractured realm. Your goal is to survive, grow stronger, and conquer the depths.<br><br>This tutorial will teach you the basics.'
-},
-{
-title:'Your Class',
-text:'You chose the <strong>'+ '<span id="tut-class-name"></span>'+'</strong>.<br><br>Each class has unique stats:<br>• <strong>VIT</strong> — Your health pool<br>• <strong>ATK</strong> — Your damage output<br>• <strong>SPD</strong> — Determines turn order'
-},
-{
-title:'Combat Basics',
-text:'Battles are <strong>turn-based</strong>. You and your enemies take turns acting.<br><br>Each turn you can:<br>• <strong>Attack</strong> — Basic strike<br>• <strong>Skills</strong> — Powerful abilities (cost MP)<br>• <strong>Items</strong> — Use potions or gear<br>• <strong>Flee</strong> — Attempt to escape'
-},
-{
-title:'Progression',
-text:'Defeat enemies to earn <strong>XP</strong> and <strong>Gold</strong>.<br><br>• <strong>Level Up</strong> increases your stats<br>• <strong>Gold</strong> buys potions and equipment in towns<br>• <strong>Spirit Essences</strong> dropped by bosses grant permanent buffs'
-},
-{
-title:'The Depths',
-text:'The realm is divided into <strong>Floors</strong>. Each floor has enemies, a mini-boss, and a gate to the next floor.<br><br>Reach <strong>Floor 10</strong> to face the <strong>Dragon King</strong> and complete your journey.<br><br><strong>Good luck, Wanderer.</strong>'
-},
+const ENEMIES=[
+{id:'imp',name:'Forest Imp',hp:40,atk:5,def:2,xp:20,gold:10,color:'#ef4444',icon:'👹'},
+{id:'wolf',name:'Shadow Wolf',hp:60,atk:8,def:3,xp:35,gold:15,color:'#6b7280',icon:'🐺'},
+{id:'golem',name:'Crystal Golem',hp:100,atk:12,def:8,xp:60,gold:30,color:'#06b6d4',icon:'🗿'},
 ];
 
+const TUTORIAL_STEPS=[
+{title:'Welcome, Wanderer',text:'You have been pulled through the <strong>Nexus Gate</strong>. Your goal is to survive, grow stronger, and conquer the depths.'},
+{title:'Your Class',text:'You are a <strong><span id="tut-class-name"></span></strong>.<br>• <strong>VIT</strong>: Health<br>• <strong>ATK</strong>: Damage<br>• <strong>SPD</strong>: Turn Order'},
+{title:'Combat',text:'Battles are <strong>turn-based</strong>.<br>• <strong>Attack</strong>: Basic strike<br>• <strong>Skill</strong>: Costs MP<br>• <strong>Item</strong>: Use Potions'},
+{title:'The Town',text:'Return to <strong>Haven</strong> to Rest, Shop, and Save. Defeat enemies to earn <strong>XP</strong> and <strong>Gold</strong>.'},
+];
 let tutorialStep=0;
 
-// === CLASS SELECTION ===
+// === LOGIC ===
 function selectClass(cls){
 selectedClass=cls;
-// Update visual selection
-document.querySelectorAll('.class-card').forEach(card=>{
-card.classList.remove('selected');
-});
+document.querySelectorAll('.class-card').forEach(c=>c.classList.remove('selected'));
 event.currentTarget.classList.add('selected');
-// Enable start button
 const btn=document.getElementById('btn-start');
 btn.disabled=false;
 btn.textContent='Begin as '+CLASSES[cls].name;
 }
 
-// === START GAME ===
 function startGame(){
 if(!selectedClass)return;
 G.class=selectedClass;
 const c=CLASSES[selectedClass];
-G.maxHp=c.baseHp;
-G.hp=c.baseHp;
-G.maxMp=c.baseMp;
-G.mp=c.baseMp;
-showToast('You are now the '+c.name);
-// Show tutorial
-setTimeout(()=>{
-openTutorial();
-},600);
+G.maxHp=c.baseHp;G.hp=c.maxHp;
+G.maxMp=c.baseMp;G.mp=c.maxMp;
+showToast('Welcome, '+c.name);
+setTimeout(openTutorial,600);
 }
 
-// === TUTORIAL SYSTEM ===
 function openTutorial(){
 tutorialStep=0;
 renderTutorialStep();
@@ -423,90 +447,205 @@ document.getElementById('tutorial-overlay').classList.add('active');
 function renderTutorialStep(){
 const step=TUTORIAL_STEPS[tutorialStep];
 document.getElementById('tutorial-title').textContent=step.title;
-// Handle dynamic class name insertion
-let text=step.text;
-if(text.includes('tut-class-name')){
-text=text.replace('<span id="tut-class-name"></span>',CLASSES[G.class].name);
-}
-document.getElementById('tutorial-text').innerHTML=text;
-// Render dots
-const dotsContainer=document.getElementById('tutorial-dots');
-dotsContainer.innerHTML='';
+let txt=step.text;
+if(txt.includes('tut-class-name'))txt=txt.replace('<span id="tut-class-name"></span>',CLASSES[G.class].name);
+document.getElementById('tutorial-text').innerHTML=txt;
+const dots=document.getElementById('tutorial-dots');dots.innerHTML='';
 TUTORIAL_STEPS.forEach((s,i)=>{
-const dot=document.createElement('div');
-dot.className='tutorial-dot';
-if(i===tutorialStep)dot.classList.add('active');
-if(i<tutorialStep)dot.classList.add('completed');
-dotsContainer.appendChild(dot);
+const d=document.createElement('div');d.className='tutorial-dot';
+if(i===tutorialStep)d.classList.add('active');
+if(i<tutorialStep)d.classList.add('completed');
+dots.appendChild(d);
 });
-// Update button text
-const nextBtn=document.getElementById('btn-tutorial-next');
-if(tutorialStep===TUTORIAL_STEPS.length-1){
-nextBtn.textContent='Begin Adventure';
-}else{
-nextBtn.textContent='Next';
-}
+document.getElementById('btn-tutorial-next').textContent=(tutorialStep===TUTORIAL_STEPS.length-1)?'Enter Haven':'Next';
 }
 
 function nextTutorialStep(){
 tutorialStep++;
 if(tutorialStep>=TUTORIAL_STEPS.length){
-completeTutorial();
+document.getElementById('tutorial-overlay').classList.remove('active');
+G.tutorialCompleted=true;
+showScreen('town');
+saveGame();
 return;
 }
 renderTutorialStep();
 }
+function skipTutorial(){nextTutorialStep=TUTORIAL_STEPS.length;nextTutorialStep();}
 
-function skipTutorial(){
-completeTutorial();
+function showScreen(id){
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+document.getElementById('screen-'+id).classList.add('active');
+G.currentScreen=id;
+if(id==='town')updateTownUI();
 }
 
-function completeTutorial(){
-document.getElementById('tutorial-overlay').classList.remove('active');
-G.tutorialCompleted=true;
-saveGame();
-showToast('Tutorial complete. Your journey begins.');
-// Transition to game screen (to be built)
+function updateTownUI(){
+document.getElementById('t-level').textContent=G.level;
+document.getElementById('t-gold').textContent=G.gold;
+document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;
+document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;
+}
+
+function doRest(){
+G.hp=G.maxHp;G.mp=G.maxMp;
+updateTownUI();showToast('You feel refreshed.');
+}
+
+function doShop(){
+if(G.gold>=20){
+G.gold-=20;G.potions++;
+updateTownUI();showToast('Bought Potion (-20g)');
+}else{showToast('Not enough gold.');}
+}
+
+function startAdventure(){
+const enemy=ENEMIES[Math.floor(Math.random()*ENEMIES.length)];
+combatState.active=true;
+combatState.enemy={...enemy, currentHp:enemy.hp};
+combatState.log=[];
+combatState.turn=G.spd>=enemy.spd?'player':'enemy'; // Simplified speed check
+showScreen('combat');
+updateCombatUI();
+logCombat('A wild '+enemy.name+' appears!');
+if(combatState.turn==='enemy')setTimeout(enemyTurn,1000);
+}
+
+function updateCombatUI(){
+const e=combatState.enemy;
+const c=CLASSES[G.class];
+// Enemy
+document.getElementById('c-enemy-name').textContent=e.name;
+document.getElementById('c-enemy-portrait').style.background=`radial-gradient(circle, ${e.color}, #000)`;
+document.getElementById('c-enemy-portrait').style.color=e.color;
+document.getElementById('c-enemy-portrait').textContent=e.icon;
+document.getElementById('c-enemy-hp').style.width=(e.currentHp/e.hp*100)+'%';
+document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.hp;
+// Player
+document.getElementById('c-player-name').textContent=c.name;
+document.getElementById('c-player-portrait').style.background=`radial-gradient(circle, ${c.color}, #000)`;
+document.getElementById('c-player-portrait').style.color=c.color;
+document.getElementById('c-player-portrait').textContent=c.icon;
+document.getElementById('c-player-hp').style.width=(G.hp/G.maxHp*100)+'%';
+document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;
+document.getElementById('c-player-mp').style.width=(G.mp/G.maxMp*100)+'%';
+document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;
+document.getElementById('c-pot-count').textContent=G.potions;
+// Log
+const logEl=document.getElementById('c-log');
+logEl.innerHTML=combatState.log.join('<br>');
+logEl.scrollTop=logEl.scrollHeight;
+}
+
+function logCombat(msg){
+combatState.log.push('> '+msg);
+if(combatState.log.length>5)combatState.log.shift();
+updateCombatUI();
+}
+
+function playerAction(type){
+if(!combatState.active||combatState.turn!=='player')return;
+const c=CLASSES[G.class];
+const e=combatState.enemy;
+let dmg=0;
+
+if(type==='attack'){
+dmg=Math.max(1, (c.baseAtk+G.level) - e.def + Math.floor(Math.random()*4));
+e.currentHp-=dmg;
+logCombat(`You strike ${e.name} for ${dmg} dmg.`);
+}else if(type==='skill'){
+const skill=c.skills[0]; // Just use first skill for now to keep UI simple
+if(G.mp>=skill.cost){
+G.mp-=skill.cost;
+dmg=Math.max(1, Math.floor((c.baseAtk+G.level)*skill.mult) - e.def);
+e.currentHp-=dmg;
+logCombat(`You cast ${skill.name} for ${dmg} dmg!`);
+}else{
+showToast('Not enough MP!');return;
+}
+}else if(type==='item'){
+if(G.potions>0){
+G.potions--;
+const heal=Math.floor(G.maxHp*0.4);
+G.hp=Math.min(G.maxHp, G.hp+heal);
+logCombat(`You drink a potion (+${heal} HP).`);
+}else{showToast('No potions!');return;}
+}else if(type==='flee'){
+logCombat('You fled successfully!');
+combatState.active=false;
+setTimeout(()=>showScreen('town'),1000);
+return;
+}
+
+updateCombatUI();
+if(e.currentHp<=0){
+winBattle();
+}else{
+combatState.turn='enemy';
+setTimeout(enemyTurn,1200);
+}
+}
+
+function enemyTurn(){
+if(!combatState.active)return;
+const e=combatState.enemy;
+const c=CLASSES[G.class];
+const dmg=Math.max(1, e.atk - (c.baseDef+Math.floor(G.level/2)) + Math.floor(Math.random()*3));
+G.hp-=dmg;
+logCombat(`${e.name} attacks you for ${dmg} dmg.`);
+updateCombatUI();
+if(G.hp<=0){
+loseBattle();
+}else{
+combatState.turn='player';
+}
+}
+
+function winBattle(){
+const e=combatState.enemy;
+logCombat(`Victory! +${e.xp} XP, +${e.gold} Gold.`);
+G.xp+=e.xp;G.gold+=e.gold;
+if(G.xp>=G.xpNext){
+G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);
+G.maxHp+=10;G.hp=G.maxHp;
+G.maxMp+=5;G.mp=G.maxMp;
+logCombat(`LEVEL UP! You are now level ${G.level}.`);
+}
+combatState.active=false;
+setTimeout(()=>showScreen('town'),2500);
+}
+
+function loseBattle(){
+logCombat('You have fallen...');
+G.hp=Math.floor(G.maxHp*0.5); // Revive with half HP
+combatState.active=false;
 setTimeout(()=>{
-showToast('The Town of Haven awaits... (Next update)');
-},1500);
+showToast('You wake up in Haven...');
+showScreen('town');
+},2500);
 }
 
-// === SAVE / LOAD ===
 function saveGame(){
-try{
-localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));
-}catch(e){}
+try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(e){}
 }
-
 function loadGame(){
 try{
 const s=localStorage.getItem('nexus-pocket-rpg-save');
-if(s){
-const p=JSON.parse(s);
-G={...G,...p};
-}
+if(s){G={...G,...JSON.parse(s)};}
 }catch(e){}
 }
-
-// === UI HELPERS ===
 function showToast(msg){
-const t=document.getElementById('toast');
-t.textContent=msg;
-t.classList.add('show');
+const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
 setTimeout(()=>t.classList.remove('show'),3000);
 }
 
-// === INIT ===
 function init(){
 loadGame();
 if(G.class&&G.tutorialCompleted){
-// If returning player, skip class selection
+showScreen('town');
 showToast('Welcome back, '+CLASSES[G.class].name);
-// TODO: Load into game screen
 }
 }
-
 init();
 </script>
 </body>
