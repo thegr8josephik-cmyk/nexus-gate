@@ -192,7 +192,7 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:10}
 <div class="sb">
   <div class="sr"><div class="rn" id="rn">Mortal</div><div class="cr">
     <span class="cb ci" id="bi">✨0</span><span class="cb cs" id="bs">💎0</span>
-    <span class="cb cd" id="bd">🛡️0</span><span class="cb cd" id="bse">💀0</span>
+    <span class="cb cd" id="bse">💀0</span>
     <span class="cb cm" id="bm">💧0</span>
   </div></div>
   <div class="qm" id="qm">0</div>
@@ -314,6 +314,8 @@ const ACTIVE_SKILLS=[{id:"meditation",n:"Meditation",i:"🧘",d:"2x QPS 30s",cd:
 const SHOP_ITEMS=[{id:"qi_pill",cat:"Pills",n:"Qi Gathering Pill",i:"💊",d:"+100% QPS 5min",c:3,t:"con",ef:"qps_pill"},{id:"enlighten_pill",cat:"Pills",n:"Enlightenment Pill",i:"🌟",d:"+1 Insight",c:5,t:"con",ef:"insight_pill"},{id:"body_pill",cat:"Pills",n:"Body Tempering Pill",i:"💪",d:"+10% tap perm",c:8,t:"con",ef:"tap_perm"},{id:"cleanse_pill",cat:"Pills",n:"Cleansing Pill",i:"🌿",d:"Remove Corruption",c:10,t:"con",ef:"cleanse"},{id:"rebirth_pill",cat:"Pills",n:"Rebirth Pill",i:"🔥",d:"Keep skills on reinc",c:25,t:"con",ef:"rebirth_keep"},{id:"bronze_ref",cat:"Refiners",n:"Bronze Refiner",i:"🥉",d:"+10% QPS",c:5,t:"eq",e:{qm:.1}},{id:"silver_ref",cat:"Refiners",n:"Silver Refiner",i:"🥈",d:"+25% QPS",c:15,t:"eq",e:{qm:.25}},{id:"gold_ref",cat:"Refiners",n:"Gold Refiner",i:"🥇",d:"+50% QPS",c:40,t:"eq",e:{qm:.5}},{id:"jade_ref",cat:"Refiners",n:"Jade Refiner",i:"💚",d:"+75% QPS,+10% Ins",c:80,t:"eq",e:{qm:.75,im:.1}},{id:"void_ref",cat:"Refiners",n:"Void Refiner",i:"🖤",d:"+150% QPS,+1 Corr",c:150,t:"eq",e:{qm:1.5,co:1}},{id:"lucky_charm",cat:"Artifacts",n:"Lucky Charm",i:"🍀",d:"+5% rare drops",c:20,t:"art",e:{lk:.05}},{id:"slip_magnet",cat:"Artifacts",n:"Jade Slip Magnet",i:"🧲",d:"Slips every 80 clicks",c:40,t:"art",e:{sr:80}},{id:"soul_lantern",cat:"Artifacts",n:"Soul Lantern",i:"🏮",d:"Keep 3 skills on reinc",c:50,t:"art",e:{ks:3}},{id:"void_seal",cat:"Artifacts",n:"Void Seal",i:"🔮",d:"Unlock Void Path",c:100,t:"art",e:{uv:1}}];
 
 const DEFENDERS=[{id:"disciple",n:"Outer Disciple",i:"👤",d:"Basic defender",bc:50,cm:1.4,dps:5,hp:20},{id:"guard",n:"Sect Guard",i:"⚔️",d:"Sturdy melee",bc:200,cm:1.5,dps:15,hp:60},{id:"archer",n:"Spirit Archer",i:"🏹",d:"Ranged attacker",bc:500,cm:1.6,dps:30,hp:40},{id:"mage",n:"Formation Mage",i:"🔮",d:"AoE damage",bc:1500,cm:1.7,dps:60,hp:50},{id:"elder_def",n:"Defensive Elder",i:"🛡️",d:"High HP tank",bc:5000,cm:1.8,dps:20,hp:200},{id:"beast_def",n:"Guardian Beast",i:"🐺",d:"Fast attacker",bc:15000,cm:1.9,dps:100,hp:120},{id:"tamed_beast",n:"Tamed Beast",i:"🐲",d:"War Art unlock",bc:30000,cm:2,dps:150,hp:180,req:"W6"},{id:"worldbreaker",n:"Worldbreaker",i:"💥",d:"Ultimate defender",bc:100000,cm:2.2,dps:500,hp:800,req:"W11"},{id:"immortal_def",n:"Immortal Sentinel",i:"⭐",d:"Peak defender",bc:50000,cm:2,dps:300,hp:500}];
+const CREATURES=[{id:"c1",n:"Slime",i:"🟢",dps:3},{id:"c2",n:"Fang Wolf",i:"🐺",dps:6},{id:"c3",n:"Stone Golem",i:"🗿",dps:12},{id:"c4",n:"Ember Drake",i:"🐲",dps:22},{id:"c5",n:"Void Sentinel",i:"👁️",dps:40}];
+const DEBUFFS=[{id:"db_weak",n:"Weaken Curse",i:"💔",d:"Invaders take +50% dmg 12s",c:20,cd:30},{id:"db_poison",n:"Poison Cloud",i:"☠️",d:"Invaders bleed +30% 8s",c:25,cd:25},{id:"db_rend",n:"Soul Rend",i:"⚡",d:"Instant heavy damage",c:45,cd:40}];
 
 const ADVENTURERS=[{n:"Novice Thief",w:1,hm:1.5,pw:"stealth",db:.2,i:"🗡️"},{n:"Veteran Knight",w:3,hm:3,pw:"shield",db:.5,i:"🛡️"},{n:"Elite Mage",w:5,hm:4,pw:"aoe",db:1,i:"🔮"},{n:"Hero Paladin",w:8,hm:6,pw:"heal",db:2,i:"⚜️"},{n:"Legend Slayer",w:12,hm:10,pw:"execute",db:5,i:"⚔️"},{n:"Mythic Hunter",w:15,hm:20,pw:"truesight",db:10,i:"👁️"}];
 
@@ -334,7 +336,7 @@ const TUT_STEPS=[
 
 // === STATE ===
 let S={username:"",saveCode:"",isAdmin:false,sovUnlocked:false,
-qi:0,tqi:0,ins:0,st:0,dp:0,se:0,mana:0,
+qi:0,tqi:0,ins:0,st:0,dp:0,se:0,mana:0,manaCap:100,manaRegen:1,creatures:{},debuffCd:{},dbWeak:0,dbPoison:0,
 reincs:0,gm:1,ups:{},skills:[],species:"human",usp:["human"],
 askills:[],scd:{},clicks:0,cts:0,js:0,gv:0,ggv:0,
 slipsE:0,trolls:0,tmerges:0,tevos:0,corrupt:0,title:"",
@@ -384,7 +386,7 @@ if(prev>0&&gap>300000)setTimeout(()=>showToast('🛡️ Welcome back! Your realm
 
 // === INIT ===
 function init(){
-loadGame();
+loadGame();ensureCreatures();
 if(!S.username){document.getElementById("username-modal").classList.add("active");return;}
 document.getElementById("username-modal").classList.remove("active");
 if(S.isAdmin){document.getElementById("nav-admin").style.display="flex";}
@@ -463,14 +465,12 @@ mc.innerHTML=h+"</div>";
 // === RENDER: DEFENSE ===
 function rDefense(mc){
 const tdps=getDPS();
-let h=`<div class="lv"><div class="wb"><div style="font-size:.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:2px">Current Wave</div><div class="wn">${S.waveOn?`Wave ${S.wave+1}`:`Wave ${S.wave+1} Ready`}</div><div style="font-size:.75rem;color:var(--dim);margin-top:4px">Enemy HP: ${fN(S.wHP)} / ${fN(S.wMHP)}</div><div class="hpb"><div class="hpf" style="width:${S.wMHP>0?(S.wHP/S.wMHP)*100:0}%"></div></div><div style="font-size:.7rem;color:var(--dim);margin-top:6px">DPS: ${fN(tdps)} | Core: ${S.coreHP}/${S.coreMHP}</div>${!S.waveOn?`<button class="btn bp" style="margin-top:12px;width:100%" onclick="startWave()">⚔️ Start Wave ${S.wave+1}</button>`:'<div style="margin-top:8px;font-size:.8rem;color:var(--se);font-weight:700">⚔️ IN PROGRESS</div>'}</div>`;
-// Combat skills
-h+=`<div class="st">Combat Skills (Cost: 💀 SE)</div><div class="skr">`;
-COMBAT_SKILLS.forEach(cs=>{const ul=hasWA("W8")||cs.id!=="cs_bomb";const cd=S.csCd[cs.id]||0;const oc=cd>0;const can=S.se>=cs.cost&&!oc&&ul;h+=`<div class="sk ${can?"":"lk"} ${oc?"oc":""}" onclick="useCS('${cs.id}')" title="${cs.n}: ${cs.d} (${cs.cost} SE)">${cs.i}${oc?`<div class="cdo">${fT(cd)}</div>`:""}</div>`;});
+let h=`<div class="lv"><div class="wb"><div style="font-size:.7rem;color:var(--dim);text-transform:uppercase;letter-spacing:2px">Invasion</div><div class="wn">${S.waveOn?`Wave ${S.wave+1}`:`Wave ${S.wave+1} Ready`}</div><div style="font-size:.75rem;color:var(--dim);margin-top:4px">Invader HP: ${fN(S.wHP)} / ${fN(S.wMHP)}</div><div class="hpb"><div class="hpf" style="width:${S.wMHP>0?(S.wHP/S.wMHP)*100:0}%"></div></div><div style="font-size:.7rem;color:var(--dim);margin-top:6px">Creature DPS: ${fN(tdps)} | 💧 ${Math.floor(S.mana)}/${S.manaCap}</div>${!S.waveOn?`<button class="btn bp" style="margin-top:12px;width:100%" onclick="startWave()">⚔️ Begin Invasion ${S.wave+1}</button>`:'<div style="margin-top:8px;font-size:.8rem;color:var(--se);font-weight:700">⚔️ INVASION IN PROGRESS</div>'}</div>`;
+h+=`<div class="st">Debuff Magic (Cost: 💧 Mana)</div><div class="skr">`;
+DEBUFFS.forEach(db=>{const cdEnd=S.debuffCd[db.id]||0;const rem=cdEnd>Date.now()?Math.ceil((cdEnd-Date.now())/1000):0;const oc=rem>0;const can=S.mana>=db.c&&!oc&&S.waveOn;h+=`<div class="sk ${can?"":"lk"} ${oc?"oc":""}" onclick="castDebuff('${db.id}')" title="${db.n}: ${db.d} (${db.c} mana)">${db.i}${oc?`<div class="cdo">${fT(rem)}</div>`:""}</div>`;});
 h+=`</div>`;
-// Defenders
-h+=`<div class="st">Summon Defenders (Cost: 🛡️ DP)</div>`;
-DEFENDERS.forEach(d=>{if(d.req&&!hasWA(d.req))return;const cnt=S.defs[d.id]||0,cost=Math.floor(d.bc*Math.pow(d.cm,cnt)),can=S.dp>=cost;h+=`<div class="cd dc ${can?"":"dis"}" onclick="buyDef('${d.id}')"><div class="cdi">${d.i}</div><div class="cdn"><div class="cdt">${d.n} <span style="color:var(--dim)">x${cnt}</span></div><div class="cdd">${d.d} | DPS:${d.dps} HP:${d.hp}</div><div class="cdc">${fN(cost)} DP</div></div></div>`;});
+h+=`<div class="st">Your Creatures (Level up with Qi)</div>`;
+CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;const cost=getCreatureCost(c,lv);const can=S.qi>=cost;h+=`<div class="cd dc ${can?"":"dis"}" onclick="levelCreature('${c.id}')"><div class="cdi">${c.i}</div><div class="cdn"><div class="cdt">${c.n} <span style="color:var(--accent)">Lv.${lv}</span></div><div class="cdd">DPS: ${fN(c.dps*lv)}</div><div class="cdc">${fN(cost)} Qi</div></div></div>`;});
 mc.innerHTML=h+"</div>";
 }
 
@@ -599,15 +599,19 @@ if(S.buffs.qps_double&&S.buffs.qps_double>now)qps*=2;
 if(S.buffs.qps_pill&&S.buffs.qps_pill>now)qps*=2;
 if(S.buffs.surge&&S.buffs.surge>now)qps*=1.5;
 if(qps>0){const g=qps*dt;S.qi+=g;S.tqi+=g;S.sQi+=g;}
-// Mana passive
-const mr=getManaRate();if(mr>0){S.mana+=mr*dt;}
+// Mana regen (capped)
+S.mana=Math.min(S.manaCap,S.mana+S.manaRegen*dt);
 // Cooldowns
 Object.keys(S.scd).forEach(k=>{if(S.scd[k]>0)S.scd[k]-=dt;if(S.scd[k]<0)S.scd[k]=0;});
 Object.keys(S.csCd).forEach(k=>{if(S.csCd[k]>0)S.csCd[k]-=dt;if(S.csCd[k]<0)S.csCd[k]=0;});
-// Wave
+// Invasion
 if(S.waveOn){
-const dps=getDPS();S.wHP-=dps*dt;
-if(S.wHP<=0){S.wHP=0;S.waveOn=false;S.wave++;const dpR=Math.floor(20*Math.pow(1.3,S.wave));const seR=Math.floor(10*Math.pow(1.4,S.wave));const manaR=Math.floor(15*Math.pow(1.2,S.wave));S.dp+=dpR;S.se+=seR;S.mana+=manaR;uQP("waves",1);showToast(`🛡️ Wave ${S.wave} cleared! +${dpR}DP +${seR}SE +${manaR}💧`);}
+let dps=getDPS();
+if(S.dbWeak>Date.now())dps*=1.5;
+if(S.dbPoison>Date.now())dps*=1.3;
+S.wHP-=dps*dt;
+if(S.wHP<=0){S.wHP=0;S.waveOn=false;S.wave++;const seR=Math.floor(10*Math.pow(1.4,S.wave));const manaR=Math.floor(20*Math.pow(1.2,S.wave));S.se+=seR;S.mana=Math.min(S.manaCap,S.mana+manaR);uQP("waves",1);showToast(`⚔️ Invasion ${S.wave} repelled! +${seR} SE +${manaR} 💧`);}
+}
 }
 chkRealm();uQP("playtime",dt);updateUI();
 if(curView==="defense")rDefense(document.getElementById("mc"));
@@ -617,7 +621,11 @@ if(curView==="core")rCore(document.getElementById("mc"));
 // === CALCULATIONS ===
 function getTP(){let b=1;UPGRADES.filter(u=>u.t==="tap").forEach(u=>b+=(S.ups[u.id]||0)*u.v);let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.tm)m+=s.e.tm;if(s.e.am)am+=s.e.am;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.tm)m+=sp.b.tm;if(sp?.b.am)am+=sp.b.am;if(S.arts.includes("body_pill_perm"))m+=.1;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;return Math.max(1,b*m*am);}
 function getQPS(){let b=0;UPGRADES.filter(u=>u.t==="auto").forEach(u=>b+=(S.ups[u.id]||0)*u.v);b+=(S.ups.sat_core||0)*getTP();let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.qm)m+=s.e.qm;if(s.e.am)am+=s.e.am;});if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.qm)m+=eq.e.qm;}const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.qm)m+=sp.b.qm;if(sp?.b.am)am+=sp.b.am;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;if(S.corrupt>=5)return 0;return Math.max(0,b*m*am);}
-function getDPS(){let d=10+Math.floor(getTP()/100);DEFENDERS.forEach(df=>{d+=(S.defs[df.id]||0)*df.dps;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
+function getDPS(){let d=0;CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;d+=c.dps*lv;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
+function ensureCreatures(){if(!S.creatures)S.creatures={};CREATURES.forEach(c=>{if(!(c.id in S.creatures))S.creatures[c.id]=1;});}
+function getCreatureCost(c,lv){return Math.floor(30*c.dps*Math.pow(lv,1.6));}
+function levelCreature(id){const c=CREATURES.find(x=>x.id===id);const lv=S.creatures[id]||1;const cost=getCreatureCost(c,lv);if(S.qi>=cost){S.qi-=cost;S.creatures[id]=lv+1;showToast(`⬆️ ${c.n} → Lv.${lv+1}`);saveGame();if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}}
+function castDebuff(id){const db=DEBUFFS.find(x=>x.id===id);if(!S.waveOn){showToast("❌ No invasion active");return;}if(S.mana<db.c){showToast("❌ Not enough mana");return;}if((S.debuffCd[id]||0)>Date.now()){showToast("❌ On cooldown");return;}S.mana-=db.c;S.debuffCd[id]=Date.now()+db.cd*1000;if(id==="db_weak"){S.dbWeak=Date.now()+12000;showToast("💔 Invaders weakened!");}else if(id==="db_poison"){S.dbPoison=Date.now()+8000;showToast("☠️ Poison cloud!");}else if(id==="db_rend"){S.wHP-=getDPS()*3;showToast("⚡ Soul Rend!");}if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}
 function getIM(){let m=1;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.im)m+=s.e.im;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.im)m+=sp.b.im;if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.im)m+=eq.e.im;}return m;}
 function gUC(u){return Math.floor(u.bc*Math.pow(u.cm,S.ups[u.id]||0));}
 function hasSk(id){return S.skills.includes(id);}
@@ -687,7 +695,7 @@ function nextTutorial(){tutStep++;if(tutStep>=TUT_STEPS.length){closeTutorial();
 function renderTutStep(){const s=TUT_STEPS[tutStep];document.getElementById("tut-step").textContent=s.s;document.getElementById("tut-title").textContent=s.t;document.getElementById("tut-desc").textContent=s.d;document.getElementById("tut-prog").textContent=`Step ${tutStep+1}/${TUT_STEPS.length}`;}
 
 // === UI HELPERS ===
-function updateUI(){document.getElementById("rn").textContent=REALMS[S.currentRealm||0].n;document.getElementById("bi").textContent=`✨${S.ins}`;document.getElementById("bs").textContent=`💎${S.st}`;document.getElementById("bd").textContent=`🛡️${S.dp}`;document.getElementById("bse").textContent=`💀${Math.floor(S.se)}`;document.getElementById("bm").textContent=`💧${Math.floor(S.mana)}`;document.getElementById("qm").textContent=fN(S.qi);document.getElementById("qd").textContent=`${fN(getQPS())} Qi/s`;document.getElementById("qt").textContent=`${fN(getTP())} Qi/tap`;document.getElementById("un-display").textContent=`Cultivator: ${S.username} ${S.isAdmin?"👑":""}`;}
+function updateUI(){document.getElementById("rn").textContent=REALMS[S.currentRealm||0].n;document.getElementById("bi").textContent=`✨${S.ins}`;document.getElementById("bs").textContent=`💎${S.st}`;document.getElementById("bse").textContent=`💀${Math.floor(S.se)}`;document.getElementById("bm").textContent=`💧${Math.floor(S.mana)}/${S.manaCap}`;document.getElementById("qm").textContent=fN(S.qi);document.getElementById("qd").textContent=`${fN(getQPS())} Qi/s`;document.getElementById("qt").textContent=`${fN(getTP())} Qi/tap`;document.getElementById("un-display").textContent=`Cultivator: ${S.username} ${S.isAdmin?"👑":""}`;}
 function spawnFloat(e,amt){const el=document.createElement("div");el.className="fq";el.textContent=`+${fN(amt)}`;const r=e.target.getBoundingClientRect();el.style.left=`${(e.clientX||r.left+r.width/2)-r.left}px`;el.style.top=`${(e.clientY||r.top+r.height/2)-r.top}px`;e.target.parentElement.appendChild(el);setTimeout(()=>el.remove(),800);}
 function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
 function showModal(title,desc,btns,showInput=false){document.getElementById("mot").innerHTML=title;document.getElementById("mod").innerHTML=desc;document.getElementById("moi").style.display=showInput?"block":"none";document.getElementById("moi").value="";document.getElementById("mob").innerHTML=btns.map(b=>`<button class="btn ${b.c}" onclick="${b.a}">${b.t}</button>`).join("");document.getElementById("mo").classList.add("active");}
