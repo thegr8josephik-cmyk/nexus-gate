@@ -52,8 +52,7 @@ canvas#particles{position:fixed;inset:0;pointer-events:none;z-index:10}
 .sc:active{transform:scale(.92)}
 .orbit-wrapper{position:absolute;width:300px;height:300px;top:50%;left:50%;transform:translate(-50%,-50%);animation:spin 12s linear infinite;pointer-events:none;z-index:4}
 @keyframes spin{100%{transform:translate(-50%,-50%) rotate(360deg)}}
-.sat-core{position:absolute;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#818cf8,#312e81);border:2px solid rgba(255,255,255,.3);box-shadow:0 0 15px var(--glow);top:50%;left:50%;margin:-21px 0 0 -21px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;animation:counter-spin 12s linear infinite}
-@keyframes counter-spin{100%{transform:rotate(-360deg)}}
+.sat-core{position:absolute;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#818cf8,#312e81);border:2px solid rgba(255,255,255,.3);box-shadow:0 0 15px var(--glow);top:50%;left:50%;margin:-21px 0 0 -21px;display:flex;align-items:center;justify-content:center;font-size:1.2rem}
 .fq{position:absolute;color:var(--gold);font-weight:700;font-size:1.1rem;pointer-events:none;animation:fu .8s ease-out forwards;z-index:15}
 @keyframes fu{0%{opacity:1;transform:translateY(0) scale(1)}to{opacity:0;transform:translateY(-50px) scale(.7)}}
 .cpb{width:100%;max-width:300px;height:6px;background:var(--panel);border-radius:3px;overflow:hidden;margin-top:4px}
@@ -284,18 +283,18 @@ const SKILLS=[
 ];
 
 const WAR_ARTS=[
-{id:"W1",n:"Qi Blade",d:"Defenders +20% DPS",c:50,e:{dd:.2}},
-{id:"W2",n:"Soul Shield",d:"Core HP +50",c:100,e:{ch:50}},
-{id:"W3",n:"Blood Harvest",d:"+30% SE from kills",c:200,e:{seb:.3}},
-{id:"W4",n:"War Drums",d:"Defender speed +25%",c:300,e:{ds:.25}},
-{id:"W5",n:"Necromancy",d:"Revive defenders 50% HP",c:500,e:{rev:1}},
-{id:"W6",n:"Beast Taming",d:"Unlock Tamed Beast defender",c:750,e:{tb:1}},
-{id:"W7",n:"Fortress Walls",d:"Core -30% damage taken",c:1000,e:{dr:.3}},
-{id:"W8",n:"Soul Bomb",d:"Active: AoE nuke (100 SE)",c:1500,e:{sb:1}},
-{id:"W9",n:"Ancestral Fury",d:"All DPS +100%",c:2000,e:{dd:1}},
-{id:"W10",n:"Undying Legion",d:"Defenders never perm die",c:3000,e:{ud:1}},
-{id:"W11",n:"Worldbreaker",d:"Unlock Worldbreaker defender",c:5000,e:{wb:1}},
-{id:"W12",n:"Sovereign's Army",d:"All War Arts,+200% DPS",c:0,e:{sa:1},admin:true}
+{id:"W1",n:"Qi Blade",d:"Creatures +20% DPS",c:50,e:{dd:.2}},
+{id:"W2",n:"Soul Shield",d:"Creatures +50% HP",c:100,e:{ch:.5}},
+{id:"W3",n:"Blood Harvest",d:"+30% SE from invasions",c:200,e:{seb:.3}},
+{id:"W4",n:"War Drums",d:"Creatures +20% DPS",c:300,e:{dd:.2}},
+{id:"W5",n:"Necromancy",d:"Creatures +40% HP",c:500,e:{ch:.4}},
+{id:"W6",n:"Beast Taming",d:"Creatures +30% DPS",c:750,e:{dd:.3}},
+{id:"W7",n:"Fortress Walls",d:"Invaders deal -30% dmg",c:1000,e:{dr:.3}},
+{id:"W8",n:"Soul Bomb",d:"Creatures +40% DPS",c:1500,e:{dd:.4}},
+{id:"W9",n:"Ancestral Fury",d:"Creatures +100% DPS",c:2000,e:{dd:1}},
+{id:"W10",n:"Undying Legion",d:"Creatures +80% HP",c:3000,e:{ch:.8}},
+{id:"W11",n:"Worldbreaker",d:"Creatures +150% DPS",c:5000,e:{dd:1.5}},
+{id:"W12",n:"Sovereign's Army",d:"Creatures +200% DPS & HP",c:0,e:{dd:2,ch:1},admin:true}
 ];
 
 const COMBAT_SKILLS=[
@@ -335,7 +334,7 @@ const TUT_STEPS=[
 
 // === STATE ===
 let S={username:"",saveCode:"",isAdmin:false,sovUnlocked:false,
-qi:0,tqi:0,ins:0,st:0,dp:0,se:0,mana:0,manaCap:100,manaRegen:1,creatures:{},debuffCd:{},dbWeak:0,dbPoison:0,
+qi:0,tqi:0,ins:0,st:0,dp:0,se:0,mana:0,manaCap:100,manaRegen:1,creatures:{},creatHP:{},debuffCd:{},dbWeak:0,dbPoison:0,
 reincs:0,gm:1,ups:{},skills:[],species:"human",usp:["human"],
 askills:[],scd:{},clicks:0,cts:0,js:0,gv:0,ggv:0,
 slipsE:0,trolls:0,tmerges:0,tevos:0,corrupt:0,title:"",
@@ -468,7 +467,7 @@ let h=`<div class="lv"><div class="wb"><div style="font-size:.7rem;color:var(--d
 h+=`<div class="st">Debuff Magic (💧)</div><div class="skr">`;
 DEBUFFS.forEach(db=>{const cdEnd=S.debuffCd[db.id]||0;const rem=cdEnd>Date.now()?Math.ceil((cdEnd-Date.now())/1000):0;const oc=rem>0;const can=S.mana>=db.c&&!oc&&S.waveOn;h+=`<div class="sk ${can?"":"lk"} ${oc?"oc":""}" onclick="castDebuff('${db.id}')" title="${db.n}: ${db.d}">${db.i}${oc?`<div class="cdo">${fT(rem)}</div>`:""}</div>`;});
 h+=`</div><div class="st">Your Creatures (Qi)</div>`;
-CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;const cost=getCreatureCost(c,lv);const can=S.qi>=cost;h+=`<div class="cd dc ${can?"":"dis"}" onclick="levelCreature('${c.id}')"><div class="cdi">${c.i}</div><div class="cdn"><div class="cdt">${c.n} <span style="color:var(--accent)">Lv.${lv}</span></div><div class="cdd">DPS: ${fN(c.dps*lv)}</div><div class="cdc">${fN(cost)} Qi</div></div></div>`;});
+CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;const cost=getCreatureCost(c,lv);const can=S.qi>=cost;const mhp=getCreatMaxHP(c,lv);const chp=Math.max(0,S.creatHP[c.id]||0);const hpPct=Math.min(100,(chp/mhp)*100);h+=`<div class="cd dc ${can?"":"dis"}" onclick="levelCreature('${c.id}')"><div class="cdi">${c.i}</div><div class="cdn"><div class="cdt">${c.n} <span style="color:var(--accent)">Lv.${lv}</span>${chp<=0&&S.waveOn?' <span style="color:var(--se)">💀</span>':''}</div><div class="cdd">DPS: ${fN(c.dps*lv*getCreaDPSMult())} · HP: ${fN(chp)}/${fN(mhp)}</div><div class="hpb" style="height:5px;margin-top:4px"><div class="hpf" style="width:${hpPct}%;background:var(--body)"></div></div><div class="cdc">${fN(cost)} Qi</div></div></div>`;});
 h+=`<div class="st">Build Dungeon (💧)</div><div class="dg-wrap"><div class="dg-grid" style="grid-template-columns:repeat(${sz},48px)">`;
 for(let y=0;y<sz;y++)for(let x=0;x<sz;x++){const key=`${x},${y}`;const cell=S.dGrid[key];h+=`<div class="dg-cell ${cell?"owned":""}" onclick="clickCell(${x},${y})">${cell?(cell.trap?TRAPS.find(t=>t.id===cell.trap)?.i||"":ROOMS.find(r=>r.id===cell.room)?.i||""):""}${cell?.trap?'<div class="trap-dot"></div>':""}</div>`;}
 h+=`</div><div class="dg-palette">`;
@@ -547,8 +546,11 @@ function rMystic(mc){mc.innerHTML=`<div class="lv"><div class="st">Jade Slips & 
 // === RENDER: EVOLUTION ===
 function rEvolution(mc){let h=`<div class="lv"><div class="st">Species Evolution</div>`;SPECIES.forEach(sp=>{const ul=S.usp.includes(sp.id),act=S.species===sp.id,can=chkSpC(sp);let cls=`cd ${act?"dis":(!ul&&!can?"dis":"")}`;let ct=sp.id==="human"?"Free":fSpC(sp.c);if(sp.c.secret)ct="Sovereign Only";h+=`<div class="${cls}" onclick="evoSp('${sp.id}')" style="${act?"border-color:var(--accent)":""}"><div class="cdi">${sp.i}</div><div class="cdn"><div class="cdt">${sp.n} ${act?"(Active)":""} ${ul&&!act?"✅":""}</div><div class="cdd">${sp.d}</div><div class="cdc">${ul?(act?"Current":"Switch: 1K Qi"):ct}</div></div></div>`;});mc.innerHTML=h+"</div>";}
 
+// === QUEST PRIORITY (claimable on top) ===
+function qPrio(q){const done=S.qc[q.id];const onCd=q.rp&&S.qcd[q.id]&&S.qcd[q.id]>Date.now();if(done&&q.ot)return 3;if(onCd)return 2;if(gQP(q)>=q.tg&&!done)return 0;return 1;}
+
 // === RENDER: QUESTS ===
-function rQuests(mc){const cats=["Progression","Repeatable","Achievement"];let h=`<div class="lv">`;cats.forEach(cat=>{h+=`<div class="st">${cat==="Progression"?"📖":cat==="Repeatable"?"🔄":"🏆"} ${cat}</div>`;QUESTS.filter(q=>q.cat===cat).forEach(q=>{const done=S.qc[q.id],prog=gQP(q),pct=Math.min((prog/q.tg)*100,100),onCd=q.rp&&S.qcd[q.id]&&S.qcd[q.id]>Date.now();if(done&&q.ot)return;let cls=`cd qc ${done||onCd?"dis":""}`;let btn="";if(pct>=100&&!done&&!onCd)btn=`<button class="qcl" onclick="claimQ('${q.id}',event)">Claim</button>`;else if(onCd){const rem=Math.ceil((S.qcd[q.id]-Date.now())/1000);btn=`<span style="font-size:.65rem;color:var(--dim)">${fT(rem)}</span>`;}h+=`<div class="${cls}"><div class="cdn"><div class="cdt">${q.n}</div><div class="cdd">${q.d}</div><div class="cdd" style="color:var(--gold)">Reward: ${fRW(q.rw)}</div><div class="qb"><div class="qf" style="width:${pct}%"></div></div><div style="font-size:.6rem;color:var(--dim);margin-top:2px">${Math.floor(prog)} / ${q.tg}</div></div><div class="cdr">${btn}</div></div>`;});});mc.innerHTML=h+"</div>";}
+function rQuests(mc){const cats=["Progression","Repeatable","Achievement"];let h=`<div class="lv">`;cats.forEach(cat=>{h+=`<div class="st">${cat==="Progression"?"📖":cat==="Repeatable"?"🔄":"🏆"} ${cat}</div>`;QUESTS.filter(q=>q.cat===cat).slice().sort((a,b)=>qPrio(a)-qPrio(b)).forEach(q=>{const done=S.qc[q.id],prog=gQP(q),pct=Math.min((prog/q.tg)*100,100),onCd=q.rp&&S.qcd[q.id]&&S.qcd[q.id]>Date.now();if(done&&q.ot)return;let cls=`cd qc ${done||onCd?"dis":""}`;let btn="";if(pct>=100&&!done&&!onCd)btn=`<button class="qcl" onclick="claimQ('${q.id}',event)">Claim</button>`;else if(onCd){const rem=Math.ceil((S.qcd[q.id]-Date.now())/1000);btn=`<span style="font-size:.65rem;color:var(--dim)">${fT(rem)}</span>`;}h+=`<div class="${cls}"><div class="cdn"><div class="cdt">${q.n}</div><div class="cdd">${q.d}</div><div class="cdd" style="color:var(--gold)">Reward: ${fRW(q.rw)}</div><div class="qb"><div class="qf" style="width:${pct}%"></div></div><div style="font-size:.6rem;color:var(--dim);margin-top:2px">${Math.floor(prog)} / ${q.tg}</div></div><div class="cdr">${btn}</div></div>`;});});mc.innerHTML=h+"</div>";}
 
 // === RENDER: SHOP ===
 function rShop(mc){const cats=["Pills","Refiners","Artifacts"];let h=`<div class="lv"><div style="text-align:center;margin-bottom:12px"><span style="font-size:1.5rem">💎</span> <span style="font-size:1.2rem;font-weight:700">${S.st} Spirit Stones</span></div>`;cats.forEach(cat=>{h+=`<div class="st">${cat}</div><div class="sg">`;SHOP_ITEMS.filter(i=>i.cat===cat).forEach(item=>{const own=item.t==="eq"?S.eq===item.id:item.t==="art"?S.arts.includes(item.id):false;const can=S.st>=item.c&&!own;h+=`<div class="si ${can?"":"dis"}" onclick="buySI('${item.id}')"><div class="sii">${item.i}</div><div class="sin">${item.n}</div><div class="sid">${item.d}</div><div class="sic">${own?"✅ Owned":`${item.c} 💎`}</div></div>`;});h+=`</div>`;});mc.innerHTML=h+"</div>";}
@@ -606,8 +608,8 @@ if(S.buffs.qps_double&&S.buffs.qps_double>now)qps*=2;
 if(S.buffs.qps_pill&&S.buffs.qps_pill>now)qps*=2;
 if(S.buffs.surge&&S.buffs.surge>now)qps*=1.5;
 if(qps>0){const g=qps*dt;S.qi+=g;S.tqi+=g;S.sQi+=g;}
-// Mana regen (capped)
-S.mana=Math.min(S.manaCap,S.mana+S.manaRegen*dt);
+// Mana regen (capped, natural + rooms)
+S.mana=Math.min(S.manaCap,S.mana+(S.manaRegen+getRoomRegen())*dt);
 // Cooldowns
 Object.keys(S.scd).forEach(k=>{if(S.scd[k]>0)S.scd[k]-=dt;if(S.scd[k]<0)S.scd[k]=0;});
 Object.keys(S.csCd).forEach(k=>{if(S.csCd[k]>0)S.csCd[k]-=dt;if(S.csCd[k]<0)S.csCd[k]=0;});
@@ -617,7 +619,10 @@ let dps=(getDPS()+getTrapDPS())*getRoomDPSMult();
 if(S.dbWeak>Date.now())dps*=1.5;
 if(S.dbPoison>Date.now())dps*=1.3;
 S.wHP-=dps*dt;
-if(S.wHP<=0){S.wHP=0;S.waveOn=false;S.wave++;const seR=Math.floor(10*Math.pow(1.4,S.wave)*getRoomSEMult());const manaR=Math.floor(20*Math.pow(1.2,S.wave));S.se+=seR;S.mana=Math.min(S.manaCap,S.mana+manaR);uQP("waves",1);showToast(`⚔️ Invasion ${S.wave} repelled! +${seR} SE +${manaR} 💧`);if(curView==="defense")rDefense(document.getElementById("mc"));}
+let alive=CREATURES.filter(c=>(S.creatHP[c.id]||0)>0);
+if(alive.length){const invDPS=4*Math.pow(1.35,S.wave)*getInvDmgMult();const per=invDPS*dt/alive.length;alive.forEach(c=>{S.creatHP[c.id]=Math.max(0,S.creatHP[c.id]-per);});}
+if(S.wHP<=0){S.wHP=0;S.waveOn=false;S.wave++;const seR=Math.floor(10*Math.pow(1.4,S.wave)*getSEMult()*getRoomSEMult());const manaR=Math.floor(20*Math.pow(1.2,S.wave));S.se+=seR;S.mana=Math.min(S.manaCap,S.mana+manaR);healCreatures();uQP("waves",1);showToast(`⚔️ Invasion ${S.wave} repelled! +${seR} SE +${manaR} 💧`);if(curView==="defense")rDefense(document.getElementById("mc"));}
+else if(!CREATURES.some(c=>(S.creatHP[c.id]||0)>0)&&getTrapDPS()<=0){S.waveOn=false;healCreatures();showToast("💀 Creatures overwhelmed! They recovered — try again.");if(curView==="defense")rDefense(document.getElementById("mc"));}
 }
 chkRealm();uQP("playtime",dt);updateUI();
 if(curView==="defense"&&S.waveOn)rDefense(document.getElementById("mc"));
@@ -625,16 +630,23 @@ if(curView==="core")rCore(document.getElementById("mc"));
 }
 
 // === CALCULATIONS ===
+function waSum(k){let s=0;WAR_ARTS.forEach(w=>{if(S.warArts.includes(w.id)&&w.e[k])s+=w.e[k];});return s;}
+function getCreaDPSMult(){return 1+waSum("dd");}
+function getCreaHPMult(){return 1+waSum("ch");}
+function getInvDmgMult(){return Math.max(.1,1-waSum("dr"));}
+function getSEMult(){return 1+waSum("seb");}
+function getCreatMaxHP(c,lv){return Math.floor(c.dps*10*lv*getCreaHPMult());}
+function healCreatures(){CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;S.creatHP[c.id]=getCreatMaxHP(c,lv);});}
 function getTP(){let b=1;UPGRADES.filter(u=>u.t==="tap").forEach(u=>b+=(S.ups[u.id]||0)*u.v);let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.tm)m+=s.e.tm;if(s.e.am)am+=s.e.am;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.tm)m+=sp.b.tm;if(sp?.b.am)am+=sp.b.am;if(S.arts.includes("body_pill_perm"))m+=.1;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;return Math.max(1,b*m*am);}
 function getQPS(){let b=0;UPGRADES.filter(u=>u.t==="auto").forEach(u=>b+=(S.ups[u.id]||0)*u.v);b+=(S.ups.sat_core||0)*getTP();let m=1,am=S.gm;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.qm)m+=s.e.qm;if(s.e.am)am+=s.e.am;});if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.qm)m+=eq.e.qm;}const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.qm)m+=sp.b.qm;if(sp?.b.am)am+=sp.b.am;if(S.corrupt>=3&&!hasSk("H6"))m*=.8;if(S.corrupt>=5)return 0;return Math.max(0,b*m*am);}
-function getDPS(){let d=0;CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;d+=c.dps*lv;});let m=1;WAR_ARTS.filter(w=>S.warArts.includes(w.id)).forEach(w=>{if(w.e.dd)m+=w.e.dd;});if(S.buffs.rally&&S.buffs.rally>Date.now())m*=1.5;return d*m;}
+function getDPS(){let d=0;CREATURES.forEach(c=>{const lv=S.creatures[c.id]||1;if(!S.waveOn||(S.creatHP[c.id]||0)>0)d+=c.dps*lv;});return d*getCreaDPSMult();}
 function getTrapDPS(){let d=0;Object.values(S.dGrid).forEach(c=>{if(c.trap){const t=TRAPS.find(x=>x.id===c.trap);if(t)d+=t.dmg;}});return d;}
 function getRoomDPSMult(){let m=1,n={};Object.values(S.dGrid).forEach(c=>{n[c.room]=(n[c.room]||0)+1;});m+=(n.training||0)*.1+(n.armory||0)*.1+(n.throne||0)*.2;return m;}
 function getRoomRegen(){let n={};Object.values(S.dGrid).forEach(c=>{n[c.room]=(n[c.room]||0)+1;});return (n.alchemy||0)*.5;}
 function getRoomSEMult(){let m=1,n={};Object.values(S.dGrid).forEach(c=>{n[c.room]=(n[c.room]||0)+1;});m+=(n.treasure||0)*.2;return m;}
-function ensureCreatures(){if(!S.creatures)S.creatures={};CREATURES.forEach(c=>{if(!(c.id in S.creatures))S.creatures[c.id]=1;});}
+function ensureCreatures(){if(!S.creatures)S.creatures={};if(!S.creatHP)S.creatHP={};CREATURES.forEach(c=>{if(!(c.id in S.creatures))S.creatures[c.id]=1;if(!(c.id in S.creatHP))S.creatHP[c.id]=getCreatMaxHP(c,S.creatures[c.id]);});}
 function getCreatureCost(c,lv){return Math.floor(30*c.dps*Math.pow(lv,1.6));}
-function levelCreature(id){const c=CREATURES.find(x=>x.id===id);const lv=S.creatures[id]||1;const cost=getCreatureCost(c,lv);if(S.qi>=cost){S.qi-=cost;S.creatures[id]=lv+1;showToast(`⬆️ ${c.n} → Lv.${lv+1}`);saveGame();if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}}
+function levelCreature(id){const c=CREATURES.find(x=>x.id===id);const lv=S.creatures[id]||1;const cost=getCreatureCost(c,lv);if(S.qi>=cost){S.qi-=cost;S.creatures[id]=lv+1;S.creatHP[id]=getCreatMaxHP(c,lv+1);showToast(`⬆️ ${c.n} → Lv.${lv+1}`);saveGame();if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}}
 function castDebuff(id){const db=DEBUFFS.find(x=>x.id===id);if(!S.waveOn){showToast("❌ No invasion active");return;}if(S.mana<db.c){showToast("❌ Not enough mana");return;}if((S.debuffCd[id]||0)>Date.now()){showToast("❌ On cooldown");return;}S.mana-=db.c;S.debuffCd[id]=Date.now()+db.cd*1000;if(id==="db_weak"){S.dbWeak=Date.now()+12000;showToast("💔 Invaders weakened!");}else if(id==="db_poison"){S.dbPoison=Date.now()+8000;showToast("☠️ Poison cloud!");}else if(id==="db_rend"){S.wHP-=getDPS()*3;showToast("⚡ Soul Rend!");}if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}
 function getIM(){let m=1;SKILLS.filter(s=>S.skills.includes(s.id)).forEach(s=>{if(s.e.im)m+=s.e.im;});const sp=SPECIES.find(s=>s.id===S.species);if(sp?.b.im)m+=sp.b.im;if(S.eq){const eq=SHOP_ITEMS.find(i=>i.id===S.eq);if(eq?.e?.im)m+=eq.e.im;}return m;}
 function gUC(u){return Math.floor(u.bc*Math.pow(u.cm,S.ups[u.id]||0));}
@@ -654,7 +666,7 @@ function buyWA(id){const w=WAR_ARTS.find(x=>x.id===id);if(S.warArts.includes(id)
 function useCS(id){const cs=COMBAT_SKILLS.find(x=>x.id===id);if(!cs||(S.csCd[id]||0)>0||S.se<cs.cost)return;S.se-=cs.cost;S.csCd[id]=cs.cd;if(id==="cs_bomb"){S.wHP-=getDPS()*5;showToast("💣 Soul Bomb!");}else if(id==="cs_rally"){S.buffs.rally=Date.now()+cs.dur*1000;showToast("📯 Rally Cry!");}else if(id==="cs_heal"){S.coreHP=Math.min(S.coreMHP,S.coreHP+S.coreMHP*.3);showToast("💚 Core Healed!");}else if(id==="cs_freeze"){showToast("❄️ Time Frozen!");}else if(id==="cs_harvest"){S.buffs.harvest=Date.now()+cs.dur*1000;showToast("💀 Soul Harvest!");}if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}
 
 // === DEFENSE ===
-function startWave(){if(S.waveOn)return;S.wMHP=Math.floor(50*Math.pow(1.5,S.wave));S.wHP=S.wMHP;S.waveOn=true;showToast(`⚔️ Wave ${S.wave+1} started!`);if(curView==="defense")rDefense(document.getElementById("mc"));}
+function startWave(){if(S.waveOn)return;healCreatures();S.wMHP=Math.floor(50*Math.pow(1.5,S.wave));S.wHP=S.wMHP;S.waveOn=true;showToast(`⚔️ Wave ${S.wave+1} started!`);if(curView==="defense")rDefense(document.getElementById("mc"));}
 function buyDef(id){const d=DEFENDERS.find(x=>x.id===id),cnt=S.defs[d.id]||0,cost=Math.floor(d.bc*Math.pow(d.cm,cnt));if(S.dp>=cost){S.dp-=cost;S.defs[d.id]=(S.defs[d.id]||0)+1;showToast(`Summoned: ${d.n}`);if(curView==="defense")rDefense(document.getElementById("mc"));updateUI();}}
 
 // === MYSTIC ===
@@ -715,7 +727,7 @@ function fT(s){if(s<60)return`${Math.floor(s)}s`;if(s<3600)return`${Math.floor(s
 
 // === SAVE/LOAD ===
 function saveGame(){try{localStorage.setItem("nexus-dao-matrix-save",JSON.stringify(S));}catch(e){}}
-function loadGame(){try{const s=localStorage.getItem("nexus-dao-matrix-save");if(s){const p=JSON.parse(s);S={...S,...p};if(!S.ups)S.ups={};if(!S.skills)S.skills=[];if(!S.usp)S.usp=["human"];if(!S.qp)S.qp={};if(!S.qc)S.qc={};if(!S.qcd)S.qcd={};if(!S.scd)S.scd={};if(!S.buffs)S.buffs={};if(!S.arts)S.arts=[];if(!S.askills)S.askills=[];if(!S.defs)S.defs={};if(!S.warArts)S.warArts=[];if(!S.csCd)S.csCd={};if(!S.dGrid)S.dGrid={};if(!S.dSize)S.dSize=3;}}catch(e){}}
+function loadGame(){try{const s=localStorage.getItem("nexus-dao-matrix-save");if(s){const p=JSON.parse(s);S={...S,...p};if(!S.ups)S.ups={};if(!S.skills)S.skills=[];if(!S.usp)S.usp=["human"];if(!S.qp)S.qp={};if(!S.qc)S.qc={};if(!S.qcd)S.qcd={};if(!S.scd)S.scd={};if(!S.buffs)S.buffs={};if(!S.arts)S.arts=[];if(!S.askills)S.askills=[];if(!S.defs)S.defs={};if(!S.warArts)S.warArts=[];if(!S.csCd)S.csCd={};if(!S.dGrid)S.dGrid={};if(!S.dSize)S.dSize=3;if(!S.creatures)S.creatures={};if(!S.creatHP)S.creatHP={};}}catch(e){}}
 
 init();
 </script>
