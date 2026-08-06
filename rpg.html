@@ -183,6 +183,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <div class="town-btn" onclick="showScreen('shop')"><div class="town-btn-icon">🛒</div><div class="town-btn-text">Shop</div><div class="town-btn-desc">Buy items</div></div>
 <div class="town-btn" id="btn-rest" onclick="doRest()"><div class="town-btn-icon">🛌</div><div class="town-btn-text">Rest</div><div class="town-btn-desc" id="rest-desc">Restore HP/MP</div></div>
 <div class="town-btn" onclick="saveGame();showToast('Game Saved!')"><div class="town-btn-icon">💾</div><div class="town-btn-text">Save</div><div class="town-btn-desc">Secure progress</div></div>
+<div class="town-btn" onclick="document.getElementById('savecode-overlay').classList.add('active')"><div class="town-btn-icon">🔑</div><div class="town-btn-text">Save Code</div><div class="town-btn-desc">Export/Import save</div></div>
 </div>
 <div class="zone-progress" id="zone-progress"></div>
 </div>
@@ -277,7 +278,20 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 </div>
-
+<!-- SAVE CODE MODAL -->
+<div class="encounter-overlay" id="savecode-overlay">
+<div class="encounter-box" style="max-width:420px">
+<div class="encounter-title" style="color:var(--accent)">Save Code</div>
+<div class="encounter-desc" style="margin-bottom:12px">Export or import your RPG save data.</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<button class="btn btn-primary btn-sm" onclick="exportRpgSave()">Export Save Code</button>
+<textarea id="savecode-input" placeholder="Paste a save code here to import..." style="width:100%;height:80px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-family:monospace;font-size:.7rem;resize:none"></textarea>
+<button class="btn btn-secondary btn-sm" onclick="importRpgSave()">Import Save Code</button>
+</div>
+<div style="margin-top:14px"><button class="btn btn-secondary btn-sm" onclick="document.getElementById('savecode-overlay').classList.remove('active')">Close</button></div>
+</div>
+</div>
+  
 <div class="toast" id="toast"></div>
 
 <script>
@@ -392,6 +406,8 @@ function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(G.maxHp*0.
 // ===== SAVE/LOAD =====
 function saveGame(){try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(e){}}
 function loadGame(){try{const s=localStorage.getItem('nexus-pocket-rpg-save');if(s)G={...G,...JSON.parse(s)};}catch(e){}}
+function exportRpgSave(){const data=btoa(JSON.stringify(G));const ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied to clipboard!');}catch(e){showToast('Code shown below — long-press to copy.');}}
+function importRpgSave(){const ta=document.getElementById('savecode-input');const code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{const parsed=JSON.parse(atob(code));G={...G,...parsed};saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported! Welcome back.');showScreen('town');updateTownUI();}catch(e){showToast('Invalid save code!');}}
 function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 function init(){loadGame();if(G.class&&G.tutorialCompleted){showScreen('town');showToast('Welcome back, '+CLASSES[G.class].name);}}
