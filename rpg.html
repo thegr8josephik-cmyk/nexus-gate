@@ -10,7 +10,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman',serif;height:100dvh;display:flex;flex-direction:column;overflow:hidden;position:relative}
 .bg-layer{position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 20% 30%,rgba(99,102,241,.08) 0%,transparent 50%),radial-gradient(circle at 80% 70%,rgba(168,85,247,.06) 0%,transparent 50%),var(--bg);pointer-events:none}
-.close-sigil{position:fixed;top:max(env(safe-area-inset-top),12px);right:16px;z-index:200;width:40px;height:40px;background:var(--panel);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--dim);font-size:1.1rem;transition:all .2s}
+.close-sigil{position:fixed;top:max(env(safe-area-inset-top),12px);right:16px;z-index:200;width:40px;height:40px;background:var(--panel);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--dim);font-size:1.1rem;transition:all .2s;cursor:pointer}
 .close-sigil:hover{background:var(--panel-h);color:var(--text)}
 .screen{display:none;flex:1;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;gap:16px;position:relative;z-index:1;padding-top:60px;padding-bottom:40px}
 .screen.active{display:flex}
@@ -129,7 +129,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 @keyframes xpPop{from{transform:translate(-50%,-50%) scale(.5);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 .xp-popup-title{font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:6px}
 .xp-popup-detail{font-size:.88rem;color:var(--dim);line-height:1.6}
-/* SPIRIT BONDS */
 .spirit-slot{display:flex;align-items:center;gap:12px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:all .2s}
 .spirit-slot.active-bond{border-color:var(--gold);box-shadow:0 0 12px rgba(251,191,36,.2)}
 .spirit-slot-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
@@ -137,12 +136,54 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .spirit-slot-name{font-weight:700;font-size:.9rem}
 .spirit-slot-desc{font-size:.7rem;color:var(--dim);margin-top:2px}
 .spirit-slot-actions{display:flex;gap:6px}
+/* === FORGE & ARTIFACTS === */
+.forge-section{width:100%;max-width:500px;display:flex;flex-direction:column;gap:12px}
+.mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.mat-card{padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:.75rem}
+.mat-icon{font-size:1.3rem;margin-bottom:4px}
+.mat-name{color:var(--dim);font-size:.65rem}
+.mat-count{font-weight:700;color:var(--accent)}
+.recipe-card{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .2s}
+.recipe-card:hover{background:var(--panel-h);border-color:var(--accent)}
+.recipe-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.recipe-name{font-weight:700;font-size:.9rem}
+.recipe-tier{font-size:.65rem;padding:2px 8px;border-radius:10px;font-weight:700}
+.tier-common{background:rgba(148,163,184,.2);color:var(--dim)}
+.tier-uncommon{background:rgba(34,197,94,.15);color:var(--green)}
+.tier-rare{background:rgba(99,102,241,.15);color:var(--accent)}
+.tier-mythic{background:rgba(251,191,36,.15);color:var(--gold)}
+.recipe-cost{font-size:.7rem;color:var(--dim);margin-top:4px}
+.artifact-slot{display:flex;align-items:center;gap:10px;padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;margin-bottom:6px}
+.artifact-slot.equipped{border-color:var(--gold);box-shadow:0 0 8px rgba(251,191,36,.15)}
+.artifact-info{flex:1;min-width:0}
+.artifact-name{font-weight:700;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.artifact-desc{font-size:.65rem;color:var(--dim);margin-top:2px}
+.chest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-top:12px}
+.chest-item{padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:10px;text-align:center;cursor:pointer;transition:all .2s;font-size:.75rem}
+.chest-item:hover{background:var(--panel-h);border-color:var(--accent)}
+.roulette-overlay{position:fixed;inset:0;z-index:350;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.roulette-overlay.active{display:flex}
+.roulette-wheel{width:260px;height:260px;border-radius:50%;border:4px solid var(--accent);position:relative;overflow:hidden;transition:transform 2s cubic-bezier(.17,.67,.12,.99)}
+.roulette-segment{position:absolute;width:50%;height:50%;transform-origin:100% 100%;left:0;top:0;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:#fff}
+.roulette-pointer{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-top:20px solid var(--gold);z-index:10}
+.confirm-overlay{position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:20px}
+.confirm-overlay.active{display:flex}
+.confirm-box{background:#13151a;border:1px solid var(--accent);border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center}
+.sell-section{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.sell-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--panel);border:1px solid var(--border);border-radius:8px;margin-bottom:6px}
+.sell-btn{padding:6px 12px;background:var(--red);color:#fff;border:none;border-radius:6px;font-size:.7rem;cursor:pointer;font-family:inherit;font-weight:700}
+.admin-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#13151a;border:1px solid var(--accent);border-radius:16px;padding:24px;z-index:9999;display:none;max-width:90%;max-height:80vh;overflow-y:auto;width:360px}
+.admin-panel.active{display:block}
+.admin-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.admin-btn{padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:inherit;font-weight:700}
+.admin-input{padding:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;width:100px;font-family:inherit}
+.file-save-row{display:flex;gap:8px;margin-top:8px}
 @media(max-width:420px){.explore-cell{width:28px;height:28px}.game-title{font-size:1.6rem}}
 </style>
 </head>
 <body>
 <div class="bg-layer"></div>
-<a href="./index.html" class="close-sigil" title="Return to Nexus Gate">✕</a>
+<a class="close-sigil" id="close-sigil" title="Return to Nexus Gate">✕</a>
 
 <!-- CLASS SELECT -->
 <div class="screen active" id="screen-class">
@@ -178,7 +219,8 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 <div class="town-actions">
 <div class="town-btn" onclick="openExplore()"><div class="town-btn-icon">🗺</div><div class="town-btn-text">Explore</div><div class="town-btn-desc">Venture into the wilds</div></div>
-<div class="town-btn" onclick="showScreen('shop')"><div class="town-btn-icon">🛒</div><div class="town-btn-text">Shop</div><div class="town-btn-desc">Buy items</div></div>
+<div class="town-btn" onclick="showScreen('shop')"><div class="town-btn-icon">🛒</div><div class="town-btn-text">Shop</div><div class="town-btn-desc">Buy & sell items</div></div>
+<div class="town-btn" onclick="showScreen('forge')"><div class="town-btn-icon">🔨</div><div class="town-btn-text">Forge</div><div class="town-btn-desc">Craft artifacts</div></div>
 <div class="town-btn" onclick="showScreen('spirits')"><div class="town-btn-icon">🐾</div><div class="town-btn-text">Spirits</div><div class="town-btn-desc">Manage bonds</div></div>
 <div class="town-btn" id="btn-rest" onclick="doRest()"><div class="town-btn-icon">🛌</div><div class="town-btn-text">Rest</div><div class="town-btn-desc" id="rest-desc">Restore HP/MP (10s)</div></div>
 <div class="town-btn" onclick="saveGame();showToast('Game Saved!')"><div class="town-btn-icon">💾</div><div class="town-btn-text">Save</div><div class="town-btn-desc">Secure progress</div></div>
@@ -190,8 +232,25 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 
 <!-- SHOP -->
 <div class="screen" id="screen-shop">
-<div class="panel" style="text-align:center"><h2 style="color:var(--accent);margin-bottom:2px">Marketplace</h2><p style="font-size:.78rem;color:var(--dim)">Stock up before the depths.</p><div class="shop-gold">💰 <span id="s-gold">0</span> Gold</div></div>
+<div class="panel" style="text-align:center"><h2 style="color:var(--accent);margin-bottom:2px">Marketplace</h2><p style="font-size:.78rem;color:var(--dim)">Stock up or sell excess goods.</p><div class="shop-gold">💰 <span id="s-gold">0</span> Gold</div></div>
 <div class="shop-items" id="shop-items"></div>
+<div class="sell-section" id="sell-section"></div>
+<button class="btn btn-secondary" onclick="showScreen('town')">← Back to Town</button>
+</div>
+
+<!-- FORGE -->
+<div class="screen" id="screen-forge">
+<div class="panel" style="text-align:center"><h2 style="color:var(--accent);margin-bottom:2px">Artifact Forge</h2><p style="font-size:.78rem;color:var(--dim)">Harvest materials from monsters. Craft artifacts. Equip up to 4.</p></div>
+<div class="forge-section">
+<div class="section-label">Materials</div>
+<div class="mat-grid" id="forge-mats"></div>
+<div class="section-label" style="margin-top:12px">Recipes</div>
+<div id="forge-recipes" style="display:flex;flex-direction:column;gap:8px"></div>
+<div class="section-label" style="margin-top:12px">Equipped (4 slots)</div>
+<div id="forge-equipped"></div>
+<div class="section-label" style="margin-top:12px">Chest Storage</div>
+<div class="chest-grid" id="forge-chest"></div>
+</div>
 <button class="btn btn-secondary" onclick="showScreen('town')">← Back to Town</button>
 </div>
 
@@ -213,7 +272,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <button class="dpad-btn" onclick="movePlayer(-1,0)">◀</button><div class="dpad-empty"></div><button class="dpad-btn" onclick="movePlayer(1,0)">▶</button>
 <div class="dpad-empty"></div><button class="dpad-btn" onclick="movePlayer(0,1)">▼</button><div class="dpad-empty"></div>
 </div>
-<div class="explore-hint">Walk through tall grass to find monsters. Reach the glowing tile to advance.</div>
+<div class="explore-hint">Walk through tall grass to find monsters. Reach the glowing tile to advance. Arrow keys / WASD supported.</div>
 <button class="btn btn-secondary btn-sm" onclick="startMiniGame()">← Return to Town</button>
 </div>
 </div>
@@ -290,12 +349,17 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <!-- SAVE CODE MODAL -->
 <div class="encounter-overlay" id="savecode-overlay">
 <div class="encounter-box" style="max-width:420px">
-<div class="encounter-title" style="color:var(--accent)">Save Code</div>
+<div class="encounter-title" style="color:var(--accent)">Save Transfer</div>
 <div class="encounter-desc" style="margin-bottom:12px">Export or import your RPG save data.</div>
 <div style="display:flex;flex-direction:column;gap:10px">
-<button class="btn btn-primary btn-sm" onclick="exportRpgSave()">Export Save Code</button>
-<textarea id="savecode-input" placeholder="Paste a save code here to import..." style="width:100%;height:80px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-family:monospace;font-size:.7rem;resize:none"></textarea>
-<button class="btn btn-secondary btn-sm" onclick="importRpgSave()">Import Save Code</button>
+<div class="file-save-row">
+<button class="btn btn-primary btn-sm" style="flex:1" onclick="exportSaveFile()">💾 Export .nexus File</button>
+<label class="btn btn-secondary btn-sm" style="flex:1;cursor:pointer;display:flex;align-items:center;justify-content:center">📂 Import .nexus File<input type="file" accept=".nexus" style="display:none" onchange="importSaveFile(this)"></label>
+</div>
+<div style="text-align:center;font-size:.7rem;color:var(--dim);margin:4px 0">— OR LEGACY BASE64 —</div>
+<button class="btn btn-secondary btn-sm" onclick="exportRpgSave()">Copy Base64 Code</button>
+<textarea id="savecode-input" placeholder="Paste base64 save code here..." style="width:100%;height:60px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px;font-family:monospace;font-size:.65rem;resize:none"></textarea>
+<button class="btn btn-secondary btn-sm" onclick="importRpgSave()">Import Base64</button>
 </div>
 <div style="margin-top:14px"><button class="btn btn-secondary btn-sm" onclick="document.getElementById('savecode-overlay').classList.remove('active')">Close</button></div>
 </div>
@@ -314,14 +378,53 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 
+<!-- ADMIN PANEL (HIDDEN) -->
+<div id="admin-panel" class="admin-panel">
+<h3 style="color:var(--accent);margin-bottom:12px;text-align:center">🔧 Sect Leader Debug</h3>
+<div class="admin-row"><input class="admin-input" id="admin-amt" type="number" value="1000" style="flex:1"><button class="admin-btn" onclick="adminGrant('gold')">+Gold</button><button class="admin-btn" onclick="adminGrant('xp')">+XP</button></div>
+<div class="admin-row"><button class="admin-btn" onclick="adminGrant('level')">+1 Level</button><button class="admin-btn" onclick="adminGrant('hp')">Full Heal</button><button class="admin-btn" onclick="adminGrant('mp')">Full MP</button></div>
+<div class="admin-row"><button class="admin-btn" onclick="adminGrant('kills')">+10 Kills</button><button class="admin-btn" onclick="adminSkipMG()" id="admin-mg-btn">MG Skip: OFF</button></div>
+<div class="admin-row" style="margin-top:12px"><button class="admin-btn" style="background:var(--red);width:100%" onclick="toggleAdminPanel()">Close Panel</button></div>
+</div>
+
+<!-- ROULETTE OVERLAY -->
+<div class="roulette-overlay" id="roulette-overlay">
+<div class="roulette-pointer"></div>
+<div class="roulette-wheel" id="roulette-wheel"></div>
+<div id="roulette-result" style="font-size:1.2rem;font-weight:800;color:var(--gold);min-height:30px;text-align:center"></div>
+</div>
+
+<!-- CONFIRM OVERLAY -->
+<div class="confirm-overlay" id="confirm-overlay">
+<div class="confirm-box">
+<h3 style="color:var(--accent);margin-bottom:10px" id="confirm-title">Confirm</h3>
+<p style="font-size:.85rem;color:var(--dim);margin-bottom:16px" id="confirm-desc">Are you sure?</p>
+<div style="display:flex;gap:10px;justify-content:center">
+<button class="btn btn-secondary btn-sm" onclick="closeConfirm()">Cancel</button>
+<button class="btn btn-primary btn-sm" id="confirm-btn" onclick="">Confirm</button>
+</div>
+</div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== SAVE WARD v3 =====
+const _ADMIN_CODE="NEXUSVOID-GATE17";
+const _H=s=>{let h=5381;for(let i=0;i<s.length;)h=((h<<5)+h)^s.charCodeAt(i++);return(h>>>0).toString(36)};
+const _X=(d,e)=>{let o="",k=e||_ADMIN_CODE;for(let i=0;i<d.length;i++)o+=String.fromCharCode(d.charCodeAt(i)^k.charCodeAt(i%k.length));return o};
+const _C=d=>{let o="",n=d.length,i=0;while(i<n){let c=d.charCodeAt(i++),r=1;if(i<n&&d[i]===c)r++;o+=r>3?String.fromCharCode(0x80|r)+c:String.fromCharCode(c)+(r>1?String.fromCharCode(0x80|r):"");i+=r-1}return o};
+const _D=d=>{let o="",i=0;while(i<d.length){let c=d.charCodeAt(i++);if(c&0x80){let r=c&0x7F;o+=String.fromCharCode(d.charCodeAt(i)).repeat(r);i++}else o+=String.fromCharCode(c)}return o};
+function exportSaveWard(){try{const clean={...G};delete clean.resting;const raw=JSON.stringify(clean);const compressed=_C(raw);const encrypted=_X(compressed);const hash=_H(encrypted);return btoa(hash+":"+encrypted)}catch(e){return""}}
+function importSaveWard(code){try{const decoded=atob(code);const sep=decoded.indexOf(":");if(sep<0)return false;const hash=decoded.substring(0,sep);const encrypted=decoded.substring(sep+1);if(_H(encrypted)!==hash)return false;const decrypted=_X(encrypted);const decompressed=_D(decrypted);const parsed=JSON.parse(decompressed);G=Object.assign({},G,parsed);return true}catch(e){return false}}
+
 // ===== STATE =====
-let G={cls:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false,bonds:[],activeBond:null};
+let G={cls:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false,bonds:[],activeBond:null,materials:{},artifacts:[],equippedArtifacts:[],townSkills:{rest:1,teleport:1,attune:1}};
 let selectedClass=null;
 let combatState={active:false,enemy:null,turn:'player',log:[]};
 let pendingEncounter=null;
+let adminMGSkip=false;
+let pendingCraft=null;
 
 // ===== CLASSES =====
 const CLASSES={
@@ -371,15 +474,37 @@ const ZONES=[
 ];
 
 const MAP=[[1,1,1,1,1,1,1,1,1],[1,2,0,0,0,0,0,0,1],[1,0,0,1,1,0,0,0,1],[1,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,1,0,1],[1,0,0,0,0,0,0,3,1],[1,1,1,1,1,1,1,1,1]];
-const SHOP_ITEMS=[{id:'potion',name:'Health Potion',desc:'Restores 50% HP',price:25,icon:'🧪'},{id:'manaPotion',name:'Mana Potion',desc:'Restores 50% MP',price:20,icon:'💧'},{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗'}];
+const SHOP_ITEMS=[{id:'potion',name:'Health Potion',desc:'Restores 50% HP',price:25,icon:'🧪',sellPrice:12},{id:'manaPotion',name:'Mana Potion',desc:'Restores 50% MP',price:20,icon:'💧',sellPrice:10},{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗',sellPrice:40}];
 const TUTORIAL_STEPS=[
 {title:'Welcome, Wanderer',text:'You have been pulled through the <strong>Nexus Gate</strong>. Survive, grow strong, and conquer the depths.'},
 {title:'Your Class',text:'You are a <strong><span id="tut-class-name"></span></strong>.<br>• <strong>VIT</strong>: Health<br>• <strong>ATK</strong>: Damage<br>• <strong>DEF</strong>: Damage reduction'},
-{title:'Exploration',text:'Use <strong>Explore</strong> to walk through the wilds. Stepping on <strong>tall grass</strong> may trigger an encounter. Reach the <strong>glowing tile</strong> to find the path forward.'},
+{title:'Exploration',text:'Use <strong>Explore</strong> to walk through the wilds. Stepping on <strong>tall grass</strong> may trigger an encounter. Reach the <strong>glowing tile</strong> to find the path forward.<br><strong>Arrow keys / WASD</strong> work on desktop.'},
 {title:'Combat & Spirits',text:'Battles are <strong>turn-based</strong>. Some creatures can be <strong>bonded</strong> instead of fought. Bonded spirits replace your second skill and grant passive bonuses.'},
-{title:'Progression',text:'Level up to grow stronger. Unlock new <strong>Zones</strong> by reaching level and kill thresholds. Rest in town to recover.'}
+{title:'Progression',text:'Level up to grow stronger. Unlock new <strong>Zones</strong> by reaching level and kill thresholds. Rest in town to recover. Visit the <strong>Shop</strong> to buy AND sell items. Use the <strong>Forge</strong> to craft artifacts from monster materials.'}
 ];
 let tutorialStep=0;
+
+// ===== MATERIALS & ARTIFACT RECIPES =====
+const MATERIALS={
+imp:{name:'Imp Ash',icon:'🔥',zone:0},wolf:{name:'Shadow Pelt',icon:'🐺',zone:0},emberFox:{name:'Ember Tail',icon:'🦊',zone:0},mossTurtle:{name:'Moss Shell',icon:'🐢',zone:0},
+sprite:{name:'Spark Core',icon:'⚡',zone:1},spider:{name:'Venom Sac',icon:'🕷',zone:1},crystalBat:{name:'Echo Wing',icon:'🦇',zone:1},stoneSerpent:{name:'Stone Scale',icon:'🐍',zone:1},golem:{name:'Crystal Shard',icon:'🗿',zone:1},
+knight:{name:'Bone Fragment',icon:'💀',zone:2},boneHawk:{name:'Hollow Feather',icon:'🦅',zone:2},ashWolf:{name:'Ash Fang',icon:'🐺',zone:2},elemental:{name:'Storm Essence',icon:'⚡',zone:2},
+wraith:{name:'Void Wisp',icon:'👻',zone:3},voidMoth:{name:'Dust Wing',icon:'🦋',zone:3},shadowStag:{name:'Shade Antler',icon:'🦌',zone:3}
+};
+const ARTIFACT_RECIPES=[
+{id:'a_iron_hide',name:'Iron Hide Charm',tier:'common',cost:{imp:2,wolf:1},gold:30,benefit:'+10% DEF',drawback:'-5% SPD',bType:'def',bVal:.1,dType:'spd',dVal:.05},
+{id:'a_swift_step',name:'Swift Step Band',tier:'common',cost:{emberFox:2,mossTurtle:1},gold:30,benefit:'+10% SPD',drawback:'-5% ATK',bType:'spd',bVal:.1,dType:'atk',dVal:.05},
+{id:'a_minor_ward',name:'Minor Ward Stone',tier:'common',cost:{sprite:2,spider:1},gold:35,benefit:'+10% max HP',drawback:'-5% MP regen',bType:'hp',bVal:.1,dType:'mpreg',dVal:.05},
+{id:'a_flame_edge',name:'Flame Edge Talisman',tier:'uncommon',cost:{emberFox:3,sprite:2,golem:1},gold:80,benefit:'+20% ATK',drawback:'-10% max HP',bType:'atk',bVal:.2,dType:'hp',dVal:.1},
+{id:'a_echo_sight',name:'Echo Sight Lens',tier:'uncommon',cost:{crystalBat:3,stoneSerpent:2},gold:80,benefit:'+20% crit chance',drawback:'-10% flee rate',bType:'crit',bVal:.2,dType:'flee',dVal:.1},
+{id:'a_bone_shield',name:'Bone Shield Amulet',tier:'uncommon',cost:{knight:3,boneHawk:2},gold:90,benefit:'+20% DEF',drawback:'-10% XP gain',bType:'def',bVal:.2,dType:'xp',dVal:.1},
+{id:'a_storm_pulse',name:'Storm Pulse Ring',tier:'rare',cost:{elemental:3,ashWolf:2,golem:2},gold:200,benefit:'+35% all damage',drawback:'-15% gold find',bType:'dmg',bVal:.35,dType:'gold',dVal:.15},
+{id:'a_void_veil',name:'Void Veil Cloak',tier:'rare',cost:{wraith:3,voidMoth:2},gold:220,benefit:'+35% flee rate',drawback:'-15% ATK',bType:'flee',bVal:.35,dType:'atk',dVal:.15},
+{id:'a_shadow_crown',name:'Shadow Crown',tier:'rare',cost:{shadowStag:3,knight:2,ashWolf:1},gold:250,benefit:'+35% XP gain',drawback:'-15% max HP',bType:'xp',bVal:.35,dType:'hp',dVal:.15},
+{id:'a_nexus_heart',name:'Nexus Heart',tier:'mythic',cost:{wraith:5,voidMoth:3,shadowStag:3,elemental:2},gold:500,benefit:'+50% all stats',drawback:'-20% flee rate',bType:'all',bVal:.5,dType:'flee',dVal:.2},
+{id:'a_abyssal_maw',name:'Abyssal Maw Token',tier:'mythic',cost:{shadowStag:5,wraith:3,voidMoth:2},gold:550,benefit:'+50% lifesteal',drawback:'-20% DEF',bType:'lifesteal',bVal:.5,dType:'def',dVal:.2},
+{id:'a_celestial_shard',name:'Celestial Shard',tier:'mythic',cost:{elemental:5,golem:3,crystalBat:2},gold:600,benefit:'+50% MP regen',drawback:'-20% max HP',bType:'mpreg',bVal:.5,dType:'hp',dVal:.2}
+];
 
 // ===== HELPERS =====
 function getActiveSpirit(){if(!G.activeBond)return null;return SPIRITS[G.activeBond]||null;}
@@ -400,17 +525,52 @@ function nextTutorialStep(){tutorialStep++;if(tutorialStep>=TUTORIAL_STEPS.lengt
 function skipTutorial(){tutorialStep=TUTORIAL_STEPS.length-1;nextTutorialStep();}
 
 // ===== SCREENS =====
-function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();if(id==='spirits')renderSpiritScreen();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();if(id==='spirits')renderSpiritScreen();if(id==='forge')renderForge();}
 
 // ===== TOWN =====
 function updateTownUI(){var z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;G.maxHp=getMaxHp();document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;var pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
 function renderZoneProgress(){var el=document.getElementById('zone-progress');var html='';if(G.zone<ZONES.length-1){var next=ZONES[G.zone+1];var lvlMet=G.level>=next.levelReq;var killMet=G.kills>=next.killReq;html+='<div class="zone-progress-title">Next Zone: '+next.name+'</div>';html+='<div class="zone-req '+(lvlMet?'met':'')+'"><span>Level</span><span>'+G.level+'/'+next.levelReq+(lvlMet?' ✓':'')+'</span></div>';html+='<div class="zone-req '+(killMet?'met':'')+'"><span>Kills</span><span>'+G.kills+'/'+next.killReq+(killMet?' ✓':'')+'</span></div>';if(lvlMet&&killMet)html+='<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to '+next.name+'</button>';}else{html+='<div class="zone-progress-title">Final zone reached.</div>';}el.innerHTML=html;}
 function advanceZone(){if(G.zone<ZONES.length-1){G.zone++;G.playerX=1;G.playerY=1;showToast('Arrived at '+ZONES[G.zone].name+'!');updateTownUI();}}
-function doRest(){if(G.resting)return;G.resting=true;var btn=document.getElementById('btn-rest');var desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';var t=10;var iv=setInterval(function(){t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=getMaxHp();G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP (10s)';updateTownUI();showToast('You feel fully restored.');}},1000);}
+function doRest(){if(G.resting)return;G.resting=true;var btn=document.getElementById('btn-rest');var desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';var restTime=Math.max(7,15-((G.townSkills?.rest||1)-1)*2);var t=restTime;var iv=setInterval(function(){t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=getMaxHp();G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP ('+restTime+'s)';if(!G.townSkills)G.townSkills={rest:1,teleport:1,attune:1};G.townSkills.rest=Math.min(5,G.townSkills.rest+1);updateTownUI();showToast('You feel fully restored. Rest skill improved!');}},1000);}
 
-// ===== SHOP =====
-function renderShop(){document.getElementById('s-gold').textContent=G.gold;var container=document.getElementById('shop-items');container.innerHTML='';SHOP_ITEMS.forEach(function(item){var can=G.gold>=item.price;var d=document.createElement('div');d.className='shop-item';d.innerHTML='<div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-info"><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div></div><button class="shop-item-price '+(can?'':'cant-afford')+'" onclick="buyItem(\''+item.id+'\')">'+item.price+'g</button>';container.appendChild(d);});}
+// ===== SHOP (WITH SELL) =====
+function renderShop(){document.getElementById('s-gold').textContent=G.gold;var container=document.getElementById('shop-items');container.innerHTML='';SHOP_ITEMS.forEach(function(item){var can=G.gold>=item.price;var d=document.createElement('div');d.className='shop-item';d.innerHTML='<div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-info"><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div></div><button class="shop-item-price '+(can?'':'cant-afford')+'" onclick="buyItem(\''+item.id+'\')">'+item.price+'g</button>';container.appendChild(d);});renderSellSection();}
 function buyItem(id){var item=SHOP_ITEMS.find(function(i){return i.id===id;});if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=getMaxHp();G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
+function renderSellSection(){var el=document.getElementById('sell-section');var html='<div class="section-label" style="text-align:left">Sell Items</div>';var hasItems=false;
+if(G.potions>0){hasItems=true;html+='<div class="sell-item"><span>🧪 Health Potion x'+G.potions+'</span><button class="sell-btn" onclick="sellPotion(\'potion\')">Sell (12g)</button></div>';}
+if(G.manaPotions>0){hasItems=true;html+='<div class="sell-item"><span>💧 Mana Potion x'+G.manaPotions+'</span><button class="sell-btn" onclick="sellPotion(\'manaPotion\')">Sell (10g)</button></div>';}
+if(!hasItems)html+='<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:12px">No items to sell</div>';
+el.innerHTML=html;}
+function sellPotion(type){if(type==='potion'&&G.potions>0){G.potions--;G.gold+=12;}else if(type==='manaPotion'&&G.manaPotions>0){G.manaPotions--;G.gold+=10;}else return;renderShop();showToast('Sold for gold!');}
+
+// ===== FORGE & CRAFTING =====
+function harvestMaterials(monsterId){
+var m=MATERIALS[monsterId];if(!m)return;
+if(Math.random()<0.4){
+if(!G.materials)G.materials={};
+G.materials[monsterId]=(G.materials[monsterId]||0)+1;
+if(G.currentScreen==='combat')logCombat('Harvested: '+m.name);
+}}
+function renderForge(){
+if(!G.materials)G.materials={};if(!G.artifacts)G.artifacts=[];if(!G.equippedArtifacts)G.equippedArtifacts=[];
+var matEl=document.getElementById('forge-mats');var matHtml='';
+Object.keys(MATERIALS).forEach(function(mid){var count=G.materials[mid]||0;if(count>0)matHtml+='<div class="mat-card"><div class="mat-icon">'+MATERIALS[mid].icon+'</div><div class="mat-count">'+count+'</div><div class="mat-name">'+MATERIALS[mid].name+'</div></div>';});
+if(!matHtml)matHtml='<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:12px">No materials yet. Kill monsters to harvest.</div>';
+matEl.innerHTML=matHtml;
+var recEl=document.getElementById('forge-recipes');recEl.innerHTML='';
+ARTIFACT_RECIPES.forEach(function(r){var canAfford=true;var costStr=[];Object.keys(r.cost).forEach(function(mid){var need=r.cost[mid];var have=G.materials[mid]||0;if(have<need)canAfford=false;costStr.push((MATERIALS[mid]?.name||mid)+' x'+need);});if(G.gold<r.gold)canAfford=false;costStr.push(r.gold+'g');var tierClass='tier-'+r.tier;var card=document.createElement('div');card.className='recipe-card';card.style.opacity=canAfford?'1':'.4';card.innerHTML='<div class="recipe-header"><span class="recipe-name">'+r.name+'</span><span class="recipe-tier '+tierClass+'">'+r.tier.toUpperCase()+'</span></div><div style="font-size:.75rem;color:var(--text)">'+r.benefit+' | <span style="color:var(--red)">'+r.drawback+'</span></div><div class="recipe-cost">'+costStr.join(' · ')+'</div>';if(canAfford)card.onclick=function(){confirmCraft(r.id);};recEl.appendChild(card);});
+var eqEl=document.getElementById('forge-equipped');eqEl.innerHTML='';
+for(var i=0;i<4;i++){var artId=G.equippedArtifacts[i];var art=artId?ARTIFACT_RECIPES.find(function(r){return r.id===artId;}):null;var slot=document.createElement('div');slot.className='artifact-slot'+(art?' equipped':'');if(art){slot.innerHTML='<div style="font-size:1.2rem">✦</div><div class="artifact-info"><div class="artifact-name">'+art.name+'</div><div class="artifact-desc">'+art.benefit+' | '+art.drawback+'</div></div><button class="btn btn-sm btn-danger" onclick="unequipArtifact('+i+')">✕</button>';}else{slot.innerHTML='<div style="font-size:1.2rem;opacity:.3">◇</div><div class="artifact-info"><div class="artifact-name" style="color:var(--dim)">Empty Slot</div></div>';}eqEl.appendChild(slot);}
+var chestEl=document.getElementById('forge-chest');chestEl.innerHTML='';
+G.artifacts.forEach(function(a,idx){var isEquipped=G.equippedArtifacts.indexOf(a.id)>=0;if(isEquipped)return;var item=document.createElement('div');item.className='chest-item';item.innerHTML='<div style="font-weight:700">'+a.name+'</div><div style="font-size:.6rem;color:var(--dim);margin-top:2px">'+a.benefit+'</div><div style="display:flex;gap:4px;margin-top:6px;justify-content:center"><button class="btn btn-sm btn-primary" style="padding:4px 8px;font-size:.6rem" onclick="equipFromChest('+idx+')">Equip</button><button class="btn btn-sm btn-danger" style="padding:4px 8px;font-size:.6rem" onclick="sellArtifactFromChest('+idx+')">Sell</button></div>';chestEl.appendChild(item);});
+if(chestEl.innerHTML==='')chestEl.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--dim);padding:12px">Chest empty. Craft artifacts to fill it.</div>';}
+function confirmCraft(recipeId){var r=ARTIFACT_RECIPES.find(function(x){return x.id===recipeId;});if(!r)return;pendingCraft=r;document.getElementById('confirm-title').textContent='Forge '+r.name+'?';document.getElementById('confirm-desc').textContent='This will consume materials and gold. The roulette determines final tier.';document.getElementById('confirm-btn').onclick=function(){executeCraft();};document.getElementById('confirm-overlay').classList.add('active');}
+function closeConfirm(){document.getElementById('confirm-overlay').classList.remove('active');pendingCraft=null;}
+function executeCraft(){if(!pendingCraft)return;var r=pendingCraft;closeConfirm();Object.keys(r.cost).forEach(function(mid){G.materials[mid]-=r.cost[mid];});G.gold-=r.gold;spinRoulette(r);}
+function spinRoulette(baseRecipe){var overlay=document.getElementById('roulette-overlay');var wheel=document.getElementById('roulette-wheel');var resultEl=document.getElementById('roulette-result');overlay.classList.add('active');resultEl.textContent='';var tiers=['common','common','uncommon','uncommon','rare','rare','mythic','common'];var colors=['#94a3b8','#94a3b8','#22c55e','#22c55e','#6366f1','#6366f1','#fbbf24','#94a3b8'];wheel.innerHTML='';tiers.forEach(function(t,i){var seg=document.createElement('div');seg.className='roulette-segment';seg.style.background=colors[i];seg.style.transform='rotate('+(i*45)+'deg) skewY(-45deg)';seg.innerHTML='<span style="transform:skewY(45deg) rotate(22deg);display:block;margin-top:40px">'+t.charAt(0).toUpperCase()+'</span>';wheel.appendChild(seg);});var roll=Math.random();var tier='common';if(roll<0.05)tier='mythic';else if(roll<0.20)tier='rare';else if(roll<0.50)tier='uncommon';var result=ARTIFACT_RECIPES.find(function(r){return r.tier===tier&&JSON.stringify(r.cost)===JSON.stringify(baseRecipe.cost);})||baseRecipe;var spins=5+Math.floor(Math.random()*3);var targetAngle=spins*360+Math.floor(Math.random()*360);wheel.style.transform='rotate('+targetAngle+'deg)';setTimeout(function(){overlay.classList.remove('active');wheel.style.transform='rotate(0deg)';if(!G.artifacts)G.artifacts=[];G.artifacts.push({id:result.id,name:result.name,tier:result.tier,benefit:result.benefit,drawback:result.drawback,bType:result.bType,bVal:result.bVal,dType:result.dType,dVal:result.dVal});saveGame();renderForge();showToast('Forged: '+result.name+' ('+result.tier+')!');},2200);}
+function equipFromChest(idx){var art=G.artifacts[idx];if(!art)return;if(G.equippedArtifacts.length>=4){showToast('All 4 slots full! Unequip first.');return;}G.equippedArtifacts.push(art.id);saveGame();renderForge();showToast('Equipped: '+art.name);}
+function unequipArtifact(slotIdx){G.equippedArtifacts.splice(slotIdx,1);saveGame();renderForge();showToast('Unequipped.');}
+function sellArtifactFromChest(idx){var art=G.artifacts[idx];if(!art)return;var val={'common':25,'uncommon':60,'rare':150,'mythic':400}[art.tier]||25;G.gold+=val;G.artifacts.splice(idx,1);saveGame();renderForge();showToast('Sold for '+val+'g');}
 
 // ===== SPIRIT MANAGEMENT =====
 function renderSpiritScreen(){var container=document.getElementById('spirit-slots');var emptyMsg=document.getElementById('spirit-empty-msg');container.innerHTML='';if(G.bonds.length===0){emptyMsg.style.display='block';return;}emptyMsg.style.display='none';G.bonds.forEach(function(bondId){var sp=SPIRITS[bondId];if(!sp)return;var isActive=G.activeBond===bondId;var slot=document.createElement('div');slot.className='spirit-slot'+(isActive?' active-bond':'');slot.innerHTML='<div class="spirit-slot-icon" style="background:radial-gradient(circle,'+sp.color+',#000);color:'+sp.color+'">'+sp.icon+'</div><div class="spirit-slot-info"><div class="spirit-slot-name">'+sp.name+(isActive?' ★':'')+'</div><div class="spirit-slot-desc">Skill: '+sp.skillName+' | '+sp.passive+'</div></div><div class="spirit-slot-actions">'+(isActive?'<button class="btn btn-sm btn-secondary" onclick="deactivateBond()">Deactivate</button>':'<button class="btn btn-sm btn-primary" onclick="activateBond(\''+bondId+'\')">Activate</button>')+'<button class="btn btn-sm btn-danger" onclick="releaseBond(\''+bondId+'\')">Release</button></div>';container.appendChild(slot);});}
@@ -421,107 +581,27 @@ function releaseBond(id){if(!confirm('Release '+SPIRITS[id].name+'? This cannot 
 // ===== EXPLORATION =====
 function openExplore(){G.playerX=1;G.playerY=1;renderExplore();showScreen('explore');document.getElementById('explore-zone').textContent=ZONES[G.zone].name;}
 function renderExplore(){var grid=document.getElementById('explore-grid');grid.style.gridTemplateColumns='repeat('+MAP[0].length+',34px)';grid.innerHTML='';for(var y=0;y<MAP.length;y++){for(var x=0;x<MAP[y].length;x++){var cell=document.createElement('div');var t=MAP[y][x];var cls='explore-cell ';if(t===1)cls+='wall';else if(t===0)cls+='grass';else if(t===2)cls+='path';else if(t===3)cls+='exit';if(x===G.playerX&&y===G.playerY)cls+=' player';cell.className=cls;cell.setAttribute('data-x',x);cell.setAttribute('data-y',y);cell.onclick=function(){tryMoveTo(parseInt(this.getAttribute('data-x')),parseInt(this.getAttribute('data-y')));};grid.appendChild(cell);}}}
-function movePlayer(dx,dy){var nx=G.playerX+dx,ny=G.playerY+dy;if(ny<0||ny>=MAP.length||nx<0||nx>=MAP[0].length)return;if(MAP[ny][nx]===1)return;G.playerX=nx;G.playerY=ny;renderExplore();checkTile();}
+function movePlayer(dx,dy){if(G.resting||combatState.active)return;var nx=G.playerX+dx,ny=G.playerY+dy;if(ny<0||ny>=MAP.length||nx<0||nx>=MAP[0].length)return;if(MAP[ny][nx]===1)return;G.playerX=nx;G.playerY=ny;renderExplore();checkTile();}
 function tryMoveTo(x,y){var dx=x-G.playerX,dy=y-G.playerY;if(Math.abs(dx)+Math.abs(dy)===1)movePlayer(dx,dy);}
 function checkTile(){var t=MAP[G.playerY][G.playerX];if(t===3){showToast('Path forward found! Return to town to advance.');return;}if(t===0&&Math.random()<0.22)triggerEncounter();}
 function triggerEncounter(){var z=ZONES[G.zone];var mid=z.monsters[Math.floor(Math.random()*z.monsters.length)];var lvl=Math.max(z.minLvl,Math.min(z.maxLvl,G.level+Math.floor(Math.random()*3)-1));var stats=getMonsterStats(mid,lvl);pendingEncounter=stats;var ov=document.getElementById('encounter-overlay');document.getElementById('enc-icon').textContent=stats.icon;document.getElementById('enc-icon').style.background='radial-gradient(circle,'+stats.color+',#000)';document.getElementById('enc-icon').style.color=stats.color;document.getElementById('enc-title').textContent='A wild '+stats.name+' appears!';document.getElementById('enc-desc').textContent='Level '+stats.lvl+(stats.bondable?' — ✦ Bondable':'');var actions=document.getElementById('enc-actions');actions.innerHTML='<button class="btn btn-danger btn-sm" onclick="startCombatFromEncounter()">Fight</button>';if(stats.bondable)actions.innerHTML+='<button class="btn btn-sm" style="background:var(--purple);color:#fff" onclick="startResonance()">🔗 Bond</button>';actions.innerHTML+='<button class="btn btn-secondary btn-sm" onclick="fleeEncounter()">Flee</button>';ov.classList.add('active');}
 function startCombatFromEncounter(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;startCombat(pendingEncounter);pendingEncounter=null;}
 function fleeEncounter(){document.getElementById('encounter-overlay').classList.remove('active');pendingEncounter=null;showToast('You slipped away safely.');}
 
+// ===== KEYBOARD MOVEMENT =====
+document.addEventListener('keydown',function(e){
+if(G.currentScreen!=='explore'||G.resting||combatState.active)return;
+var map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],W:[0,-1],s:[0,1],S:[0,1],a:[-1,0],A:[-1,0],d:[1,0],D:[1,0]};
+var dir=map[e.key];if(dir){e.preventDefault();movePlayer(dir[0],dir[1]);}
+});
+
 // ===== SPIRIT OFFERING MINI-GAME =====
 var OFFER_RUNES=['🔥','💧','🌿','⚡','🌙','☀','❄','💎','🩸'];
 var resState={round:0,correct:0,misses:0,targetIdx:0,done:false,active:false};
-function startResonance(){
-document.getElementById('encounter-overlay').classList.remove('active');
-if(!pendingEncounter)return;
-var sp=SPIRITS[pendingEncounter.spiritId];
-document.getElementById('res-title').textContent='Bond with '+pendingEncounter.name;
-document.getElementById('res-desc').textContent='The spirit shows what it desires. Offer the match.';
-document.getElementById('res-status').textContent='';
-resState.round=0;resState.correct=0;resState.misses=0;resState.done=false;resState.active=true;
-document.getElementById('resonance-overlay').classList.add('active');
-nextOfferRound();
-}
-function nextOfferRound(){
-if(resState.done)return;
-resState.round++;
-document.getElementById('res-round').textContent=resState.round+'/3';
-resState.targetIdx=Math.floor(Math.random()*OFFER_RUNES.length);
-document.getElementById('res-desire').textContent=OFFER_RUNES[resState.targetIdx];
-var choices=document.getElementById('res-choices');
-choices.innerHTML='';
-var opts=[resState.targetIdx];
-while(opts.length<3){
-var r=Math.floor(Math.random()*OFFER_RUNES.length);
-if(opts.indexOf(r)===-1)opts.push(r);
-}
-opts.sort(function(){return Math.random()-0.5;});
-opts.forEach(function(idx){
-var btn=document.createElement('button');
-btn.className='btn btn-secondary';
-btn.style.cssText='padding:18px 22px;font-size:1.8rem;min-width:auto;';
-btn.textContent=OFFER_RUNES[idx];
-btn.onclick=function(){offerChoice(idx);};
-choices.appendChild(btn);
-});
-}
-function offerChoice(idx){
-if(!resState.active||resState.done)return;
-var status=document.getElementById('res-status');
-if(idx===resState.targetIdx){
-resState.correct++;
-status.textContent='✓ The spirit accepts your offering.';
-status.style.color='var(--green)';
-document.getElementById('res-hits').textContent=resState.correct;
-}else{
-resState.misses++;
-status.textContent='✗ The spirit turns away...';
-status.style.color='var(--red)';
-document.getElementById('res-misses').textContent=resState.misses+'/2';
-if(resState.misses>=2){
-resState.done=true;resState.active=false;
-setTimeout(function(){
-document.getElementById('resonance-overlay').classList.remove('active');
-pendingEncounter=null;
-showToast('The spirit rejected your offerings.');
-showScreen('explore');
-},1500);
-return;
-}
-}
-if(resState.correct>=2){
-resState.done=true;resState.active=false;
-status.textContent='✦ The spirit bonds with you!';
-setTimeout(function(){completeBond();},1500);
-return;
-}
-if(resState.round>=3&&resState.correct<2){
-resState.done=true;resState.active=false;
-status.textContent='The spirit loses interest...';
-setTimeout(function(){
-document.getElementById('resonance-overlay').classList.remove('active');
-pendingEncounter=null;
-showToast('Bond failed. The spirit wandered off.');
-showScreen('explore');
-},1500);
-return;
-}
-setTimeout(nextOfferRound,1200);
-}
-function completeBond(){
-var sid=pendingEncounter.spiritId;
-if(G.bonds.length>=3){
-showToast('Bond slots full! Release a spirit first.');
-document.getElementById('resonance-overlay').classList.remove('active');
-pendingEncounter=null;showScreen('spirits');return;
-}
-if(G.bonds.indexOf(sid)===-1)G.bonds.push(sid);
-if(!G.activeBond)G.activeBond=sid;
-pendingEncounter=null;
-document.getElementById('resonance-overlay').classList.remove('active');
-saveGame();showToast('Bonded with '+SPIRITS[sid].name+'!');
-showScreen('explore');
-}
+function startResonance(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;document.getElementById('res-title').textContent='Bond with '+pendingEncounter.name;document.getElementById('res-desc').textContent='The spirit shows what it desires. Offer the match.';document.getElementById('res-status').textContent='';resState.round=0;resState.correct=0;resState.misses=0;resState.done=false;resState.active=true;document.getElementById('resonance-overlay').classList.add('active');nextOfferRound();}
+function nextOfferRound(){if(resState.done)return;resState.round++;document.getElementById('res-round').textContent=resState.round+'/3';resState.targetIdx=Math.floor(Math.random()*OFFER_RUNES.length);document.getElementById('res-desire').textContent=OFFER_RUNES[resState.targetIdx];var choices=document.getElementById('res-choices');choices.innerHTML='';var opts=[resState.targetIdx];while(opts.length<3){var r=Math.floor(Math.random()*OFFER_RUNES.length);if(opts.indexOf(r)===-1)opts.push(r);}opts.sort(function(){return Math.random()-0.5;});opts.forEach(function(idx){var btn=document.createElement('button');btn.className='btn btn-secondary';btn.style.cssText='padding:18px 22px;font-size:1.8rem;min-width:auto;';btn.textContent=OFFER_RUNES[idx];btn.onclick=function(){offerChoice(idx);};choices.appendChild(btn);});}
+function offerChoice(idx){if(!resState.active||resState.done)return;var status=document.getElementById('res-status');if(idx===resState.targetIdx){resState.correct++;status.textContent='✓ The spirit accepts your offering.';status.style.color='var(--green)';document.getElementById('res-hits').textContent=resState.correct;}else{resState.misses++;status.textContent='✗ The spirit turns away...';status.style.color='var(--red)';document.getElementById('res-misses').textContent=resState.misses+'/2';if(resState.misses>=2){resState.done=true;resState.active=false;setTimeout(function(){document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showToast('The spirit rejected your offerings.');showScreen('explore');},1500);return;}}if(resState.correct>=2){resState.done=true;resState.active=false;status.textContent='✦ The spirit bonds with you!';setTimeout(function(){completeBond();},1500);return;}if(resState.round>=3&&resState.correct<2){resState.done=true;resState.active=false;status.textContent='The spirit loses interest...';setTimeout(function(){document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showToast('Bond failed. The spirit wandered off.');showScreen('explore');},1500);return;}setTimeout(nextOfferRound,1200);}
+function completeBond(){var sid=pendingEncounter.spiritId;if(G.bonds.length>=3){showToast('Bond slots full! Release a spirit first.');document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showScreen('spirits');return;}if(G.bonds.indexOf(sid)===-1)G.bonds.push(sid);if(!G.activeBond)G.activeBond=sid;pendingEncounter=null;document.getElementById('resonance-overlay').classList.remove('active');saveGame();showToast('Bonded with '+SPIRITS[sid].name+'!');showScreen('explore');}
 
 // ===== COMBAT =====
 function getCombatSkills(){var pcls=CLASSES[G.cls];var skills=[{name:pcls.skills[0].name,cost:getSkillCost(pcls.skills[0].cost),mult:pcls.skills[0].mult,type:'damage'}];var sp=getActiveSpirit();if(sp){skills.push({name:sp.skillName,cost:getSkillCost(sp.skillCost),mult:sp.skillMult,type:sp.skillMult>0?'damage':'special'});}else{skills.push({name:pcls.skills[1].name,cost:getSkillCost(pcls.skills[1].cost),mult:pcls.skills[1].mult,type:'damage'});}return skills;}
@@ -531,24 +611,39 @@ function logCombat(m){combatState.log.push('> '+m);if(combatState.log.length>6)c
 function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;var e=combatState.enemy;var dmg=0;if(type==='attack'){var sp=getActiveSpirit();var critChance=0.05;if(sp&&sp.passiveType==='crit')critChance+=sp.passiveVal;var isCrit=Math.random()<critChance;dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));if(isCrit){dmg=Math.floor(dmg*1.5);logCombat('CRITICAL! You strike '+e.name+' for '+dmg+' dmg!');}else{logCombat('You strike '+e.name+' for '+dmg+' dmg.');}e.currentHp-=dmg;if(sp&&sp.passiveType==='regen'){var heal=sp.passiveVal;G.hp=Math.min(getMaxHp(),G.hp+heal);}}else if(type==='item'){if(G.potions>0){G.potions--;var heal=Math.floor(getMaxHp()*0.5);G.hp=Math.min(getMaxHp(),G.hp+heal);logCombat('You drink a potion (+'+heal+' HP).');}else{showToast('No potions!');return;}}else if(type==='flee'){var lvlDiff=G.level-e.lvl;var failChance=0;if(lvlDiff===0)failChance=0.5;else if(lvlDiff<0)failChance=Math.min(0.95,0.75+Math.abs(lvlDiff)*0.05);else failChance=Math.max(0.05,0.25-lvlDiff*0.05);var sp=getActiveSpirit();if(sp&&sp.passiveType==='flee')failChance=Math.max(0.05,failChance-sp.passiveVal);if(Math.random()<failChance){logCombat('Failed to flee! ('+Math.round(failChance*100)+'% fail)');combatState.turn='enemy';setTimeout(enemyTurn,1100);}else{logCombat('You escaped!');combatState.active=false;setTimeout(function(){showScreen('explore');},800);}return;}updateCombatUI();if(e.currentHp<=0)winBattle();else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
 function useSkill(idx){if(!combatState.active||combatState.turn!=='player')return;var skills=getCombatSkills();var sk=skills[idx];if(!sk){showToast('No such skill!');return;}if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}G.mp-=sk.cost;var e=combatState.enemy;var sp=getActiveSpirit();if(sk.type==='special'&&sp){if(sp.skillName==="Nature's Mend"){var heal=Math.floor(getMaxHp()*0.25);G.hp=Math.min(getMaxHp(),G.hp+heal);logCombat("Nature's Mend heals "+heal+" HP!");}else if(sp.skillName==='Sonic Screech'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;e.stunned=true;logCombat('Sonic Screech deals '+dmg+' dmg and stuns!');}else if(sp.skillName==='Petrify'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;e.def=Math.max(0,e.def-3);logCombat('Petrify deals '+dmg+' dmg and reduces DEF!');}else if(sp.skillName==='Soul Reap'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;var drain=Math.floor(dmg*0.2);G.hp=Math.min(getMaxHp(),G.hp+drain);logCombat('Soul Reap deals '+dmg+' dmg, drains '+drain+' HP!');}else if(sp.skillName==='Pack Howl'){logCombat('Pack Howl boosts your ATK for 3 turns!');combatState.atkBuff=3;}else if(sp.skillName==='Drain Touch'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;var mpDrain=Math.floor(dmg*0.3);G.mp=Math.min(G.maxMp,G.mp+mpDrain);logCombat('Drain Touch deals '+dmg+' dmg, steals '+mpDrain+' MP!');}else if(sp.skillName==='Phase Shift'){combatState.dodgeNext=true;logCombat('Phase Shift! You will dodge the next attack.');}}else{var mult=sk.mult;if(combatState.atkBuff&&combatState.atkBuff>0)mult+=0.3;var dmg=Math.max(1,Math.floor(getPlayerAtk()*mult)-e.def);e.currentHp-=dmg;logCombat('You cast '+sk.name+' for '+dmg+' dmg! (-'+sk.cost+' MP)');}updateCombatUI();if(e.currentHp<=0)winBattle();else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
 function enemyTurn(){if(!combatState.active)return;var e=combatState.enemy;if(e.stunned){logCombat(e.name+' is stunned and cannot act!');e.stunned=false;combatState.turn='player';return;}if(combatState.dodgeNext){logCombat('You phase-shifted! Dodged '+e.name+"'s attack!");combatState.dodgeNext=false;combatState.turn='player';return;}var dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(e.name+' hits you for '+dmg+' dmg.');if(combatState.atkBuff&&combatState.atkBuff>0)combatState.atkBuff--;var sp=getActiveSpirit();if(sp&&sp.passiveType==='regen'){G.hp=Math.min(getMaxHp(),G.hp+sp.passiveVal);}updateCombatUI();if(G.hp<=0)loseBattle();else combatState.turn='player';}
-function winBattle(){var e=combatState.enemy;var xpGain=e.xp;var goldGain=e.gold;var sp=getActiveSpirit();if(sp&&sp.passiveType==='xp')xpGain=Math.floor(xpGain*(1+sp.passiveVal));if(sp&&sp.passiveType==='gold')goldGain=Math.floor(goldGain*(1+sp.passiveVal));G.xp+=xpGain;G.gold+=goldGain;G.kills++;combatState.active=false;combatState.atkBuff=0;combatState.dodgeNext=false;var p=document.createElement('div');p.className='xp-popup';p.innerHTML='<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+'+xpGain+' XP<br>+'+goldGain+' Gold</div>';document.body.appendChild(p);setTimeout(function(){p.remove();},2200);var leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp=getMaxHp();G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(function(){if(leveled)showToast('LEVEL UP! Now level '+G.level);showScreen('explore');},2300);}
+function winBattle(){var e=combatState.enemy;var xpGain=e.xp;var goldGain=e.gold;var sp=getActiveSpirit();if(sp&&sp.passiveType==='xp')xpGain=Math.floor(xpGain*(1+sp.passiveVal));if(sp&&sp.passiveType==='gold')goldGain=Math.floor(goldGain*(1+sp.passiveVal));G.xp+=xpGain;G.gold+=goldGain;G.kills++;combatState.active=false;combatState.atkBuff=0;combatState.dodgeNext=false;
+// Harvest materials on win
+var mid=Object.keys(MONSTERS).find(function(k){return MONSTERS[k].name===e.name;});
+if(mid)harvestMaterials(mid);
+var p=document.createElement('div');p.className='xp-popup';p.innerHTML='<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+'+xpGain+' XP<br>+'+goldGain+' Gold</div>';document.body.appendChild(p);setTimeout(function(){p.remove();},2200);var leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp=getMaxHp();G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(function(){if(leveled)showToast('LEVEL UP! Now level '+G.level);showScreen('explore');},2300);}
 function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(getMaxHp()*0.5);combatState.active=false;combatState.atkBuff=0;combatState.dodgeNext=false;setTimeout(function(){showToast('You wake up in town...');showScreen('town');},1800);}
 
 // ===== RUNE LOCK MINI-GAME =====
 var RUNE_SYMBOLS=['☯','✦','◆','⚔','🔥','💧','⚡','🌙','☀'];
 var mgState={sequence:[],playerInput:[],phase:'idle',length:3,delay:800};
-function startMiniGame(){document.getElementById('minigame-overlay').classList.add('active');document.getElementById('mg-close-btn').style.display='block';document.getElementById('mg-status').textContent='';document.getElementById('mg-status').style.color='var(--dim)';mgState.length=3+Math.min(G.zone,2);mgState.delay=Math.max(400,800-G.zone*120);mgState.sequence=[];mgState.playerInput=[];mgState.phase='watch';for(var i=0;i<mgState.length;i++)mgState.sequence.push(Math.floor(Math.random()*9));document.getElementById('mg-desc').textContent='Watch the sequence... ('+mgState.length+' runes)';renderRuneGrid(true);playSequence();}
+function startMiniGame(){if(adminMGSkip){showScreen('town');showToast('Admin: Teleported safely.');return;}document.getElementById('minigame-overlay').classList.add('active');document.getElementById('mg-close-btn').style.display='block';document.getElementById('mg-status').textContent='';document.getElementById('mg-status').style.color='var(--dim)';mgState.length=3+Math.min(G.zone,2);mgState.delay=Math.max(400,800-G.zone*120);mgState.sequence=[];mgState.playerInput=[];mgState.phase='watch';for(var i=0;i<mgState.length;i++)mgState.sequence.push(Math.floor(Math.random()*9));document.getElementById('mg-desc').textContent='Watch the sequence... ('+mgState.length+' runes)';renderRuneGrid(true);playSequence();}
 function renderRuneGrid(disabled){var grid=document.getElementById('mg-grid');grid.innerHTML='';for(var i=0;i<9;i++){var btn=document.createElement('button');btn.className='btn btn-secondary';btn.style.cssText='padding:14px;font-size:1.4rem;min-width:auto;aspect-ratio:1;';btn.textContent=RUNE_SYMBOLS[i];if(disabled){btn.disabled=true;btn.style.opacity='0.5';}else{btn.onclick=(function(idx){return function(){onRuneTap(idx);};})(i);}grid.appendChild(btn);}}
 function playSequence(){var display=document.getElementById('mg-runes-display');var idx=0;display.innerHTML='<div style="font-size:2rem;color:var(--dim)">●</div>';var iv=setInterval(function(){if(idx>=mgState.sequence.length){clearInterval(iv);setTimeout(function(){mgState.phase='input';mgState.playerInput=[];document.getElementById('mg-desc').textContent='Now repeat the sequence!';document.getElementById('mg-runes-display').innerHTML='';renderRuneGrid(false);},400);return;}display.innerHTML='<div style="font-size:2.5rem;animation:xpPop .3s ease-out">'+RUNE_SYMBOLS[mgState.sequence[idx]]+'</div>';idx++;},mgState.delay);}
 function onRuneTap(idx){if(mgState.phase!=='input')return;mgState.playerInput.push(idx);var pos=mgState.playerInput.length-1;document.getElementById('mg-runes-display').innerHTML='<div style="font-size:2rem;color:var(--accent)">'+RUNE_SYMBOLS[idx]+'</div>';if(mgState.playerInput[pos]!==mgState.sequence[pos]){mgState.phase='done';document.getElementById('mg-status').textContent='✗ Wrong rune! The ward rejects you.';document.getElementById('mg-status').style.color='var(--red)';renderRuneGrid(true);var dmg=Math.floor(getMaxHp()*0.15);G.hp=Math.max(1,G.hp-dmg);document.getElementById('mg-close-btn').textContent='Limp to Town (-'+dmg+' HP)';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(false);};return;}if(mgState.playerInput.length===mgState.sequence.length){mgState.phase='done';document.getElementById('mg-status').textContent='✓ Ward unlocked! Safe passage.';document.getElementById('mg-status').style.color='var(--green)';renderRuneGrid(true);document.getElementById('mg-close-btn').textContent='Continue Safely';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(true);};}}
 function closeMiniGame(safe){document.getElementById('minigame-overlay').classList.remove('active');mgState.phase='idle';showScreen('town');if(!safe)showToast('You barely made it back...');else showToast('Returned safely.');}
 
-// ===== SAVE/LOAD/RESET =====
+// ===== HIDDEN ADMIN PANEL =====
+var _adminTapCount=0,_adminTapTimer=null;
+document.getElementById('close-sigil').addEventListener('click',function(e){e.preventDefault();_adminTapCount++;clearTimeout(_adminTapTimer);_adminTapTimer=setTimeout(function(){_adminTapCount=0;},600);if(_adminTapCount>=3){_adminTapCount=0;toggleAdminPanel();}});
+function toggleAdminPanel(){document.getElementById('admin-panel').classList.toggle('active');}
+function adminGrant(type){var amt=parseInt(document.getElementById('admin-amt').value)||0;if(type==='gold'){G.gold+=amt;showToast('Admin: +'+amt+' gold');}else if(type==='xp'){G.xp+=amt;showToast('Admin: +'+amt+' XP');}else if(type==='level'){G.level++;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp=getMaxHp();G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;showToast('Admin: Level up!');}else if(type==='hp'){G.hp=getMaxHp();showToast('Admin: Full HP');}else if(type==='mp'){G.mp=G.maxMp;showToast('Admin: Full MP');}else if(type==='kills'){G.kills+=10;showToast('Admin: +10 kills');}if(G.currentScreen==='town')updateTownUI();}
+function adminSkipMG(){adminMGSkip=!adminMGSkip;document.getElementById('admin-mg-btn').textContent='MG Skip: '+(adminMGSkip?'ON':'OFF');showToast('Mini-game skip: '+(adminMGSkip?'ON':'OFF'));}
+
+// ===== FILE-BASED SAVE SYSTEM =====
+function exportSaveFile(){var warded=exportSaveWard();var blob=new Blob([warded],{type:'application/octet-stream'});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download=(G.cls||'rpg-save')+'.nexus';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);showToast('💾 .nexus file downloaded');}
+function importSaveFile(input){var file=input.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(e){if(importSaveWard(e.target.result)){if(!G.bonds)G.bonds=[];if(!G.materials)G.materials={};if(!G.artifacts)G.artifacts=[];if(!G.equippedArtifacts)G.equippedArtifacts=[];if(!G.townSkills)G.townSkills={rest:1,teleport:1,attune:1};saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('✅ .nexus save loaded!');showScreen('town');updateTownUI();}else showToast('❌ Invalid or corrupted .nexus file');};reader.readAsText(file);input.value='';}
+
+// ===== LEGACY SAVE/LOAD/RESET =====
 function saveGame(){try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(ex){}}
-function loadGame(){try{var s=localStorage.getItem('nexus-pocket-rpg-save');if(s){var parsed=JSON.parse(s);G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];if(G.activeBond===undefined)G.activeBond=null;}}catch(ex){}}
+function loadGame(){try{var s=localStorage.getItem('nexus-pocket-rpg-save');if(s){var parsed=JSON.parse(s);G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];if(G.activeBond===undefined)G.activeBond=null;if(!G.materials)G.materials={};if(!G.artifacts)G.artifacts=[];if(!G.equippedArtifacts)G.equippedArtifacts=[];if(!G.townSkills)G.townSkills={rest:1,teleport:1,attune:1};}}catch(ex){}}
 function resetRpg(){if(!confirm('Reset ALL progress? Cannot be undone.'))return;localStorage.removeItem('nexus-pocket-rpg-save');location.reload();}
-function exportRpgSave(){var data=btoa(JSON.stringify(G));var ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied!');}catch(ex){showToast('Code shown below — long-press to copy.');}}
-function importRpgSave(){var ta=document.getElementById('savecode-input');var code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{var parsed=JSON.parse(atob(code));G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported!');showScreen('town');updateTownUI();}catch(ex){showToast('Invalid save code!');}}
+function exportRpgSave(){var data=btoa(JSON.stringify(G));var ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Base64 code copied!');}catch(ex){showToast('Code shown below — long-press to copy.');}}
+function importRpgSave(){var ta=document.getElementById('savecode-input');var code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{var parsed=JSON.parse(atob(code));G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];if(!G.materials)G.materials={};if(!G.artifacts)G.artifacts=[];if(!G.equippedArtifacts)G.equippedArtifacts=[];if(!G.townSkills)G.townSkills={rest:1,teleport:1,attune:1};saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Legacy save imported!');showScreen('town');updateTownUI();}catch(ex){showToast('Invalid base64 save code!');}}
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
 
 // ===== INIT =====
