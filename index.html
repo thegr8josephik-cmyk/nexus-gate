@@ -4,195 +4,180 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Nexus Gate</title>
-
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-180.png" />
-
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
-  <meta name="theme-color" content="#0f1115" />
-
+  <meta name="theme-color" content="#ffffff" />
   <style>
-       :root {
-      --bg: #090a0f;
-      --panel: rgba(22, 25, 35, 0.6);
-      --panel-hover: rgba(30, 34, 48, 0.9);
-      --border: rgba(255, 255, 255, 0.06);
-      --text: #f1f5f9;
-      --text-muted: #94a3b8;
-      --accent: #6366f1; /* Mystical Indigo */
-      --accent-glow: rgba(99, 102, 241, 0.15);
+    :root {
+      --bg: #ffffff;
+      --panel: #ffffff;
+      --panel-h: #f4f4f2;
+      --border: #141414;
+      --text: #141414;
+      --text-muted: #6f6f6f;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.2);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 85% 90%, rgba(236, 72, 153, 0.05) 0%, transparent 40%);
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
       color: var(--text);
       line-height: 1.6;
       min-height: 100dvh;
       padding: max(env(safe-area-inset-top), 20px) 16px 100px;
-      -webkit-font-smoothing: antialiased;
     }
-
     .container { max-width: 1000px; margin: 0 auto; }
     header { margin-bottom: 40px; text-align: center; }
-    h1 { 
-      font-size: 2.2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px;
-      background: linear-gradient(135deg, #fff 30%, #6366f1);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    h1 {
+      font-size: 2.2rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 8px; color: var(--text);
     }
-    .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 32px; }
-
+    .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 32px; font-style: italic; }
     .search-wrapper { position: relative; max-width: 550px; margin: 0 auto; }
     .search-input {
-      width: 100%; padding: 16px 24px 16px 52px; font-size: 1rem;
-      background: var(--panel); backdrop-filter: blur(10px);
-      border: 1px solid var(--border); border-radius: 16px;
-      color: var(--text); outline: none; transition: all 0.3s;
+      width: 100%; padding: 14px 24px 14px 24px; font-size: 1rem;
+      background: #fff; border: 3px solid var(--border);
+      box-shadow: 4px 4px 0 var(--border);
+      color: var(--text); outline: none; transition: transform .1s, box-shadow .1s;
+      font-family: inherit;
     }
-    .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-    .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
-
+    .search-input:focus { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--accent); }
+    .search-input::placeholder { color: var(--text-muted); font-style: italic; }
     .category { margin-bottom: 48px; }
     .category-title {
-      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--accent); margin-bottom: 20px; padding-left: 4px;
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 3px; color: var(--accent); margin-bottom: 20px;
+      padding-bottom: 8px; border-bottom: 3px solid var(--border);
       display: flex; align-items: center; gap: 10px;
     }
-    .category-title::after {
-      content: ""; flex: 1; height: 1px; 
-      background: linear-gradient(90deg, var(--accent), transparent);
-    }
-
     .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-
     .card {
-      display: flex; align-items: center; gap: 16px; padding: 20px;
-      background: var(--panel); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 18px;
+      display: flex; align-items: center; gap: 16px; padding: 18px;
+      background: var(--panel); border: 3px solid var(--border);
+      box-shadow: 4px 4px 0 var(--border);
       text-decoration: none; color: var(--text);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative; overflow: hidden;
+      transition: transform .1s, box-shadow .1s;
+      position: relative;
     }
-    .card::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--accent); transform: scaleX(0); transition: transform 0.3s;
+    .card:hover {
+      transform: translate(-3px,-3px); box-shadow: 7px 7px 0 var(--accent);
+      background: var(--panel-h);
     }
-    .card:hover { 
-      background: var(--panel-hover); border-color: rgba(255,255,255,0.15); 
-      transform: translateY(-4px); box-shadow: 0 8px 24px var(--accent-glow);
-    }
-    .card:hover::before { transform: scaleX(1); }
-
+    .card:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--border); }
     .card-icon {
-      font-size: 1.6rem; flex-shrink: 0; width: 48px; height: 48px;
-      display: flex; align-items: center; justify-content: center;
-      background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(236,72,153,0.05));
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 12px;
+      font-size: 0.9rem; flex-shrink: 0; width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content:center;
+      background: var(--accent); color: #fff;
+      border: 3px solid var(--border); font-weight: 700;
+      letter-spacing: 1px;
     }
     .card-content { flex: 1; min-width: 0; }
-    .card-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-desc {
-      font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;
       display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      font-style: italic;
     }
-
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); display: none; }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); display: none; font-style: italic; }
     .empty-state.show { display: block; }
-
-    /* Custom Bookmarks Formation */
     .fab {
       position: fixed; bottom: 30px; right: 30px; width: 64px; height: 64px;
-      background: linear-gradient(135deg, #6366f1, #a855f7); color: white; border: none; border-radius: 50%;
-      font-size: 2.2rem; display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4); cursor: pointer; z-index: 100;
-      transition: transform 0.2s;
+      background: var(--accent); color: white; border: 3px solid var(--border);
+      box-shadow: 5px 5px 0 var(--border);
+      font-size: 2.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; z-index: 100;
+      transition: transform .1s, box-shadow .1s;
+      font-family: inherit;
     }
-    .fab:hover { transform: scale(1.1) rotate(90deg); }
-
+    .fab:hover { transform: translate(-3px,-3px); box-shadow: 8px 8px 0 var(--border); }
+    .fab:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 var(--border); }
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+      background: rgba(255,255,255,0.92);
       display: none; align-items: center; justify-content: center;
       z-index: 200; padding: 20px;
     }
     .modal-overlay.active { display: flex; }
-
     .modal {
-      background: var(--panel); backdrop-filter: blur(20px);
-      border: 1px solid var(--border); border-radius: 24px;
-      padding: 32px; width: 100%; max-width: 420px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      background: var(--panel); border: 3px solid var(--accent);
+      box-shadow: 8px 8px 0 var(--border);
+      padding: 28px; width: 100%; max-width: 420px;
     }
-    .modal h2 { margin-bottom: 24px; font-size: 1.3rem; text-align: center; }
-    .form-group { margin-bottom: 20px; }
-    .form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
+    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
     .form-group input, .form-group select {
-      width: 100%; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-      border-radius: 12px; color: var(--text); font-size: 1rem;
+      width: 100%; padding: 12px; background: #fff; border: 3px solid var(--border);
+      color: var(--text); font-size: 0.95rem; font-family: inherit;
+      outline: none;
     }
-    .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
-    .modal-buttons button { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-    .btn-save { background: linear-gradient(135deg, #6366f1, #a855f7); color: white; }
-    .btn-cancel { background: rgba(255,255,255,0.05); color: var(--text); }
-
+    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+    .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+    .modal-buttons button {
+      flex: 1; padding: 14px; border: 3px solid var(--border);
+      font-size: 0.95rem; font-weight: 700; cursor: pointer;
+      font-family: inherit; box-shadow: 3px 3px 0 var(--border);
+      transition: transform .1s, box-shadow .1s;
+    }
+    .modal-buttons button:active { transform: translate(3px,3px); box-shadow: 0 0 0; }
+    .btn-save { background: var(--accent); color: white; }
+    .btn-cancel { background: #fff; color: var(--text); }
     .custom-card { position: relative; }
     .delete-btn {
-      position: absolute; top: 12px; right: 12px; width: 24px; height: 24px;
-      background: rgba(255,0,0,0.2); color: #ff4444; border: none; border-radius: 50%;
-      font-size: 0.8rem; cursor: pointer; display: none; align-items: center; justify-content: center;
+      position: absolute; top: -3px; right: -3px; width: 28px; height: 28px;
+      background: #ef4444; color: #fff; border: 3px solid var(--border);
+      font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      font-family: inherit;
     }
     .custom-card:hover .delete-btn { display: flex; }
-
-    /* Portal Viewer Formation */
     .viewer-overlay {
       position: fixed; inset: 0; background: var(--bg); z-index: 300;
       display: none; flex-direction: column;
     }
-    .viewer-overlay.active { display: flex; animation: viewerRise 0.25s ease; }
-    @keyframes viewerRise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
+    .viewer-overlay.active { display: flex; animation: viewerRise 0.2s ease; }
+    @keyframes viewerRise { from { opacity: 0; } to { opacity: 1; } }
     .viewer-toolbar {
-      display: flex; gap: 8px; align-items: center; padding: 12px;
-      padding-top: max(env(safe-area-inset-top), 12px);
-      background: var(--panel); backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      display: flex; gap: 8px; align-items: center; padding: 10px;
+      padding-top: max(env(safe-area-inset-top), 10px);
+      background: #fff; border-bottom: 3px solid var(--border);
     }
     .viewer-btn {
-      width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--border);
-      background: var(--bg); color: var(--text); border-radius: 12px;
-      font-size: 1.1rem; cursor: pointer;
+      width: 40px; height: 40px; flex-shrink: 0; border: 3px solid var(--border);
+      box-shadow: 2px 2px 0 var(--border);
+      background: #fff; color: var(--text); font-size: 1.1rem; cursor: pointer;
+      font-family: inherit; font-weight: 700;
+      transition: transform .08s, box-shadow .08s;
     }
-    .viewer-btn:hover { background: var(--panel-hover); }
+    .viewer-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0; }
     .viewer-omnibox {
-      flex: 1; min-width: 0; padding: 12px 18px; background: var(--bg);
-      border: 1px solid var(--border); border-radius: 12px; color: var(--text);
-      font-size: 0.95rem; outline: none;
+      flex: 1; min-width: 0; padding: 10px 14px; background: #fff;
+      border: 3px solid var(--border); color: var(--text);
+      font-size: 0.95rem; outline: none; font-family: inherit;
     }
     .viewer-omnibox:focus { border-color: var(--accent); }
     .viewer-stage { flex: 1; position: relative; background: #fff; }
     .viewer-stage iframe { width: 100%; height: 100%; border: none; }
-
     .viewer-ward {
       position: absolute; inset: 0; background: var(--bg); color: var(--text);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       text-align: center; padding: 30px; gap: 12px;
     }
-    .ward-icon { font-size: 3rem; }
-    .viewer-ward h3 { font-size: 1.2rem; }
-    .viewer-ward p { color: var(--text-muted); font-size: 0.95rem; max-width: 420px; margin-bottom: 12px; }
+    .ward-icon { font-size: 3rem; font-weight: 700; color: var(--accent); }
+    .viewer-ward h3 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 1px; }
+    .viewer-ward p { color: var(--text-muted); font-size: 0.95rem; max-width: 420px; margin-bottom: 12px; font-style: italic; }
     .ward-btn {
-      padding: 14px 28px; border: none; border-radius: 12px;
-      background: linear-gradient(135deg, #6366f1, #a855f7); color: white; font-size: 1rem; font-weight: 600; cursor: pointer;
+      padding: 14px 28px; border: 3px solid var(--border); box-shadow: 4px 4px 0 var(--border);
+      background: var(--accent); color: white; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      transition: transform .1s, box-shadow .1s;
     }
+    .ward-btn:active { transform: translate(4px,4px); box-shadow: 0 0 0; }
   </style>
 </head>
 <body>
@@ -200,37 +185,31 @@
     <header>
       <h1>Nexus Gate</h1>
       <p class="subtitle">Curated directory for sanctioned realms and local artifacts.</p>
-      
       <div class="search-wrapper">
-        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
         <input type="text" id="search" class="search-input" placeholder="Filter the archives..." autocomplete="off">
       </div>
     </header>
 
     <main id="main-content">
-      <!-- Local Tools --> 
       <section class="category" data-category="local">
         <h2 class="category-title">Local Artifacts</h2>
         <div class="grid">
           <a class="card" href="reader.html" target="_self">
-            <div class="card-icon">📘</div>
+            <div class="card-icon" style="background:#ef4444">ER</div>
             <div class="card-content">
               <div class="card-title">EPUB Reader</div>
-              <div class="card-desc">Read local cultivation manuals and novels offline. (Autosaves progress)</div>
+              <div class="card-desc">Read local cultivation manuals and novels offline. Autosaves progress.</div>
             </div>
           </a>
           <a class="card" href="player.html" target="_self">
-            <div class="card-icon">🎬</div>
+            <div class="card-icon" style="background:#f97316">MP</div>
             <div class="card-content">
               <div class="card-title">Media Player</div>
               <div class="card-desc">Play local audio and video files with a playlist queue.</div>
             </div>
           </a>
           <a class="card" href="#" id="openViewerBtn">
-            <div class="card-icon">🌐</div>
+            <div class="card-icon" style="background:#3b82f6">PV</div>
             <div class="card-content">
               <div class="card-title">Portal Viewer</div>
               <div class="card-desc">Browse frame-friendly realms without leaving the Gate.</div>
@@ -239,40 +218,39 @@
         </div>
       </section>
 
-      <!-- The Archives -->
       <section class="category" data-category="archives">
         <h2 class="category-title">The Grand Archives</h2>
         <div class="grid">
           <a class="card" href="https://annas-archive.gl" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🏛️</div>
+            <div class="card-icon" style="background:#78716c">SL</div>
             <div class="card-content">
               <div class="card-title">Shadow Library</div>
               <div class="card-desc">Anna's Archive. Vast repository of texts and novels.</div>
             </div>
           </a>
           <a class="card" href="https://comix.to" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">📜</div>
+            <div class="card-icon" style="background:#a855f7">IS</div>
             <div class="card-content">
               <div class="card-title">Illustrated Scrolls</div>
               <div class="card-desc">Manga, comics, and visual storytelling.</div>
             </div>
           </a>
           <a class="card" href="https://mkissa.to" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🎨</div>
+            <div class="card-icon" style="background:#ec4899">MC</div>
             <div class="card-content">
               <div class="card-title">The Moving Canvas</div>
-              <div class="card-desc">mkissa.to - Manhwa, webtoons, and anime streams.</div>
+              <div class="card-desc">mkissa.to — Manhwa, webtoons, and anime streams.</div>
             </div>
           </a>
           <a class="card" href="https://pinterest.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">📌</div>
+            <div class="card-icon" style="background:#dc2626">VL</div>
             <div class="card-content">
               <div class="card-title">The Vision Loom</div>
               <div class="card-desc">Pinterest. Visual discovery and inspiration boards.</div>
             </div>
           </a>
           <a class="card" href="https://fmhy.net/startpage" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🗺️</div>
+            <div class="card-icon" style="background:#0891b2">FM</div>
             <div class="card-content">
               <div class="card-title">Free Media Nexus</div>
               <div class="card-desc">FMHY Directory for streaming and software.</div>
@@ -281,19 +259,18 @@
         </div>
       </section>
 
-      <!-- Guilds & Harmonies -->
       <section class="category" data-category="social">
         <h2 class="category-title">Guilds & Harmonies</h2>
         <div class="grid">
           <a class="card" href="https://discord.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🛡️</div>
+            <div class="card-icon" style="background:#5865f2">GH</div>
             <div class="card-content">
               <div class="card-title">The Guild Hall</div>
               <div class="card-desc">Discord. Voice, text, and community servers.</div>
             </div>
           </a>
           <a class="card" href="https://spotify.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🎧</div>
+            <div class="card-icon" style="background:#1db954">HW</div>
             <div class="card-content">
               <div class="card-title">Harmonic Weave</div>
               <div class="card-desc">Spotify. Audio streaming and playlists.</div>
@@ -302,19 +279,18 @@
         </div>
       </section>
 
-      <!-- The Oracles -->
       <section class="category" data-category="oracles">
         <h2 class="category-title">The Oracles</h2>
         <div class="grid">
           <a class="card" href="https://chat.qwen.ai" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🤖</div>
+            <div class="card-icon" style="background:#6366f1">OQ</div>
             <div class="card-content">
               <div class="card-title">Oracle of Qwen</div>
               <div class="card-desc">AI Scholar, assistant, and coding companion.</div>
             </div>
           </a>
           <a class="card" href="https://google.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🔍</div>
+            <div class="card-icon" style="background:#4285f4">AS</div>
             <div class="card-content">
               <div class="card-title">All-Seeing Eye</div>
               <div class="card-desc">The standard global search engine.</div>
@@ -322,33 +298,33 @@
           </a>
         </div>
       </section>
-            <!-- The Astral Arcade -->
+
       <section class="category" data-category="arcade">
         <h2 class="category-title">The Astral Arcade</h2>
         <div class="grid">
           <a class="card" href="https://itch.io/games/free" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🎮</div>
+            <div class="card-icon" style="background:#fa5c5c">II</div>
             <div class="card-content">
               <div class="card-title">Itch.io Indies</div>
-              <div class="card-desc">Play thousands of free indie web games (Most work in iframes!).</div>
+              <div class="card-desc">Thousands of free indie web games. Most work in iframes.</div>
             </div>
           </a>
           <a class="card" href="https://krunker.io" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🔫</div>
+            <div class="card-icon" style="background:#2f3542">KR</div>
             <div class="card-content">
               <div class="card-title">Krunker.io</div>
               <div class="card-desc">Fast-paced block FPS action.</div>
             </div>
           </a>
           <a class="card" href="clicker.html" target="_self">
-            <div class="card-icon">✨</div>
+            <div class="card-icon" style="background:#f59e0b">SC</div>
             <div class="card-content">
               <div class="card-title">Spirit Clicker</div>
-              <div class="card-desc">A custom cultivation idle game built just for the Gate.</div>
+              <div class="card-desc">A custom cultivation idle game built for the Gate.</div>
             </div>
           </a>
           <a class="card" href="rpg.html" target="_self">
-            <div class="card-icon">🗡️</div>
+            <div class="card-icon" style="background:#22c55e">PR</div>
             <div class="card-content">
               <div class="card-title">Pocket RPG</div>
               <div class="card-desc">A custom turn-based adventure forged in the Gate's depths.</div>
@@ -356,19 +332,19 @@
           </a>
         </div>
       </section>
-      <!-- The Academy & Forge -->
+
       <section class="category" data-category="academy">
         <h2 class="category-title">The Academy & Forge</h2>
         <div class="grid">
           <a class="card" href="https://web.dev/learn/html" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">🏛️</div>
+            <div class="card-icon" style="background:#1a73e8">HC</div>
             <div class="card-content">
               <div class="card-title">HTML Codex</div>
               <div class="card-desc">web.dev's official guide to the foundational runes.</div>
             </div>
           </a>
           <a class="card" href="https://chunkbase.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon">⛏️</div>
+            <div class="card-icon" style="background:#84a59d">WC</div>
             <div class="card-content">
               <div class="card-title">World Cartographer</div>
               <div class="card-desc">Chunkbase. Minecraft biome and seed mapping.</div>
@@ -383,10 +359,8 @@
     </div>
   </div>
 
-  <!-- Bookmark Summoning Talisman -->
   <button class="fab" id="addBookmarkBtn">+</button>
 
-  <!-- Bookmark Inscription Modal -->
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <h2>Inscribe New Portal</h2>
@@ -397,10 +371,6 @@
       <div class="form-group">
         <label>Spirit Link (URL)</label>
         <input type="url" id="bmUrl" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label>Sigil (Emoji Icon)</label>
-        <input type="text" id="bmIcon" placeholder="🌟" maxlength="2">
       </div>
       <div class="form-group">
         <label>Sect (Category)</label>
@@ -419,7 +389,6 @@
     </div>
   </div>
 
-  <!-- Portal Viewer (In-App Browser) -->
   <div class="viewer-overlay" id="viewerOverlay">
     <div class="viewer-toolbar">
       <button class="viewer-btn" id="viewerBack" title="Back">←</button>
@@ -427,12 +396,12 @@
       <button class="viewer-btn" id="viewerReload" title="Reload">⟳</button>
       <input type="text" class="viewer-omnibox" id="viewerOmnibox" placeholder="Summon a realm (e.g., en.wikipedia.org)" autocomplete="off">
       <button class="viewer-btn" id="viewerExternal" title="Open in new tab">↗</button>
-      <button class="viewer-btn" id="viewerClose" title="Close">✕</button>
+      <button class="viewer-btn" id="viewerClose" title="Close">X</button>
     </div>
     <div class="viewer-stage">
       <iframe id="viewerFrame" src="about:blank" allow="fullscreen"></iframe>
       <div class="viewer-ward" id="viewerWard" style="display:none;">
-        <div class="ward-icon">🛡️</div>
+        <div class="ward-icon">!!</div>
         <h3>This realm is protected by Anti-Summoning Wards.</h3>
         <p>Some realms refuse to appear inside another app's frame. You must visit them directly through the outer veil.</p>
         <button class="ward-btn" id="wardOpen">Open in New Tab ↗</button>
@@ -440,9 +409,7 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
   <script>
-    // --- SEARCH & FILTER FORMATION ---
     const searchInput = document.getElementById('search');
     const emptyState = document.getElementById('empty-state');
 
@@ -455,7 +422,6 @@
       allCards.forEach(card => {
         const title = card.querySelector('.card-title').textContent.toLowerCase();
         const desc = card.querySelector('.card-desc').textContent.toLowerCase();
-        
         if (title.includes(query) || desc.includes(query)) {
           card.style.display = 'flex';
           visibleCount++;
@@ -466,26 +432,31 @@
 
       allCategories.forEach(cat => {
         let hasVisible = false;
-        cat.querySelectorAll('.card').forEach(c => {
-           if(c.style.display !== 'none') hasVisible = true;
-        });
+        cat.querySelectorAll('.card').forEach(c => { if(c.style.display !== 'none') hasVisible = true; });
         cat.style.display = hasVisible ? 'block' : 'none';
       });
 
-      if (visibleCount === 0 && query !== '') {
-        emptyState.classList.add('show');
-      } else {
-        emptyState.classList.remove('show');
-      }
+      if (visibleCount === 0 && query !== '') emptyState.classList.add('show');
+      else emptyState.classList.remove('show');
     }
-
     searchInput.addEventListener('input', runSearch);
 
-    // --- CUSTOM BOOKMARKS FORMATION ---
     const fab = document.getElementById('addBookmarkBtn');
     const modalOverlay = document.getElementById('modalOverlay');
     const cancelBtn = document.getElementById('cancelBtn');
     const saveBtn = document.getElementById('saveBtn');
+
+    function iconFromTitle(t) {
+      const words = t.trim().split(/\s+/);
+      if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+      return t.substring(0,2).toUpperCase();
+    }
+    function colorFromString(s) {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h);
+      const palette = ['#ef4444','#f97316','#f59e0b','#22c55e','#14b8a6','#3b82f6','#6366f1','#a855f7','#ec4899','#78716c','#0891b2','#5865f2'];
+      return palette[Math.abs(h) % palette.length];
+    }
 
     fab.addEventListener('click', () => modalOverlay.classList.add('active'));
     cancelBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
@@ -493,24 +464,16 @@
     saveBtn.addEventListener('click', () => {
       const title = document.getElementById('bmTitle').value.trim();
       const url = document.getElementById('bmUrl').value.trim();
-      const icon = document.getElementById('bmIcon').value.trim() || '🔗';
       const category = document.getElementById('bmCategory').value;
-
-      if (!title || !url) {
-        alert('A portal requires a Name and a Link, Sect Leader!');
-        return;
-      }
-
+      if (!title || !url) { alert('A portal requires a Name and a Link, Sect Leader.'); return; }
       const bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
-      bookmarks.push({ title, url, icon, category, id: Date.now() });
+      bookmarks.push({ title, url, icon: iconFromTitle(title), color: colorFromString(title), category, id: Date.now() });
       localStorage.setItem('nexus_bookmarks', JSON.stringify(bookmarks));
-      
       modalOverlay.classList.remove('active');
       document.getElementById('bmTitle').value = '';
       document.getElementById('bmUrl').value = '';
-      document.getElementById('bmIcon').value = '';
       renderCustomBookmarks();
-      runSearch(); 
+      runSearch();
     });
 
     function renderCustomBookmarks() {
@@ -522,7 +485,6 @@
       if (bookmarks.length === 0) return;
 
       const mainContent = document.getElementById('main-content');
-      
       const personalBookmarks = bookmarks.filter(b => b.category === 'personal');
       if (personalBookmarks.length > 0) {
         const personalSection = document.createElement('section');
@@ -534,52 +496,41 @@
 
       bookmarks.forEach(bm => {
         let targetGrid;
-        if (bm.category === 'personal') {
-          targetGrid = document.querySelector('[data-category="personal"] .grid');
-        } else {
+        if (bm.category === 'personal') targetGrid = document.querySelector('[data-category="personal"] .grid');
+        else {
           const existingCat = document.querySelector('[data-category="' + bm.category + '"] .grid');
           targetGrid = existingCat || document.querySelector('[data-category="personal"] .grid') || document.querySelector('.grid');
         }
-
         const card = document.createElement('a');
         card.className = 'card custom-card';
         card.href = bm.url;
         card.target = '_self';
         card.rel = 'noopener noreferrer';
-        card.innerHTML = 
-          '<div class="card-icon">' + bm.icon + '</div>' +
-          '<div class="card-content">' +
-            '<div class="card-title">' + bm.title + '</div>' +
-            '<div class="card-desc">Custom inscribed portal.</div>' +
-          '</div>' +
-          '<button class="delete-btn" data-id="' + bm.id + '">✕</button>';
-
+        const color = bm.color || colorFromString(bm.title);
+        const icon = bm.icon || iconFromTitle(bm.title);
+        card.innerHTML =
+          '<div class="card-icon" style="background:' + color + '">' + icon + '</div>' +
+          '<div class="card-content"><div class="card-title">' + bm.title + '</div><div class="card-desc">Custom inscribed portal.</div></div>' +
+          '<button class="delete-btn" data-id="' + bm.id + '">X</button>';
         targetGrid.appendChild(card);
-
         card.querySelector('.delete-btn').addEventListener('click', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
+          e.preventDefault(); e.stopPropagation();
           if (confirm('Banish the portal "' + bm.title + '" from your memory crystals?')) {
             let currentBookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
             currentBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
             localStorage.setItem('nexus_bookmarks', JSON.stringify(currentBookmarks));
-            renderCustomBookmarks();
-            runSearch();
+            renderCustomBookmarks(); runSearch();
           }
         });
       });
     }
-
     renderCustomBookmarks();
 
-    // --- PORTAL VIEWER FORMATION (In-App Browser) ---
     const viewerOverlay = document.getElementById('viewerOverlay');
     const viewerFrame = document.getElementById('viewerFrame');
     const viewerOmnibox = document.getElementById('viewerOmnibox');
     const viewerWard = document.getElementById('viewerWard');
-    let viewerHistory = [];
-    let viewerIndex = -1;
-
+    let viewerHistory = [], viewerIndex = -1;
     const wardedRealms = ['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
 
     function isWarded(url) {
@@ -588,7 +539,6 @@
         return wardedRealms.some(r => host === r || host.endsWith('.' + r));
       } catch (e) { return false; }
     }
-
     function normalizeUrl(input) {
       const t = input.trim();
       if (!t) return null;
@@ -596,7 +546,6 @@
       if (/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t)) return 'https://' + t;
       return 'https://www.mojeek.com/search?q=' + encodeURIComponent(t);
     }
-
     function viewerNavigate(url, pushToHistory) {
       if (pushToHistory === undefined) pushToHistory = true;
       if (!url) return;
@@ -615,32 +564,19 @@
         viewerIndex = viewerHistory.length - 1;
       }
     }
-
     document.getElementById('openViewerBtn').addEventListener('click', (e) => {
       e.preventDefault();
       viewerOverlay.classList.add('active');
       if (viewerIndex === -1) viewerNavigate('./hub.html');
       viewerOmnibox.focus();
     });
-
     viewerOmnibox.addEventListener('focus', () => viewerOmnibox.select());
-    viewerOmnibox.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') viewerNavigate(normalizeUrl(viewerOmnibox.value));
-    });
-
+    viewerOmnibox.addEventListener('keydown', (e) => { if (e.key === 'Enter') viewerNavigate(normalizeUrl(viewerOmnibox.value)); });
     document.getElementById('viewerClose').addEventListener('click', () => viewerOverlay.classList.remove('active'));
-    document.getElementById('viewerBack').addEventListener('click', () => {
-      if (viewerIndex > 0) { viewerIndex--; viewerNavigate(viewerHistory[viewerIndex], false); }
-    });
-    document.getElementById('viewerForward').addEventListener('click', () => {
-      if (viewerIndex < viewerHistory.length - 1) { viewerIndex++; viewerNavigate(viewerHistory[viewerIndex], false); }
-    });
-    document.getElementById('viewerReload').addEventListener('click', () => {
-      if (viewerIndex >= 0) viewerNavigate(viewerHistory[viewerIndex], false);
-    });
-    document.getElementById('viewerExternal').addEventListener('click', () => {
-      if (viewerIndex >= 0) window.open(viewerHistory[viewerIndex], '_blank');
-    });
+    document.getElementById('viewerBack').addEventListener('click', () => { if (viewerIndex > 0) { viewerIndex--; viewerNavigate(viewerHistory[viewerIndex], false); } });
+    document.getElementById('viewerForward').addEventListener('click', () => { if (viewerIndex < viewerHistory.length - 1) { viewerIndex++; viewerNavigate(viewerHistory[viewerIndex], false); } });
+    document.getElementById('viewerReload').addEventListener('click', () => { if (viewerIndex >= 0) viewerNavigate(viewerHistory[viewerIndex], false); });
+    document.getElementById('viewerExternal').addEventListener('click', () => { if (viewerIndex >= 0) window.open(viewerHistory[viewerIndex], '_blank'); });
   </script>
 </body>
 </html>
