@@ -137,11 +137,6 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .spirit-slot-name{font-weight:700;font-size:.9rem}
 .spirit-slot-desc{font-size:.7rem;color:var(--dim);margin-top:2px}
 .spirit-slot-actions{display:flex;gap:6px}
-/* RESONANCE DIAL */
-.resonance-ring{position:relative;width:220px;height:220px;border-radius:50%;border:3px solid var(--border);margin:0 auto 16px;background:rgba(0,0,0,.3)}
-.resonance-target{position:absolute;inset:0;border-radius:50%;border:6px solid transparent;pointer-events:none}
-.resonance-marker{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:50%;left:50%;margin:-7px 0 0 -7px;box-shadow:0 0 10px #fff;pointer-events:none}
-.resonance-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;pointer-events:none}
 @media(max-width:420px){.explore-cell{width:28px;height:28px}.game-title{font-size:1.6rem}}
 </style>
 </head>
@@ -261,21 +256,22 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 
-<!-- RESONANCE MINI-GAME -->
+<!-- SPIRIT OFFERING MINI-GAME -->
 <div class="encounter-overlay" id="resonance-overlay">
 <div class="encounter-box" style="max-width:340px;border-color:var(--purple)">
-<div class="encounter-title" style="color:var(--purple)" id="res-title">Spirit Resonance</div>
-<div class="encounter-desc" id="res-desc">Tap when the marker enters the arc!</div>
-<div class="resonance-ring" id="res-ring" onclick="resonanceTap()">
-<div class="resonance-target" id="res-target"></div>
-<div class="resonance-marker" id="res-marker"></div>
-<div class="resonance-center" id="res-center">🐾</div>
+<div class="encounter-title" style="color:var(--purple)" id="res-title">Spirit Offering</div>
+<div class="encounter-desc" id="res-desc">The spirit shows what it desires. Choose wisely.</div>
+<div style="text-align:center;margin:16px 0">
+<div style="font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px">The Spirit Craves</div>
+<div id="res-desire" style="font-size:3.5rem;text-shadow:0 0 20px var(--purple)">🔥</div>
 </div>
-<div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px">
-<div style="text-align:center"><div style="font-size:.7rem;color:var(--dim)">HITS</div><div style="font-size:1.2rem;font-weight:700;color:var(--green)" id="res-hits">0/3</div></div>
-<div style="text-align:center"><div style="font-size:.7rem;color:var(--dim)">MISSES</div><div style="font-size:1.2rem;font-weight:700;color:var(--red)" id="res-misses">0/5</div></div>
+<div id="res-choices" style="display:flex;gap:10px;justify-content:center;margin-bottom:16px"></div>
+<div style="display:flex;justify-content:center;gap:20px;margin-bottom:10px">
+<div style="text-align:center"><div style="font-size:.65rem;color:var(--dim)">ROUND</div><div style="font-size:1.1rem;font-weight:700;color:var(--accent)" id="res-round">1/3</div></div>
+<div style="text-align:center"><div style="font-size:.65rem;color:var(--dim)">CORRECT</div><div style="font-size:1.1rem;font-weight:700;color:var(--green)" id="res-hits">0</div></div>
+<div style="text-align:center"><div style="font-size:.65rem;color:var(--dim)">MISSES</div><div style="font-size:1.1rem;font-weight:700;color:var(--red)" id="res-misses">0/2</div></div>
 </div>
-<div id="res-status" style="font-size:.85rem;color:var(--dim);min-height:20px"></div>
+<div id="res-status" style="font-size:.85rem;color:var(--dim);min-height:22px;text-align:center"></div>
 </div>
 </div>
 
@@ -432,13 +428,100 @@ function triggerEncounter(){var z=ZONES[G.zone];var mid=z.monsters[Math.floor(Ma
 function startCombatFromEncounter(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;startCombat(pendingEncounter);pendingEncounter=null;}
 function fleeEncounter(){document.getElementById('encounter-overlay').classList.remove('active');pendingEncounter=null;showToast('You slipped away safely.');}
 
-// ===== RESONANCE MINI-GAME =====
-var resState={active:false,angle:0,speed:2,targetStart:0,targetSize:40,hits:0,misses:0,animFrame:null,done:false};
-function startResonance(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;var sp=SPIRITS[pendingEncounter.spiritId];document.getElementById('res-title').textContent='Bond with '+pendingEncounter.name;document.getElementById('res-center').textContent=sp?sp.icon:'🐾';document.getElementById('res-status').textContent='';resState.hits=0;resState.misses=0;resState.angle=0;resState.speed=1.5+G.zone*0.3;resState.targetSize=40;resState.done=false;resState.active=true;updateResUI();document.getElementById('resonance-overlay').classList.add('active');resLoop();}
-function resLoop(){if(!resState.active)return;resState.angle+=resState.speed;if(resState.angle>=360)resState.angle-=360;var marker=document.getElementById('res-marker');var rad=(resState.angle-90)*Math.PI/180;var cx=110+Math.cos(rad)*95;var cy=110+Math.sin(rad)*95;marker.style.left=cx+'px';marker.style.top=cy+'px';marker.style.transform='translate(-50%,-50%)';var target=document.getElementById('res-target');target.style.borderTopColor='transparent';target.style.borderRightColor='transparent';target.style.borderBottomColor='transparent';target.style.borderLeftColor='transparent';target.style.transform='rotate('+resState.targetStart+'deg)';target.style.borderTopColor='rgba(168,85,247,0.6)';target.style.clipPath='conic-gradient(from '+resState.targetStart+'deg,transparent 0deg,transparent '+resState.targetSize+'deg,transparent 360deg)';target.style.background='conic-gradient(from 0deg,transparent '+resState.targetStart+'deg,rgba(168,85,247,0.3) '+resState.targetStart+'deg,rgba(168,85,247,0.3) '+(resState.targetStart+resState.targetSize)+'deg,transparent '+(resState.targetStart+resState.targetSize)+'deg)';resState.animFrame=requestAnimationFrame(resLoop);}
-function resonanceTap(){if(!resState.active||resState.done)return;var angle=resState.angle;var inTarget=angle>=resState.targetStart&&angle<=(resState.targetStart+resState.targetSize);if(angle>360-resState.targetSize&&resState.targetStart<resState.targetSize)inTarget=true;if(inTarget){resState.hits++;resState.targetStart=Math.floor(Math.random()*(360-resState.targetSize));document.getElementById('res-status').textContent='✓ Resonance!';document.getElementById('res-status').style.color='var(--green)';if(resState.hits>=3){resState.done=true;resState.active=false;cancelAnimationFrame(resState.animFrame);document.getElementById('res-status').textContent='✦ Bond forged successfully!';setTimeout(function(){completeBond();},1500);}}else{resState.misses++;resState.targetSize=Math.max(15,resState.targetSize-5);document.getElementById('res-status').textContent='✗ Missed...';document.getElementById('res-status').style.color='var(--red)';if(resState.misses>=5){resState.done=true;resState.active=false;cancelAnimationFrame(resState.animFrame);document.getElementById('res-status').textContent='The spirit rejected you.';setTimeout(function(){document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showToast('Bond failed. The spirit fled.');showScreen('explore');},1500);}}updateResUI();}
-function updateResUI(){document.getElementById('res-hits').textContent=resState.hits+'/3';document.getElementById('res-misses').textContent=resState.misses+'/5';}
-function completeBond(){var sid=pendingEncounter.spiritId;if(G.bonds.length>=3){showToast('Bond slots full! Release a spirit first.');document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showScreen('spirits');return;}if(G.bonds.indexOf(sid)===-1)G.bonds.push(sid);if(!G.activeBond)G.activeBond=sid;pendingEncounter=null;document.getElementById('resonance-overlay').classList.remove('active');saveGame();showToast('Bonded with '+SPIRITS[sid].name+'!');showScreen('explore');}
+// ===== SPIRIT OFFERING MINI-GAME =====
+var OFFER_RUNES=['🔥','💧','🌿','⚡','🌙','☀','❄','💎','🩸'];
+var resState={round:0,correct:0,misses:0,targetIdx:0,done:false,active:false};
+function startResonance(){
+document.getElementById('encounter-overlay').classList.remove('active');
+if(!pendingEncounter)return;
+var sp=SPIRITS[pendingEncounter.spiritId];
+document.getElementById('res-title').textContent='Bond with '+pendingEncounter.name;
+document.getElementById('res-desc').textContent='The spirit shows what it desires. Offer the match.';
+document.getElementById('res-status').textContent='';
+resState.round=0;resState.correct=0;resState.misses=0;resState.done=false;resState.active=true;
+document.getElementById('resonance-overlay').classList.add('active');
+nextOfferRound();
+}
+function nextOfferRound(){
+if(resState.done)return;
+resState.round++;
+document.getElementById('res-round').textContent=resState.round+'/3';
+resState.targetIdx=Math.floor(Math.random()*OFFER_RUNES.length);
+document.getElementById('res-desire').textContent=OFFER_RUNES[resState.targetIdx];
+var choices=document.getElementById('res-choices');
+choices.innerHTML='';
+var opts=[resState.targetIdx];
+while(opts.length<3){
+var r=Math.floor(Math.random()*OFFER_RUNES.length);
+if(opts.indexOf(r)===-1)opts.push(r);
+}
+opts.sort(function(){return Math.random()-0.5;});
+opts.forEach(function(idx){
+var btn=document.createElement('button');
+btn.className='btn btn-secondary';
+btn.style.cssText='padding:18px 22px;font-size:1.8rem;min-width:auto;';
+btn.textContent=OFFER_RUNES[idx];
+btn.onclick=function(){offerChoice(idx);};
+choices.appendChild(btn);
+});
+}
+function offerChoice(idx){
+if(!resState.active||resState.done)return;
+var status=document.getElementById('res-status');
+if(idx===resState.targetIdx){
+resState.correct++;
+status.textContent='✓ The spirit accepts your offering.';
+status.style.color='var(--green)';
+document.getElementById('res-hits').textContent=resState.correct;
+}else{
+resState.misses++;
+status.textContent='✗ The spirit turns away...';
+status.style.color='var(--red)';
+document.getElementById('res-misses').textContent=resState.misses+'/2';
+if(resState.misses>=2){
+resState.done=true;resState.active=false;
+setTimeout(function(){
+document.getElementById('resonance-overlay').classList.remove('active');
+pendingEncounter=null;
+showToast('The spirit rejected your offerings.');
+showScreen('explore');
+},1500);
+return;
+}
+}
+if(resState.correct>=2){
+resState.done=true;resState.active=false;
+status.textContent='✦ The spirit bonds with you!';
+setTimeout(function(){completeBond();},1500);
+return;
+}
+if(resState.round>=3&&resState.correct<2){
+resState.done=true;resState.active=false;
+status.textContent='The spirit loses interest...';
+setTimeout(function(){
+document.getElementById('resonance-overlay').classList.remove('active');
+pendingEncounter=null;
+showToast('Bond failed. The spirit wandered off.');
+showScreen('explore');
+},1500);
+return;
+}
+setTimeout(nextOfferRound,1200);
+}
+function completeBond(){
+var sid=pendingEncounter.spiritId;
+if(G.bonds.length>=3){
+showToast('Bond slots full! Release a spirit first.');
+document.getElementById('resonance-overlay').classList.remove('active');
+pendingEncounter=null;showScreen('spirits');return;
+}
+if(G.bonds.indexOf(sid)===-1)G.bonds.push(sid);
+if(!G.activeBond)G.activeBond=sid;
+pendingEncounter=null;
+document.getElementById('resonance-overlay').classList.remove('active');
+saveGame();showToast('Bonded with '+SPIRITS[sid].name+'!');
+showScreen('explore');
+}
 
 // ===== COMBAT =====
 function getCombatSkills(){var pcls=CLASSES[G.cls];var skills=[{name:pcls.skills[0].name,cost:getSkillCost(pcls.skills[0].cost),mult:pcls.skills[0].mult,type:'damage'}];var sp=getActiveSpirit();if(sp){skills.push({name:sp.skillName,cost:getSkillCost(sp.skillCost),mult:sp.skillMult,type:sp.skillMult>0?'damage':'special'});}else{skills.push({name:pcls.skills[1].name,cost:getSkillCost(pcls.skills[1].cost),mult:pcls.skills[1].mult,type:'damage'});}return skills;}
