@@ -94,7 +94,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 .encounter-enemy-icon{width:70px;height:70px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 20px currentColor}
 .encounter-title{font-size:1.1rem;font-weight:800;color:var(--red);margin-bottom:6px}
 .encounter-desc{font-size:.85rem;color:var(--dim);margin-bottom:18px}
-.encounter-actions{display:flex;gap:12px;justify-content:center}
+.encounter-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .combat-container{width:100%;max-width:500px;display:flex;flex-direction:column;gap:14px}
 .combat-arena{display:flex;flex-direction:column;justify-content:space-between;gap:16px;padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:14px;min-height:280px}
 .entity-card{display:flex;align-items:center;gap:14px;padding:10px;background:rgba(0,0,0,.2);border-radius:12px;border:1px solid var(--border)}
@@ -129,6 +129,19 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 @keyframes xpPop{from{transform:translate(-50%,-50%) scale(.5);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
 .xp-popup-title{font-size:1.3rem;font-weight:800;color:var(--gold);margin-bottom:6px}
 .xp-popup-detail{font-size:.88rem;color:var(--dim);line-height:1.6}
+/* SPIRIT BONDS */
+.spirit-slot{display:flex;align-items:center;gap:12px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;transition:all .2s}
+.spirit-slot.active-bond{border-color:var(--gold);box-shadow:0 0 12px rgba(251,191,36,.2)}
+.spirit-slot-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.spirit-slot-info{flex:1;text-align:left}
+.spirit-slot-name{font-weight:700;font-size:.9rem}
+.spirit-slot-desc{font-size:.7rem;color:var(--dim);margin-top:2px}
+.spirit-slot-actions{display:flex;gap:6px}
+/* RESONANCE DIAL */
+.resonance-ring{position:relative;width:220px;height:220px;border-radius:50%;border:3px solid var(--border);margin:0 auto 16px;background:rgba(0,0,0,.3)}
+.resonance-target{position:absolute;inset:0;border-radius:50%;border:6px solid transparent;pointer-events:none}
+.resonance-marker{position:absolute;width:14px;height:14px;border-radius:50%;background:#fff;top:50%;left:50%;margin:-7px 0 0 -7px;box-shadow:0 0 10px #fff;pointer-events:none}
+.resonance-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2rem;pointer-events:none}
 @media(max-width:420px){.explore-cell{width:28px;height:28px}.game-title{font-size:1.6rem}}
 </style>
 </head>
@@ -171,9 +184,10 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <div class="town-actions">
 <div class="town-btn" onclick="openExplore()"><div class="town-btn-icon">🗺</div><div class="town-btn-text">Explore</div><div class="town-btn-desc">Venture into the wilds</div></div>
 <div class="town-btn" onclick="showScreen('shop')"><div class="town-btn-icon">🛒</div><div class="town-btn-text">Shop</div><div class="town-btn-desc">Buy items</div></div>
-<div class="town-btn" id="btn-rest" onclick="doRest()"><div class="town-btn-icon">🛌</div><div class="town-btn-text">Rest</div><div class="town-btn-desc" id="rest-desc">Restore HP/MP</div></div>
+<div class="town-btn" onclick="showScreen('spirits')"><div class="town-btn-icon">🐾</div><div class="town-btn-text">Spirits</div><div class="town-btn-desc">Manage bonds</div></div>
+<div class="town-btn" id="btn-rest" onclick="doRest()"><div class="town-btn-icon">🛌</div><div class="town-btn-text">Rest</div><div class="town-btn-desc" id="rest-desc">Restore HP/MP (10s)</div></div>
 <div class="town-btn" onclick="saveGame();showToast('Game Saved!')"><div class="town-btn-icon">💾</div><div class="town-btn-text">Save</div><div class="town-btn-desc">Secure progress</div></div>
-<div class="town-btn" onclick="document.getElementById('savecode-overlay').classList.add('active')"><div class="town-btn-icon">🔑</div><div class="town-btn-text">Save Code</div><div class="town-btn-desc">Export/Import save</div></div>
+<div class="town-btn" onclick="document.getElementById('savecode-overlay').classList.add('active')"><div class="town-btn-icon">🔑</div><div class="town-btn-text">Save Code</div><div class="town-btn-desc">Export/Import</div></div>
 <div class="town-btn" onclick="resetRpg()"><div class="town-btn-icon">🗑</div><div class="town-btn-text">Reset</div><div class="town-btn-desc">Wipe all progress</div></div>
 </div>
 <div class="zone-progress" id="zone-progress"></div>
@@ -181,12 +195,16 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 
 <!-- SHOP -->
 <div class="screen" id="screen-shop">
-<div class="panel" style="text-align:center">
-<h2 style="color:var(--accent);margin-bottom:2px">Marketplace</h2>
-<p style="font-size:.78rem;color:var(--dim)">Stock up before the depths.</p>
-<div class="shop-gold">💰 <span id="s-gold">0</span> Gold</div>
-</div>
+<div class="panel" style="text-align:center"><h2 style="color:var(--accent);margin-bottom:2px">Marketplace</h2><p style="font-size:.78rem;color:var(--dim)">Stock up before the depths.</p><div class="shop-gold">💰 <span id="s-gold">0</span> Gold</div></div>
 <div class="shop-items" id="shop-items"></div>
+<button class="btn btn-secondary" onclick="showScreen('town')">← Back to Town</button>
+</div>
+
+<!-- SPIRITS -->
+<div class="screen" id="screen-spirits">
+<div class="panel" style="text-align:center"><h2 style="color:var(--accent);margin-bottom:2px">Spirit Sanctuary</h2><p style="font-size:.78rem;color:var(--dim)">Bonded spirits reshape your skills. Activate one to carry into battle.</p></div>
+<div id="spirit-slots" style="width:100%;max-width:500px"></div>
+<div id="spirit-empty-msg" style="text-align:center;color:var(--dim);font-size:.85rem;padding:20px;display:none">No spirits bonded yet. Find bondable creatures while exploring!</div>
 <button class="btn btn-secondary" onclick="showScreen('town')">← Back to Town</button>
 </div>
 
@@ -229,13 +247,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 </div>
-<div class="combat-actions">
-<button class="action-btn" onclick="playerAction('attack')"><div class="action-icon">⚔</div><div class="action-label">Attack</div></button>
-<button class="action-btn" onclick="useSkill(0)"><div class="action-icon">✨</div><div class="action-label" id="skill-btn-0">Skill 1</div></button>
-<button class="action-btn" onclick="useSkill(1)" id="skill-btn-1-wrap"><div class="action-icon">🌟</div><div class="action-label" id="skill-btn-1">Skill 2</div></button>
-<button class="action-btn" onclick="playerAction('item')"><div class="action-icon">🧪</div><div class="action-label">Potion (<span id="c-pot-count">3</span>)</div></button>
-<button class="action-btn" onclick="playerAction('flee')"><div class="action-icon">🏃</div><div class="action-label">Flee</div></button>
-</div>
+<div class="combat-actions" id="combat-actions"></div>
 </div>
 </div>
 
@@ -245,10 +257,37 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 <div class="encounter-enemy-icon" id="enc-icon">👹</div>
 <div class="encounter-title" id="enc-title">A wild enemy appears!</div>
 <div class="encounter-desc" id="enc-desc">Prepare for battle.</div>
-<div class="encounter-actions">
-<button class="btn btn-danger btn-sm" onclick="startCombatFromEncounter()">Fight</button>
-<button class="btn btn-secondary btn-sm" onclick="fleeEncounter()">Flee</button>
+<div class="encounter-actions" id="enc-actions"></div>
 </div>
+</div>
+
+<!-- RESONANCE MINI-GAME -->
+<div class="encounter-overlay" id="resonance-overlay">
+<div class="encounter-box" style="max-width:340px;border-color:var(--purple)">
+<div class="encounter-title" style="color:var(--purple)" id="res-title">Spirit Resonance</div>
+<div class="encounter-desc" id="res-desc">Tap when the marker enters the arc!</div>
+<div class="resonance-ring" id="res-ring" onclick="resonanceTap()">
+<div class="resonance-target" id="res-target"></div>
+<div class="resonance-marker" id="res-marker"></div>
+<div class="resonance-center" id="res-center">🐾</div>
+</div>
+<div style="display:flex;justify-content:center;gap:16px;margin-bottom:12px">
+<div style="text-align:center"><div style="font-size:.7rem;color:var(--dim)">HITS</div><div style="font-size:1.2rem;font-weight:700;color:var(--green)" id="res-hits">0/3</div></div>
+<div style="text-align:center"><div style="font-size:.7rem;color:var(--dim)">MISSES</div><div style="font-size:1.2rem;font-weight:700;color:var(--red)" id="res-misses">0/5</div></div>
+</div>
+<div id="res-status" style="font-size:.85rem;color:var(--dim);min-height:20px"></div>
+</div>
+</div>
+
+<!-- RUNE LOCK MINI-GAME -->
+<div class="encounter-overlay" id="minigame-overlay">
+<div class="encounter-box" style="max-width:380px;border-color:var(--accent)">
+<div class="encounter-title" style="color:var(--accent)">Rune Lock</div>
+<div class="encounter-desc" id="mg-desc">Watch the rune sequence, then repeat it.</div>
+<div id="mg-runes-display" style="display:flex;gap:10px;justify-content:center;margin:16px 0;min-height:60px"></div>
+<div id="mg-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
+<div id="mg-status" style="font-size:.85rem;color:var(--dim);margin-bottom:12px;min-height:20px;text-align:center"></div>
+<button class="btn btn-secondary btn-sm" id="mg-close-btn" onclick="closeMiniGame(false)" style="width:100%;display:none">Give Up (Take Damage)</button>
 </div>
 </div>
 
@@ -278,23 +317,12 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </div>
 </div>
 </div>
-<!-- RUNE LOCK MINI-GAME -->
-<div class="encounter-overlay" id="minigame-overlay">
-<div class="encounter-box" style="max-width:380px;border-color:var(--accent)">
-<div class="encounter-title" style="color:var(--accent)">Rune Lock</div>
-<div class="encounter-desc" id="mg-desc">Watch the rune sequence, then repeat it.</div>
-<div id="mg-runes-display" style="display:flex;gap:10px;justify-content:center;margin:16px 0;min-height:60px"></div>
-<div id="mg-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px"></div>
-<div id="mg-status" style="font-size:.85rem;color:var(--dim);margin-bottom:12px;min-height:20px;text-align:center"></div>
-<button class="btn btn-secondary btn-sm" id="mg-close-btn" onclick="closeMiniGame(false)" style="width:100%;display:none">Give Up (Take Damage)</button>
-</div>
-</div>
-  
+
 <div class="toast" id="toast"></div>
 
 <script>
 // ===== STATE =====
-let G={cls:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false};
+let G={cls:null,level:1,xp:0,xpNext:100,hp:100,maxHp:100,mp:50,maxMp:50,gold:50,potions:3,manaPotions:0,kills:0,zone:0,tutorialCompleted:false,playerX:1,playerY:1,resting:false,bonds:[],activeBond:null};
 let selectedClass=null;
 let combatState={active:false,enemy:null,turn:'player',log:[]};
 let pendingEncounter=null;
@@ -308,56 +336,62 @@ rogue:{name:'Shadow Step',baseHp:85,baseMp:50,baseAtk:10,baseDef:4,color:'#22c55
 
 // ===== MONSTERS =====
 const MONSTERS={
-imp:{name:'Forest Imp',baseHp:40,baseAtk:9,baseDef:2,baseXp:18,baseGold:12,hpG:8,atkG:2.5,defG:1,xpG:6,goldG:3,color:'#ef4444',icon:'👹'},
-wolf:{name:'Shadow Wolf',baseHp:45,baseAtk:7,baseDef:3,baseXp:22,baseGold:14,hpG:8,atkG:2.2,defG:1.1,xpG:7,goldG:4,color:'#6b7280',icon:'🐺'},
-sprite:{name:'Fire Sprite',baseHp:38,baseAtk:9,baseDef:2,baseXp:28,baseGold:18,hpG:7,atkG:2.5,defG:1,xpG:8,goldG:5,color:'#f97316',icon:'🔥'},
-spider:{name:'Venom Spider',baseHp:55,baseAtk:8,baseDef:4,baseXp:35,baseGold:22,hpG:9,atkG:2.3,defG:1.3,xpG:9,goldG:5,color:'#22c55e',icon:'🕷'},
-golem:{name:'Crystal Golem',baseHp:80,baseAtk:10,baseDef:6,baseXp:50,baseGold:32,hpG:12,atkG:2.5,defG:1.8,xpG:12,goldG:7,color:'#06b6d4',icon:'🗿'},
-knight:{name:'Bone Knight',baseHp:95,baseAtk:12,baseDef:7,baseXp:65,baseGold:40,hpG:13,atkG:3,defG:2,xpG:14,goldG:8,color:'#94a3b8',icon:'💀'},
-elemental:{name:'Storm Elemental',baseHp:110,baseAtk:14,baseDef:6,baseXp:80,baseGold:50,hpG:14,atkG:3.2,defG:1.8,xpG:16,goldG:10,color:'#3b82f6',icon:'⚡'},
-wraith:{name:'Void Wraith',baseHp:130,baseAtk:16,baseDef:8,baseXp:100,baseGold:65,hpG:16,atkG:3.5,defG:2.2,xpG:20,goldG:12,color:'#a855f7',icon:'👻'}
+imp:{name:'Forest Imp',baseHp:40,baseAtk:9,baseDef:2,baseXp:18,baseGold:12,hpG:8,atkG:2.5,defG:1,xpG:6,goldG:3,color:'#ef4444',icon:'👹',bondable:false},
+wolf:{name:'Shadow Wolf',baseHp:45,baseAtk:7,baseDef:3,baseXp:22,baseGold:14,hpG:8,atkG:2.2,defG:1.1,xpG:7,goldG:4,color:'#6b7280',icon:'🐺',bondable:false},
+emberFox:{name:'Ember Fox',baseHp:35,baseAtk:8,baseDef:2,baseXp:25,baseGold:15,hpG:7,atkG:2,defG:1,xpG:8,goldG:4,color:'#f97316',icon:'🦊',bondable:true,spiritId:'ember_fox'},
+mossTurtle:{name:'Moss Turtle',baseHp:60,baseAtk:5,baseDef:5,baseXp:25,baseGold:15,hpG:10,atkG:1.5,defG:1.5,xpG:8,goldG:4,color:'#22c55e',icon:'🐢',bondable:true,spiritId:'moss_turtle'},
+sprite:{name:'Fire Sprite',baseHp:38,baseAtk:9,baseDef:2,baseXp:28,baseGold:18,hpG:7,atkG:2.5,defG:1,xpG:8,goldG:5,color:'#f97316',icon:'🔥',bondable:false},
+spider:{name:'Venom Spider',baseHp:55,baseAtk:8,baseDef:4,baseXp:35,baseGold:22,hpG:9,atkG:2.3,defG:1.3,xpG:9,goldG:5,color:'#22c55e',icon:'🕷',bondable:false},
+crystalBat:{name:'Crystal Bat',baseHp:40,baseAtk:10,baseDef:3,baseXp:35,baseGold:20,hpG:7,atkG:2.5,defG:1,xpG:9,goldG:5,color:'#a855f7',icon:'🦇',bondable:true,spiritId:'crystal_bat'},
+stoneSerpent:{name:'Stone Serpent',baseHp:70,baseAtk:9,baseDef:6,baseXp:40,baseGold:25,hpG:11,atkG:2.2,defG:1.5,xpG:10,goldG:6,color:'#78716c',icon:'🐍',bondable:true,spiritId:'stone_serpent'},
+golem:{name:'Crystal Golem',baseHp:80,baseAtk:10,baseDef:6,baseXp:50,baseGold:32,hpG:12,atkG:2.5,defG:1.8,xpG:12,goldG:7,color:'#06b6d4',icon:'🗿',bondable:false},
+knight:{name:'Bone Knight',baseHp:95,baseAtk:12,baseDef:7,baseXp:65,baseGold:40,hpG:13,atkG:3,defG:2,xpG:14,goldG:8,color:'#94a3b8',icon:'💀',bondable:false},
+boneHawk:{name:'Bone Hawk',baseHp:65,baseAtk:13,baseDef:4,baseXp:55,baseGold:35,hpG:10,atkG:2.8,defG:1.2,xpG:12,goldG:7,color:'#d4d4d8',icon:'🦅',bondable:true,spiritId:'bone_hawk'},
+ashWolf:{name:'Ash Wolf',baseHp:80,baseAtk:14,baseDef:5,baseXp:60,baseGold:38,hpG:12,atkG:3,defG:1.5,xpG:13,goldG:8,color:'#78350f',icon:'🐺',bondable:true,spiritId:'ash_wolf'},
+elemental:{name:'Storm Elemental',baseHp:110,baseAtk:14,baseDef:6,baseXp:80,baseGold:50,hpG:14,atkG:3.2,defG:1.8,xpG:16,goldG:10,color:'#3b82f6',icon:'⚡',bondable:false},
+wraith:{name:'Void Wraith',baseHp:130,baseAtk:16,baseDef:8,baseXp:100,baseGold:65,hpG:16,atkG:3.5,defG:2.2,xpG:20,goldG:12,color:'#a855f7',icon:'👻',bondable:false},
+voidMoth:{name:'Void Moth',baseHp:90,baseAtk:15,baseDef:5,baseXp:90,baseGold:55,hpG:13,atkG:3,defG:1.5,xpG:18,goldG:10,color:'#7c3aed',icon:'🦋',bondable:true,spiritId:'void_moth'},
+shadowStag:{name:'Shadow Stag',baseHp:100,baseAtk:14,baseDef:6,baseXp:95,baseGold:60,hpG:14,atkG:2.8,defG:1.8,xpG:19,goldG:11,color:'#4c1d95',icon:'🦌',bondable:true,spiritId:'shadow_stag'}
+};
+
+// ===== SPIRITS =====
+const SPIRITS={
+ember_fox:{name:'Ember Fox',icon:'🦊',color:'#f97316',skillName:'Flame Strike',skillCost:10,skillMult:1.5,passive:'+10% ATK',passiveType:'atk',passiveVal:0.1},
+moss_turtle:{name:'Moss Turtle',icon:'🐢',color:'#22c55e',skillName:"Nature's Mend",skillCost:12,skillMult:0,passive:'+3 HP/turn',passiveType:'regen',passiveVal:3},
+crystal_bat:{name:'Crystal Bat',icon:'🦇',color:'#a855f7',skillName:'Sonic Screech',skillCost:10,skillMult:0.8,passive:'+20% flee rate',passiveType:'flee',passiveVal:0.2},
+stone_serpent:{name:'Stone Serpent',icon:'🐍',color:'#78716c',skillName:'Petrify',skillCost:12,skillMult:0.6,passive:'+15% max HP',passiveType:'hp',passiveVal:0.15},
+bone_hawk:{name:'Bone Hawk',icon:'🦅',color:'#d4d4d8',skillName:'Soul Reap',skillCost:10,skillMult:1.2,passive:'+25% XP gain',passiveType:'xp',passiveVal:0.25},
+ash_wolf:{name:'Ash Wolf',icon:'🐺',color:'#78350f',skillName:'Pack Howl',skillCost:14,skillMult:0,passive:'+15% crit chance',passiveType:'crit',passiveVal:0.15},
+void_moth:{name:'Void Moth',icon:'🦋',color:'#7c3aed',skillName:'Drain Touch',skillCost:8,skillMult:1.3,passive:'-20% skill MP cost',passiveType:'mpcost',passiveVal:0.2},
+shadow_stag:{name:'Shadow Stag',icon:'🦌',color:'#4c1d95',skillName:'Phase Shift',skillCost:14,skillMult:0,passive:'+30% gold find',passiveType:'gold',passiveVal:0.3}
 };
 
 // ===== ZONES =====
 const ZONES=[
-{id:'woods',name:'Verdant Woods',town:'Haven',levelReq:1,killReq:0,monsters:['imp','wolf'],minLvl:1,maxLvl:5,desc:'A peaceful forest on the edge of civilization.'},
-{id:'caverns',name:'Crystal Caverns',town:'Deephold',levelReq:5,killReq:15,monsters:['sprite','spider','golem'],minLvl:5,maxLvl:10,desc:'Glittering caves filled with danger.'},
-{id:'wastes',name:'Bone Wastes',town:'Ashen Rest',levelReq:10,killReq:40,monsters:['knight','elemental'],minLvl:10,maxLvl:16,desc:'A desolate graveyard of forgotten wars.'},
-{id:'depths',name:'Void Depths',town:'Last Light',levelReq:16,killReq:80,monsters:['wraith'],minLvl:16,maxLvl:25,desc:'Where reality frays at the seams.'}
+{id:'woods',name:'Verdant Woods',town:'Haven',levelReq:1,killReq:0,monsters:['imp','wolf','emberFox','mossTurtle'],minLvl:1,maxLvl:5,desc:'A peaceful forest on the edge of civilization.'},
+{id:'caverns',name:'Crystal Caverns',town:'Deephold',levelReq:5,killReq:15,monsters:['sprite','spider','crystalBat','stoneSerpent','golem'],minLvl:5,maxLvl:10,desc:'Glittering caves filled with danger.'},
+{id:'wastes',name:'Bone Wastes',town:'Ashen Rest',levelReq:10,killReq:40,monsters:['knight','boneHawk','ashWolf','elemental'],minLvl:10,maxLvl:16,desc:'A desolate graveyard of forgotten wars.'},
+{id:'depths',name:'Void Depths',town:'Last Light',levelReq:16,killReq:80,monsters:['wraith','voidMoth','shadowStag'],minLvl:16,maxLvl:25,desc:'Where reality frays at the seams.'}
 ];
 
-// ===== MAP =====
-const MAP=[
-[1,1,1,1,1,1,1,1,1],
-[1,2,0,0,0,0,0,0,1],
-[1,0,0,1,1,0,0,0,1],
-[1,0,0,1,0,0,0,0,1],
-[1,0,0,0,0,0,1,0,1],
-[1,0,0,0,0,0,0,3,1],
-[1,1,1,1,1,1,1,1,1]
-];
-
-// ===== SHOP =====
-const SHOP_ITEMS=[
-{id:'potion',name:'Health Potion',desc:'Restores 50% HP',price:25,icon:'🧪'},
-{id:'manaPotion',name:'Mana Potion',desc:'Restores 50% MP',price:20,icon:'💧'},
-{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗'}
-];
-
-// ===== TUTORIAL =====
+const MAP=[[1,1,1,1,1,1,1,1,1],[1,2,0,0,0,0,0,0,1],[1,0,0,1,1,0,0,0,1],[1,0,0,1,0,0,0,0,1],[1,0,0,0,0,0,1,0,1],[1,0,0,0,0,0,0,3,1],[1,1,1,1,1,1,1,1,1]];
+const SHOP_ITEMS=[{id:'potion',name:'Health Potion',desc:'Restores 50% HP',price:25,icon:'🧪'},{id:'manaPotion',name:'Mana Potion',desc:'Restores 50% MP',price:20,icon:'💧'},{id:'elixir',name:'Grand Elixir',desc:'Fully restores HP & MP',price:80,icon:'⚗'}];
 const TUTORIAL_STEPS=[
 {title:'Welcome, Wanderer',text:'You have been pulled through the <strong>Nexus Gate</strong>. Survive, grow strong, and conquer the depths.'},
 {title:'Your Class',text:'You are a <strong><span id="tut-class-name"></span></strong>.<br>• <strong>VIT</strong>: Health<br>• <strong>ATK</strong>: Damage<br>• <strong>DEF</strong>: Damage reduction'},
 {title:'Exploration',text:'Use <strong>Explore</strong> to walk through the wilds. Stepping on <strong>tall grass</strong> may trigger an encounter. Reach the <strong>glowing tile</strong> to find the path forward.'},
-{title:'Combat',text:'Battles are <strong>turn-based</strong>. Attack, use Skills (cost MP), drink Potions, or Flee. Defeat enemies to earn <strong>XP</strong> and <strong>Gold</strong>.'},
+{title:'Combat & Spirits',text:'Battles are <strong>turn-based</strong>. Some creatures can be <strong>bonded</strong> instead of fought. Bonded spirits replace your second skill and grant passive bonuses.'},
 {title:'Progression',text:'Level up to grow stronger. Unlock new <strong>Zones</strong> by reaching level and kill thresholds. Rest in town to recover.'}
 ];
 let tutorialStep=0;
 
 // ===== HELPERS =====
-function getPlayerAtk(){return CLASSES[G.cls].baseAtk+Math.floor(G.level*1.5);}
+function getActiveSpirit(){if(!G.activeBond)return null;return SPIRITS[G.activeBond]||null;}
+function getPlayerAtk(){var base=CLASSES[G.cls].baseAtk+Math.floor(G.level*1.5);var sp=getActiveSpirit();if(sp&&sp.passiveType==='atk')base=Math.floor(base*(1+sp.passiveVal));return base;}
 function getPlayerDef(){return CLASSES[G.cls].baseDef+Math.floor(G.level*0.5);}
-function getMonsterStats(id,lvl){var m=MONSTERS[id];return{name:m.name,lvl:lvl,hp:m.baseHp+Math.floor(lvl*m.hpG),maxHp:m.baseHp+Math.floor(lvl*m.hpG),atk:m.baseAtk+Math.floor(lvl*m.atkG),def:m.baseDef+Math.floor(lvl*m.defG),xp:m.baseXp+Math.floor(lvl*m.xpG),gold:m.baseGold+Math.floor(lvl*m.goldG),color:m.color,icon:m.icon};}
+function getMaxHp(){var base=CLASSES[G.cls].baseHp+G.level*12;var sp=getActiveSpirit();if(sp&&sp.passiveType==='hp')base=Math.floor(base*(1+sp.passiveVal));return base;}
+function getSkillCost(baseCost){var sp=getActiveSpirit();if(sp&&sp.passiveType==='mpcost')return Math.max(1,Math.floor(baseCost*(1-sp.passiveVal)));return baseCost;}
+function getMonsterStats(id,lvl){var m=MONSTERS[id];return{name:m.name,lvl:lvl,hp:m.baseHp+Math.floor(lvl*m.hpG),maxHp:m.baseHp+Math.floor(lvl*m.hpG),atk:m.baseAtk+Math.floor(lvl*m.atkG),def:m.baseDef+Math.floor(lvl*m.defG),xp:m.baseXp+Math.floor(lvl*m.xpG),gold:m.baseGold+Math.floor(lvl*m.goldG),color:m.color,icon:m.icon,bondable:m.bondable||false,spiritId:m.spiritId||null};}
 
 // ===== CLASS SELECT =====
 function selectClass(cls){selectedClass=cls;document.querySelectorAll('.class-card').forEach(function(el){el.classList.remove('selected');});event.currentTarget.classList.add('selected');var b=document.getElementById('btn-start');b.disabled=false;b.textContent='Begin as '+CLASSES[cls].name;}
@@ -370,53 +404,68 @@ function nextTutorialStep(){tutorialStep++;if(tutorialStep>=TUTORIAL_STEPS.lengt
 function skipTutorial(){tutorialStep=TUTORIAL_STEPS.length-1;nextTutorialStep();}
 
 // ===== SCREENS =====
-function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});document.getElementById('screen-'+id).classList.add('active');G.currentScreen=id;if(id==='town')updateTownUI();if(id==='shop')renderShop();if(id==='spirits')renderSpiritScreen();}
 
 // ===== TOWN =====
-function updateTownUI(){var z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;var pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
-function renderZoneProgress(){var el=document.getElementById('zone-progress');var html='';if(G.zone<ZONES.length-1){var next=ZONES[G.zone+1];var lvlMet=G.level>=next.levelReq;var killMet=G.kills>=next.killReq;html+='<div class="zone-progress-title">Next Zone: '+next.name+'</div>';html+='<div class="zone-req '+(lvlMet?'met':'')+'"><span>Level Requirement</span><span>'+G.level+' / '+next.levelReq+(lvlMet?' ✓':'')+'</span></div>';html+='<div class="zone-req '+(killMet?'met':'')+'"><span>Kill Requirement</span><span>'+G.kills+' / '+next.killReq+(killMet?' ✓':'')+'</span></div>';if(lvlMet&&killMet){html+='<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to '+next.name+'</button>';}}else{html+='<div class="zone-progress-title">You have reached the final zone.</div>';}el.innerHTML=html;}
+function updateTownUI(){var z=ZONES[G.zone];document.getElementById('town-name').textContent=z.town;document.getElementById('town-zone-name').textContent=z.name+' — '+z.desc;document.getElementById('t-level').textContent=G.level;document.getElementById('t-gold').textContent=G.gold;document.getElementById('t-kills').textContent=G.kills;G.maxHp=getMaxHp();document.getElementById('t-hp').textContent=G.hp+'/'+G.maxHp;document.getElementById('t-mp').textContent=G.mp+'/'+G.maxMp;var pct=Math.min(100,(G.xp/G.xpNext)*100);document.getElementById('t-xp-fill').style.width=pct+'%';document.getElementById('t-xp-text').textContent=G.xp+' / '+G.xpNext;renderZoneProgress();}
+function renderZoneProgress(){var el=document.getElementById('zone-progress');var html='';if(G.zone<ZONES.length-1){var next=ZONES[G.zone+1];var lvlMet=G.level>=next.levelReq;var killMet=G.kills>=next.killReq;html+='<div class="zone-progress-title">Next Zone: '+next.name+'</div>';html+='<div class="zone-req '+(lvlMet?'met':'')+'"><span>Level</span><span>'+G.level+'/'+next.levelReq+(lvlMet?' ✓':'')+'</span></div>';html+='<div class="zone-req '+(killMet?'met':'')+'"><span>Kills</span><span>'+G.kills+'/'+next.killReq+(killMet?' ✓':'')+'</span></div>';if(lvlMet&&killMet)html+='<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="advanceZone()">Travel to '+next.name+'</button>';}else{html+='<div class="zone-progress-title">Final zone reached.</div>';}el.innerHTML=html;}
 function advanceZone(){if(G.zone<ZONES.length-1){G.zone++;G.playerX=1;G.playerY=1;showToast('Arrived at '+ZONES[G.zone].name+'!');updateTownUI();}}
-function doRest(){if(G.resting)return;G.resting=true;var btn=document.getElementById('btn-rest');var desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';var t=10;var iv=setInterval(function(){t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=G.maxHp;G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP';updateTownUI();showToast('You feel fully restored.');}},1000);}
+function doRest(){if(G.resting)return;G.resting=true;var btn=document.getElementById('btn-rest');var desc=document.getElementById('rest-desc');btn.classList.add('disabled');desc.textContent='Resting...';var t=10;var iv=setInterval(function(){t--;desc.textContent='Resting... '+t+'s';if(t<=0){clearInterval(iv);G.hp=getMaxHp();G.mp=G.maxMp;G.resting=false;btn.classList.remove('disabled');desc.textContent='Restore HP/MP (10s)';updateTownUI();showToast('You feel fully restored.');}},1000);}
 
 // ===== SHOP =====
 function renderShop(){document.getElementById('s-gold').textContent=G.gold;var container=document.getElementById('shop-items');container.innerHTML='';SHOP_ITEMS.forEach(function(item){var can=G.gold>=item.price;var d=document.createElement('div');d.className='shop-item';d.innerHTML='<div class="shop-item-icon">'+item.icon+'</div><div class="shop-item-info"><div class="shop-item-name">'+item.name+'</div><div class="shop-item-desc">'+item.desc+'</div></div><button class="shop-item-price '+(can?'':'cant-afford')+'" onclick="buyItem(\''+item.id+'\')">'+item.price+'g</button>';container.appendChild(d);});}
-function buyItem(id){var item=SHOP_ITEMS.find(function(i){return i.id===id;});if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=G.maxHp;G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
+function buyItem(id){var item=SHOP_ITEMS.find(function(i){return i.id===id;});if(!item||G.gold<item.price){showToast('Not enough gold!');return;}G.gold-=item.price;if(id==='potion')G.potions++;else if(id==='manaPotion')G.manaPotions++;else if(id==='elixir'){G.hp=getMaxHp();G.mp=G.maxMp;}renderShop();showToast('Purchased '+item.name+'!');}
+
+// ===== SPIRIT MANAGEMENT =====
+function renderSpiritScreen(){var container=document.getElementById('spirit-slots');var emptyMsg=document.getElementById('spirit-empty-msg');container.innerHTML='';if(G.bonds.length===0){emptyMsg.style.display='block';return;}emptyMsg.style.display='none';G.bonds.forEach(function(bondId){var sp=SPIRITS[bondId];if(!sp)return;var isActive=G.activeBond===bondId;var slot=document.createElement('div');slot.className='spirit-slot'+(isActive?' active-bond':'');slot.innerHTML='<div class="spirit-slot-icon" style="background:radial-gradient(circle,'+sp.color+',#000);color:'+sp.color+'">'+sp.icon+'</div><div class="spirit-slot-info"><div class="spirit-slot-name">'+sp.name+(isActive?' ★':'')+'</div><div class="spirit-slot-desc">Skill: '+sp.skillName+' | '+sp.passive+'</div></div><div class="spirit-slot-actions">'+(isActive?'<button class="btn btn-sm btn-secondary" onclick="deactivateBond()">Deactivate</button>':'<button class="btn btn-sm btn-primary" onclick="activateBond(\''+bondId+'\')">Activate</button>')+'<button class="btn btn-sm btn-danger" onclick="releaseBond(\''+bondId+'\')">Release</button></div>';container.appendChild(slot);});}
+function activateBond(id){G.activeBond=id;saveGame();renderSpiritScreen();showToast(SPIRITS[id].name+' activated!');}
+function deactivateBond(){G.activeBond=null;saveGame();renderSpiritScreen();showToast('No active spirit.');}
+function releaseBond(id){if(!confirm('Release '+SPIRITS[id].name+'? This cannot be undone.'))return;G.bonds=G.bonds.filter(function(b){return b!==id;});if(G.activeBond===id)G.activeBond=null;saveGame();renderSpiritScreen();showToast(SPIRITS[id].name+' released.');}
 
 // ===== EXPLORATION =====
 function openExplore(){G.playerX=1;G.playerY=1;renderExplore();showScreen('explore');document.getElementById('explore-zone').textContent=ZONES[G.zone].name;}
 function renderExplore(){var grid=document.getElementById('explore-grid');grid.style.gridTemplateColumns='repeat('+MAP[0].length+',34px)';grid.innerHTML='';for(var y=0;y<MAP.length;y++){for(var x=0;x<MAP[y].length;x++){var cell=document.createElement('div');var t=MAP[y][x];var cls='explore-cell ';if(t===1)cls+='wall';else if(t===0)cls+='grass';else if(t===2)cls+='path';else if(t===3)cls+='exit';if(x===G.playerX&&y===G.playerY)cls+=' player';cell.className=cls;cell.setAttribute('data-x',x);cell.setAttribute('data-y',y);cell.onclick=function(){tryMoveTo(parseInt(this.getAttribute('data-x')),parseInt(this.getAttribute('data-y')));};grid.appendChild(cell);}}}
 function movePlayer(dx,dy){var nx=G.playerX+dx,ny=G.playerY+dy;if(ny<0||ny>=MAP.length||nx<0||nx>=MAP[0].length)return;if(MAP[ny][nx]===1)return;G.playerX=nx;G.playerY=ny;renderExplore();checkTile();}
-function tryMoveTo(x,y){var dx=x-G.playerX,dy=y-G.playerY;if(Math.abs(dx)+Math.abs(dy)===1){movePlayer(dx,dy);}}
-function checkTile(){var t=MAP[G.playerY][G.playerX];if(t===3){showToast('You found the path forward! Return to town to advance.');return;}if(t===0){if(Math.random()<0.22){triggerEncounter();}}}
-function triggerEncounter(){var z=ZONES[G.zone];var mid=z.monsters[Math.floor(Math.random()*z.monsters.length)];var lvl=Math.max(z.minLvl,Math.min(z.maxLvl,G.level+Math.floor(Math.random()*3)-1));var stats=getMonsterStats(mid,lvl);pendingEncounter=stats;var ov=document.getElementById('encounter-overlay');document.getElementById('enc-icon').textContent=stats.icon;document.getElementById('enc-icon').style.background='radial-gradient(circle,'+stats.color+',#000)';document.getElementById('enc-icon').style.color=stats.color;document.getElementById('enc-title').textContent='A wild '+stats.name+' appears!';document.getElementById('enc-desc').textContent='Level '+stats.lvl+' — Prepare for battle.';ov.classList.add('active');}
+function tryMoveTo(x,y){var dx=x-G.playerX,dy=y-G.playerY;if(Math.abs(dx)+Math.abs(dy)===1)movePlayer(dx,dy);}
+function checkTile(){var t=MAP[G.playerY][G.playerX];if(t===3){showToast('Path forward found! Return to town to advance.');return;}if(t===0&&Math.random()<0.22)triggerEncounter();}
+function triggerEncounter(){var z=ZONES[G.zone];var mid=z.monsters[Math.floor(Math.random()*z.monsters.length)];var lvl=Math.max(z.minLvl,Math.min(z.maxLvl,G.level+Math.floor(Math.random()*3)-1));var stats=getMonsterStats(mid,lvl);pendingEncounter=stats;var ov=document.getElementById('encounter-overlay');document.getElementById('enc-icon').textContent=stats.icon;document.getElementById('enc-icon').style.background='radial-gradient(circle,'+stats.color+',#000)';document.getElementById('enc-icon').style.color=stats.color;document.getElementById('enc-title').textContent='A wild '+stats.name+' appears!';document.getElementById('enc-desc').textContent='Level '+stats.lvl+(stats.bondable?' — ✦ Bondable':'');var actions=document.getElementById('enc-actions');actions.innerHTML='<button class="btn btn-danger btn-sm" onclick="startCombatFromEncounter()">Fight</button>';if(stats.bondable)actions.innerHTML+='<button class="btn btn-sm" style="background:var(--purple);color:#fff" onclick="startResonance()">🔗 Bond</button>';actions.innerHTML+='<button class="btn btn-secondary btn-sm" onclick="fleeEncounter()">Flee</button>';ov.classList.add('active');}
 function startCombatFromEncounter(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;startCombat(pendingEncounter);pendingEncounter=null;}
 function fleeEncounter(){document.getElementById('encounter-overlay').classList.remove('active');pendingEncounter=null;showToast('You slipped away safely.');}
 
+// ===== RESONANCE MINI-GAME =====
+var resState={active:false,angle:0,speed:2,targetStart:0,targetSize:40,hits:0,misses:0,animFrame:null,done:false};
+function startResonance(){document.getElementById('encounter-overlay').classList.remove('active');if(!pendingEncounter)return;var sp=SPIRITS[pendingEncounter.spiritId];document.getElementById('res-title').textContent='Bond with '+pendingEncounter.name;document.getElementById('res-center').textContent=sp?sp.icon:'🐾';document.getElementById('res-status').textContent='';resState.hits=0;resState.misses=0;resState.angle=0;resState.speed=1.5+G.zone*0.3;resState.targetSize=40;resState.done=false;resState.active=true;updateResUI();document.getElementById('resonance-overlay').classList.add('active');resLoop();}
+function resLoop(){if(!resState.active)return;resState.angle+=resState.speed;if(resState.angle>=360)resState.angle-=360;var marker=document.getElementById('res-marker');var rad=(resState.angle-90)*Math.PI/180;var cx=110+Math.cos(rad)*95;var cy=110+Math.sin(rad)*95;marker.style.left=cx+'px';marker.style.top=cy+'px';marker.style.transform='translate(-50%,-50%)';var target=document.getElementById('res-target');target.style.borderTopColor='transparent';target.style.borderRightColor='transparent';target.style.borderBottomColor='transparent';target.style.borderLeftColor='transparent';target.style.transform='rotate('+resState.targetStart+'deg)';target.style.borderTopColor='rgba(168,85,247,0.6)';target.style.clipPath='conic-gradient(from '+resState.targetStart+'deg,transparent 0deg,transparent '+resState.targetSize+'deg,transparent 360deg)';target.style.background='conic-gradient(from 0deg,transparent '+resState.targetStart+'deg,rgba(168,85,247,0.3) '+resState.targetStart+'deg,rgba(168,85,247,0.3) '+(resState.targetStart+resState.targetSize)+'deg,transparent '+(resState.targetStart+resState.targetSize)+'deg)';resState.animFrame=requestAnimationFrame(resLoop);}
+function resonanceTap(){if(!resState.active||resState.done)return;var angle=resState.angle;var inTarget=angle>=resState.targetStart&&angle<=(resState.targetStart+resState.targetSize);if(angle>360-resState.targetSize&&resState.targetStart<resState.targetSize)inTarget=true;if(inTarget){resState.hits++;resState.targetStart=Math.floor(Math.random()*(360-resState.targetSize));document.getElementById('res-status').textContent='✓ Resonance!';document.getElementById('res-status').style.color='var(--green)';if(resState.hits>=3){resState.done=true;resState.active=false;cancelAnimationFrame(resState.animFrame);document.getElementById('res-status').textContent='✦ Bond forged successfully!';setTimeout(function(){completeBond();},1500);}}else{resState.misses++;resState.targetSize=Math.max(15,resState.targetSize-5);document.getElementById('res-status').textContent='✗ Missed...';document.getElementById('res-status').style.color='var(--red)';if(resState.misses>=5){resState.done=true;resState.active=false;cancelAnimationFrame(resState.animFrame);document.getElementById('res-status').textContent='The spirit rejected you.';setTimeout(function(){document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showToast('Bond failed. The spirit fled.');showScreen('explore');},1500);}}updateResUI();}
+function updateResUI(){document.getElementById('res-hits').textContent=resState.hits+'/3';document.getElementById('res-misses').textContent=resState.misses+'/5';}
+function completeBond(){var sid=pendingEncounter.spiritId;if(G.bonds.length>=3){showToast('Bond slots full! Release a spirit first.');document.getElementById('resonance-overlay').classList.remove('active');pendingEncounter=null;showScreen('spirits');return;}if(G.bonds.indexOf(sid)===-1)G.bonds.push(sid);if(!G.activeBond)G.activeBond=sid;pendingEncounter=null;document.getElementById('resonance-overlay').classList.remove('active');saveGame();showToast('Bonded with '+SPIRITS[sid].name+'!');showScreen('explore');}
+
 // ===== COMBAT =====
-function startCombat(enemy){combatState.active=true;combatState.enemy={hp:enemy.hp,maxHp:enemy.maxHp,atk:enemy.atk,def:enemy.def,xp:enemy.xp,gold:enemy.gold,name:enemy.name,lvl:enemy.lvl,color:enemy.color,icon:enemy.icon,currentHp:enemy.hp};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
-function updateCombatUI(){var e=combatState.enemy;var pcls=CLASSES[G.cls];document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background='radial-gradient(circle,'+e.color+',#000)';document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=pcls.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background='radial-gradient(circle,'+pcls.color+',#000)';document.getElementById('c-player-portrait').style.color=pcls.color;document.getElementById('c-player-portrait').textContent=pcls.icon;document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;document.getElementById('c-pot-count').textContent=G.potions;if(pcls.skills[0])document.getElementById('skill-btn-0').textContent=pcls.skills[0].name+' ('+pcls.skills[0].cost+' MP)';if(pcls.skills[1]){document.getElementById('skill-btn-1').textContent=pcls.skills[1].name+' ('+pcls.skills[1].cost+' MP)';document.getElementById('skill-btn-1-wrap').style.display='flex';}else{document.getElementById('skill-btn-1-wrap').style.display='none';}var logEl=document.getElementById('c-log');logEl.innerHTML=combatState.log.join('<br>');logEl.scrollTop=logEl.scrollHeight;}
+function getCombatSkills(){var pcls=CLASSES[G.cls];var skills=[{name:pcls.skills[0].name,cost:getSkillCost(pcls.skills[0].cost),mult:pcls.skills[0].mult,type:'damage'}];var sp=getActiveSpirit();if(sp){skills.push({name:sp.skillName,cost:getSkillCost(sp.skillCost),mult:sp.skillMult,type:sp.skillMult>0?'damage':'special'});}else{skills.push({name:pcls.skills[1].name,cost:getSkillCost(pcls.skills[1].cost),mult:pcls.skills[1].mult,type:'damage'});}return skills;}
+function startCombat(enemy){combatState.active=true;combatState.enemy={hp:enemy.hp,maxHp:enemy.maxHp,atk:enemy.atk,def:enemy.def,xp:enemy.xp,gold:enemy.gold,name:enemy.name,lvl:enemy.lvl,color:enemy.color,icon:enemy.icon,currentHp:enemy.hp,stunned:false};combatState.log=[];combatState.turn='player';showScreen('combat');updateCombatUI();logCombat('A wild '+enemy.name+' (Lv.'+enemy.lvl+') appears!');}
+function updateCombatUI(){var e=combatState.enemy;var pcls=CLASSES[G.cls];var skills=getCombatSkills();document.getElementById('c-enemy-name').textContent=e.name;document.getElementById('c-enemy-lvl').textContent='Lv.'+e.lvl;document.getElementById('c-enemy-portrait').style.background='radial-gradient(circle,'+e.color+',#000)';document.getElementById('c-enemy-portrait').style.color=e.color;document.getElementById('c-enemy-portrait').textContent=e.icon;document.getElementById('c-enemy-hp').style.width=Math.max(0,(e.currentHp/e.maxHp*100))+'%';document.getElementById('c-enemy-hp-text').textContent=Math.max(0,e.currentHp)+'/'+e.maxHp;document.getElementById('c-player-name').textContent=pcls.name;document.getElementById('c-player-lvl').textContent='Lv.'+G.level;document.getElementById('c-player-portrait').style.background='radial-gradient(circle,'+pcls.color+',#000)';document.getElementById('c-player-portrait').style.color=pcls.color;document.getElementById('c-player-portrait').textContent=pcls.icon;G.maxHp=getMaxHp();document.getElementById('c-player-hp').style.width=Math.max(0,(G.hp/G.maxHp*100))+'%';document.getElementById('c-player-hp-text').textContent=G.hp+'/'+G.maxHp;document.getElementById('c-player-mp').style.width=Math.max(0,(G.mp/G.maxMp*100))+'%';document.getElementById('c-player-mp-text').textContent=G.mp+'/'+G.maxMp;var actDiv=document.getElementById('combat-actions');actDiv.innerHTML='<button class="action-btn" onclick="playerAction(\'attack\')"><div class="action-icon">⚔</div><div class="action-label">Attack</div></button>';skills.forEach(function(sk,i){actDiv.innerHTML+='<button class="action-btn" onclick="useSkill('+i+')"><div class="action-icon">✨</div><div class="action-label">'+sk.name+' ('+sk.cost+' MP)</div></button>';});actDiv.innerHTML+='<button class="action-btn" onclick="playerAction(\'item\')"><div class="action-icon">🧪</div><div class="action-label">Potion ('+G.potions+')</div></button>';actDiv.innerHTML+='<button class="action-btn" onclick="playerAction(\'flee\')"><div class="action-icon">🏃</div><div class="action-label">Flee</div></button>';var logEl=document.getElementById('c-log');logEl.innerHTML=combatState.log.join('<br>');logEl.scrollTop=logEl.scrollHeight;}
 function logCombat(m){combatState.log.push('> '+m);if(combatState.log.length>6)combatState.log.shift();updateCombatUI();}
-function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;var e=combatState.enemy;var dmg=0;if(type==='attack'){dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));e.currentHp-=dmg;logCombat('You strike '+e.name+' for '+dmg+' dmg.');}else if(type==='item'){if(G.potions>0){G.potions--;var heal=Math.floor(G.maxHp*0.5);G.hp=Math.min(G.maxHp,G.hp+heal);logCombat('You drink a potion (+'+heal+' HP).');}else{showToast('No potions!');return;}}else if(type==='flee'){var lvlDiff=G.level-combatState.enemy.lvl;var failChance=0;if(lvlDiff===0){failChance=0.5;}else if(lvlDiff<0){failChance=Math.min(0.95,0.75+Math.abs(lvlDiff)*0.05);}else{failChance=Math.max(0.05,0.25-lvlDiff*0.05);}if(Math.random()<failChance){logCombat('Failed to flee! ('+Math.round(failChance*100)+'% fail chance)');combatState.turn='enemy';setTimeout(enemyTurn,1100);}else{logCombat('You escaped successfully!');combatState.active=false;setTimeout(function(){showScreen('explore');},800);}return;}updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
-function useSkill(idx){if(!combatState.active||combatState.turn!=='player')return;var pcls=CLASSES[G.cls];var e=combatState.enemy;var sk=pcls.skills[idx];if(!sk){showToast('No such skill!');return;}if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}G.mp-=sk.cost;var dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;logCombat('You cast '+sk.name+' for '+dmg+' dmg! (-'+sk.cost+' MP)');updateCombatUI();if(e.currentHp<=0){winBattle();}else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
-function enemyTurn(){if(!combatState.active)return;var e=combatState.enemy;var dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(e.name+' hits you for '+dmg+' dmg.');updateCombatUI();if(G.hp<=0){loseBattle();}else{combatState.turn='player';}}
-function winBattle(){var e=combatState.enemy;G.xp+=e.xp;G.gold+=e.gold;G.kills++;combatState.active=false;var p=document.createElement('div');p.className='xp-popup';p.innerHTML='<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+'+e.xp+' XP<br>+'+e.gold+' Gold</div>';document.body.appendChild(p);setTimeout(function(){p.remove();},2200);var leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp+=12;G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(function(){if(leveled)showToast('LEVEL UP! You are now level '+G.level);showScreen('explore');},2300);}
-function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(G.maxHp*0.5);combatState.active=false;setTimeout(function(){showToast('You wake up in town...');showScreen('town');},1800);}
+function playerAction(type){if(!combatState.active||combatState.turn!=='player')return;var e=combatState.enemy;var dmg=0;if(type==='attack'){var sp=getActiveSpirit();var critChance=0.05;if(sp&&sp.passiveType==='crit')critChance+=sp.passiveVal;var isCrit=Math.random()<critChance;dmg=Math.max(1,getPlayerAtk()-e.def+Math.floor(Math.random()*4));if(isCrit){dmg=Math.floor(dmg*1.5);logCombat('CRITICAL! You strike '+e.name+' for '+dmg+' dmg!');}else{logCombat('You strike '+e.name+' for '+dmg+' dmg.');}e.currentHp-=dmg;if(sp&&sp.passiveType==='regen'){var heal=sp.passiveVal;G.hp=Math.min(getMaxHp(),G.hp+heal);}}else if(type==='item'){if(G.potions>0){G.potions--;var heal=Math.floor(getMaxHp()*0.5);G.hp=Math.min(getMaxHp(),G.hp+heal);logCombat('You drink a potion (+'+heal+' HP).');}else{showToast('No potions!');return;}}else if(type==='flee'){var lvlDiff=G.level-e.lvl;var failChance=0;if(lvlDiff===0)failChance=0.5;else if(lvlDiff<0)failChance=Math.min(0.95,0.75+Math.abs(lvlDiff)*0.05);else failChance=Math.max(0.05,0.25-lvlDiff*0.05);var sp=getActiveSpirit();if(sp&&sp.passiveType==='flee')failChance=Math.max(0.05,failChance-sp.passiveVal);if(Math.random()<failChance){logCombat('Failed to flee! ('+Math.round(failChance*100)+'% fail)');combatState.turn='enemy';setTimeout(enemyTurn,1100);}else{logCombat('You escaped!');combatState.active=false;setTimeout(function(){showScreen('explore');},800);}return;}updateCombatUI();if(e.currentHp<=0)winBattle();else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
+function useSkill(idx){if(!combatState.active||combatState.turn!=='player')return;var skills=getCombatSkills();var sk=skills[idx];if(!sk){showToast('No such skill!');return;}if(G.mp<sk.cost){showToast('Not enough MP! Need '+sk.cost);return;}G.mp-=sk.cost;var e=combatState.enemy;var sp=getActiveSpirit();if(sk.type==='special'&&sp){if(sp.skillName==="Nature's Mend"){var heal=Math.floor(getMaxHp()*0.25);G.hp=Math.min(getMaxHp(),G.hp+heal);logCombat("Nature's Mend heals "+heal+" HP!");}else if(sp.skillName==='Sonic Screech'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;e.stunned=true;logCombat('Sonic Screech deals '+dmg+' dmg and stuns!');}else if(sp.skillName==='Petrify'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;e.def=Math.max(0,e.def-3);logCombat('Petrify deals '+dmg+' dmg and reduces DEF!');}else if(sp.skillName==='Soul Reap'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;var drain=Math.floor(dmg*0.2);G.hp=Math.min(getMaxHp(),G.hp+drain);logCombat('Soul Reap deals '+dmg+' dmg, drains '+drain+' HP!');}else if(sp.skillName==='Pack Howl'){logCombat('Pack Howl boosts your ATK for 3 turns!');combatState.atkBuff=3;}else if(sp.skillName==='Drain Touch'){dmg=Math.max(1,Math.floor(getPlayerAtk()*sk.mult)-e.def);e.currentHp-=dmg;var mpDrain=Math.floor(dmg*0.3);G.mp=Math.min(G.maxMp,G.mp+mpDrain);logCombat('Drain Touch deals '+dmg+' dmg, steals '+mpDrain+' MP!');}else if(sp.skillName==='Phase Shift'){combatState.dodgeNext=true;logCombat('Phase Shift! You will dodge the next attack.');}}else{var mult=sk.mult;if(combatState.atkBuff&&combatState.atkBuff>0)mult+=0.3;var dmg=Math.max(1,Math.floor(getPlayerAtk()*mult)-e.def);e.currentHp-=dmg;logCombat('You cast '+sk.name+' for '+dmg+' dmg! (-'+sk.cost+' MP)');}updateCombatUI();if(e.currentHp<=0)winBattle();else{combatState.turn='enemy';setTimeout(enemyTurn,1100);}}
+function enemyTurn(){if(!combatState.active)return;var e=combatState.enemy;if(e.stunned){logCombat(e.name+' is stunned and cannot act!');e.stunned=false;combatState.turn='player';return;}if(combatState.dodgeNext){logCombat('You phase-shifted! Dodged '+e.name+"'s attack!");combatState.dodgeNext=false;combatState.turn='player';return;}var dmg=Math.max(1,e.atk-getPlayerDef()+Math.floor(Math.random()*3));G.hp-=dmg;logCombat(e.name+' hits you for '+dmg+' dmg.');if(combatState.atkBuff&&combatState.atkBuff>0)combatState.atkBuff--;var sp=getActiveSpirit();if(sp&&sp.passiveType==='regen'){G.hp=Math.min(getMaxHp(),G.hp+sp.passiveVal);}updateCombatUI();if(G.hp<=0)loseBattle();else combatState.turn='player';}
+function winBattle(){var e=combatState.enemy;var xpGain=e.xp;var goldGain=e.gold;var sp=getActiveSpirit();if(sp&&sp.passiveType==='xp')xpGain=Math.floor(xpGain*(1+sp.passiveVal));if(sp&&sp.passiveType==='gold')goldGain=Math.floor(goldGain*(1+sp.passiveVal));G.xp+=xpGain;G.gold+=goldGain;G.kills++;combatState.active=false;combatState.atkBuff=0;combatState.dodgeNext=false;var p=document.createElement('div');p.className='xp-popup';p.innerHTML='<div class="xp-popup-title">Victory!</div><div class="xp-popup-detail">+'+xpGain+' XP<br>+'+goldGain+' Gold</div>';document.body.appendChild(p);setTimeout(function(){p.remove();},2200);var leveled=false;if(G.xp>=G.xpNext){G.level++;G.xp-=G.xpNext;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp=getMaxHp();G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;leveled=true;}setTimeout(function(){if(leveled)showToast('LEVEL UP! Now level '+G.level);showScreen('explore');},2300);}
+function loseBattle(){logCombat('You have fallen...');G.hp=Math.floor(getMaxHp()*0.5);combatState.active=false;combatState.atkBuff=0;combatState.dodgeNext=false;setTimeout(function(){showToast('You wake up in town...');showScreen('town');},1800);}
+
 // ===== RUNE LOCK MINI-GAME =====
 var RUNE_SYMBOLS=['☯','✦','◆','⚔','🔥','💧','⚡','🌙','☀'];
 var mgState={sequence:[],playerInput:[],phase:'idle',length:3,delay:800};
-function startMiniGame(){document.getElementById('minigame-overlay').classList.add('active');document.getElementById('mg-close-btn').style.display='block';document.getElementById('mg-status').textContent='';document.getElementById('mg-status').style.color='var(--dim)';mgState.length=3+Math.min(G.zone,2);mgState.delay=Math.max(400,800-G.zone*120);mgState.sequence=[];mgState.playerInput=[];mgState.phase='watch';for(var i=0;i<mgState.length;i++){mgState.sequence.push(Math.floor(Math.random()*9));}document.getElementById('mg-desc').textContent='Watch the sequence... ('+mgState.length+' runes)';renderRuneGrid(true);playSequence();}
+function startMiniGame(){document.getElementById('minigame-overlay').classList.add('active');document.getElementById('mg-close-btn').style.display='block';document.getElementById('mg-status').textContent='';document.getElementById('mg-status').style.color='var(--dim)';mgState.length=3+Math.min(G.zone,2);mgState.delay=Math.max(400,800-G.zone*120);mgState.sequence=[];mgState.playerInput=[];mgState.phase='watch';for(var i=0;i<mgState.length;i++)mgState.sequence.push(Math.floor(Math.random()*9));document.getElementById('mg-desc').textContent='Watch the sequence... ('+mgState.length+' runes)';renderRuneGrid(true);playSequence();}
 function renderRuneGrid(disabled){var grid=document.getElementById('mg-grid');grid.innerHTML='';for(var i=0;i<9;i++){var btn=document.createElement('button');btn.className='btn btn-secondary';btn.style.cssText='padding:14px;font-size:1.4rem;min-width:auto;aspect-ratio:1;';btn.textContent=RUNE_SYMBOLS[i];if(disabled){btn.disabled=true;btn.style.opacity='0.5';}else{btn.onclick=(function(idx){return function(){onRuneTap(idx);};})(i);}grid.appendChild(btn);}}
-function playSequence(){var display=document.getElementById('mg-runes-display');var idx=0;display.innerHTML='<div style="font-size:2rem;color:var(--dim)">●</div>';var iv=setInterval(function(){if(idx>=mgState.sequence.length){clearInterval(iv);setTimeout(function(){mgState.phase='input';mgState.playerInput=[];document.getElementById('mg-desc').textContent='Now repeat the sequence!';document.getElementById('mg-runes-display').innerHTML='';renderRuneGrid(false);},400);return;}var sym=RUNE_SYMBOLS[mgState.sequence[idx]];display.innerHTML='<div style="font-size:2.5rem;animation:xpPop .3s ease-out">'+sym+'</div>';idx++;},mgState.delay);}
-function onRuneTap(idx){if(mgState.phase!=='input')return;mgState.playerInput.push(idx);var pos=mgState.playerInput.length-1;var display=document.getElementById('mg-runes-display');display.innerHTML='<div style="font-size:2rem;color:var(--accent)">'+RUNE_SYMBOLS[idx]+'</div>';if(mgState.playerInput[pos]!==mgState.sequence[pos]){mgState.phase='done';document.getElementById('mg-status').textContent='✗ Wrong rune! The ward rejects you.';document.getElementById('mg-status').style.color='var(--red)';renderRuneGrid(true);var dmg=Math.floor(G.maxHp*0.15);G.hp=Math.max(1,G.hp-dmg);document.getElementById('mg-close-btn').textContent='Limp to Town (-'+dmg+' HP)';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(false);};return;}if(mgState.playerInput.length===mgState.sequence.length){mgState.phase='done';document.getElementById('mg-status').textContent='✓ Ward unlocked! Safe passage granted.';document.getElementById('mg-status').style.color='var(--green)';renderRuneGrid(true);document.getElementById('mg-close-btn').textContent='Continue Safely';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(true);};}}
-function closeMiniGame(safe){document.getElementById('minigame-overlay').classList.remove('active');mgState.phase='idle';showScreen('town');if(!safe){showToast('You barely made it back...');}else{showToast('Returned safely.');}}
+function playSequence(){var display=document.getElementById('mg-runes-display');var idx=0;display.innerHTML='<div style="font-size:2rem;color:var(--dim)">●</div>';var iv=setInterval(function(){if(idx>=mgState.sequence.length){clearInterval(iv);setTimeout(function(){mgState.phase='input';mgState.playerInput=[];document.getElementById('mg-desc').textContent='Now repeat the sequence!';document.getElementById('mg-runes-display').innerHTML='';renderRuneGrid(false);},400);return;}display.innerHTML='<div style="font-size:2.5rem;animation:xpPop .3s ease-out">'+RUNE_SYMBOLS[mgState.sequence[idx]]+'</div>';idx++;},mgState.delay);}
+function onRuneTap(idx){if(mgState.phase!=='input')return;mgState.playerInput.push(idx);var pos=mgState.playerInput.length-1;document.getElementById('mg-runes-display').innerHTML='<div style="font-size:2rem;color:var(--accent)">'+RUNE_SYMBOLS[idx]+'</div>';if(mgState.playerInput[pos]!==mgState.sequence[pos]){mgState.phase='done';document.getElementById('mg-status').textContent='✗ Wrong rune! The ward rejects you.';document.getElementById('mg-status').style.color='var(--red)';renderRuneGrid(true);var dmg=Math.floor(getMaxHp()*0.15);G.hp=Math.max(1,G.hp-dmg);document.getElementById('mg-close-btn').textContent='Limp to Town (-'+dmg+' HP)';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(false);};return;}if(mgState.playerInput.length===mgState.sequence.length){mgState.phase='done';document.getElementById('mg-status').textContent='✓ Ward unlocked! Safe passage.';document.getElementById('mg-status').style.color='var(--green)';renderRuneGrid(true);document.getElementById('mg-close-btn').textContent='Continue Safely';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(true);};}}
+function closeMiniGame(safe){document.getElementById('minigame-overlay').classList.remove('active');mgState.phase='idle';showScreen('town');if(!safe)showToast('You barely made it back...');else showToast('Returned safely.');}
+
 // ===== SAVE/LOAD/RESET =====
 function saveGame(){try{localStorage.setItem('nexus-pocket-rpg-save',JSON.stringify(G));}catch(ex){}}
-function loadGame(){try{var s=localStorage.getItem('nexus-pocket-rpg-save');if(s)G=Object.assign({},G,JSON.parse(s));}catch(ex){}}
-function resetRpg(){if(!confirm('Are you sure you want to reset ALL progress? This cannot be undone.'))return;localStorage.removeItem('nexus-pocket-rpg-save');location.reload();}
-function exportRpgSave(){var data=btoa(JSON.stringify(G));var ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied to clipboard!');}catch(ex){showToast('Code shown below — long-press to copy.');}}
-function importRpgSave(){var ta=document.getElementById('savecode-input');var code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{var parsed=JSON.parse(atob(code));G=Object.assign({},G,parsed);saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported! Welcome back.');showScreen('town');updateTownUI();}catch(ex){showToast('Invalid save code!');}}
-
-// ===== UI =====
+function loadGame(){try{var s=localStorage.getItem('nexus-pocket-rpg-save');if(s){var parsed=JSON.parse(s);G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];if(G.activeBond===undefined)G.activeBond=null;}}catch(ex){}}
+function resetRpg(){if(!confirm('Reset ALL progress? Cannot be undone.'))return;localStorage.removeItem('nexus-pocket-rpg-save');location.reload();}
+function exportRpgSave(){var data=btoa(JSON.stringify(G));var ta=document.getElementById('savecode-input');ta.value=data;ta.select();ta.setSelectionRange(0,99999);try{navigator.clipboard.writeText(data);showToast('Save code copied!');}catch(ex){showToast('Code shown below — long-press to copy.');}}
+function importRpgSave(){var ta=document.getElementById('savecode-input');var code=ta.value.trim();if(!code){showToast('Paste a save code first!');return;}try{var parsed=JSON.parse(atob(code));G=Object.assign({},G,parsed);if(!G.bonds)G.bonds=[];saveGame();document.getElementById('savecode-overlay').classList.remove('active');showToast('Save imported!');showScreen('town');updateTownUI();}catch(ex){showToast('Invalid save code!');}}
 function showToast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
 
 // ===== INIT =====
