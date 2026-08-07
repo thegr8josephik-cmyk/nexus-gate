@@ -176,7 +176,7 @@ body{background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman
 </style>
 </head>
 <body>
-<a class="close-sigil" id="close-sigil" title="Return to Nexus Gate">×</a>
+<a href="./index.html" class="close-sigil" title="Return to Nexus Gate">×</a>
 
 <div class="screen active" id="screen-class">
 <h1 class="game-title">Pocket RPG</h1>
@@ -589,11 +589,11 @@ function playSequence(){var display=document.getElementById('mg-runes-display');
 function onRuneTap(idx){if(mgState.phase!=='input')return;mgState.playerInput.push(idx);var pos=mgState.playerInput.length-1;document.getElementById('mg-runes-display').innerHTML='<div style="font-size:2rem;color:'+OFFER_COLORS[idx]+'">'+RUNE_SYMBOLS[idx]+'</div>';if(mgState.playerInput[pos]!==mgState.sequence[pos]){mgState.phase='done';document.getElementById('mg-status').textContent='Wrong rune! The ward rejects you.';document.getElementById('mg-status').style.color='var(--red)';renderRuneGrid(true);var dmg=Math.floor(getMaxHp()*0.15);G.hp=Math.max(1,G.hp-dmg);document.getElementById('mg-close-btn').textContent='Limp to Town (-'+dmg+' HP)';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(false);};return;}if(mgState.playerInput.length===mgState.sequence.length){mgState.phase='done';document.getElementById('mg-status').textContent='Ward unlocked! Safe passage.';document.getElementById('mg-status').style.color='var(--green)';renderRuneGrid(true);document.getElementById('mg-close-btn').textContent='Continue Safely';document.getElementById('mg-close-btn').onclick=function(){closeMiniGame(true);};}}
 function closeMiniGame(safe){document.getElementById('minigame-overlay').classList.remove('active');mgState.phase='idle';showScreen('town');if(!safe)showToast('You barely made it back...');else showToast('Returned safely.');}
 
-var _at=0,_atT=null;
-document.getElementById('close-sigil').addEventListener('click',function(e){
-e.preventDefault();_at++;clearTimeout(_atT);
-if(_at>=3){_at=0;toggleAdminPanel();return;}
-_atT=setTimeout(function(){_at=0;window.location.href='./index.html';},400);
+var _tt=0,_ttT=null;
+document.getElementById('town-name').addEventListener('click',function(){
+_tt++;clearTimeout(_ttT);
+_ttT=setTimeout(function(){_tt=0;},600);
+if(_tt>=3){_tt=0;var c=prompt('Sovereign code:');if(c===null)return;if(c.trim()==='NEXUSVOID-GATE17'){toggleAdminPanel();}else{showToast('Invalid code.');}}
 });
 function toggleAdminPanel(){document.getElementById('admin-panel').classList.toggle('active');}
 function adminGrant(type){var amt=parseInt(document.getElementById('admin-amt').value)||0;if(type==='gold'){G.gold+=amt;showToast('Admin: +'+amt+' gold');}else if(type==='xp'){G.xp+=amt;showToast('Admin: +'+amt+' XP');}else if(type==='level'){G.level++;G.xpNext=Math.floor(G.xpNext*1.5);G.maxHp=getMaxHp();G.hp=G.maxHp;G.maxMp+=6;G.mp=G.maxMp;showToast('Admin: Level up');}else if(type==='hp'){G.hp=getMaxHp();showToast('Admin: Full HP');}else if(type==='mp'){G.mp=G.maxMp;showToast('Admin: Full MP');}else if(type==='kills'){G.kills+=10;showToast('Admin: +10 kills');}if(G.currentScreen==='town')updateTownUI();}
