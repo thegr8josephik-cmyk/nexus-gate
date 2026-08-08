@@ -11,15 +11,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Reader" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#000000" />
 
   <style>
     :root {
-      --bg: #05070f;
-      --panel: rgba(18, 24, 48, 0.72);
-      --border: rgba(120, 190, 255, 0.22);
-      --text: #eaf3ff;
-      --muted: #93a7c9;
-      --accent: #66e0ff;
+      --bg: #000000;
+      --panel: #101010;
+      --panel-h: #1a1a1a;
+      --border: #333333;
+      --text: #f5f5f5;
+      --muted: #9a9a9a;
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.25);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,7 +34,7 @@
       flex-direction: column;
       background: var(--bg);
       color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      font-family: Georgia, 'Times New Roman', serif;
       overflow: hidden;
     }
 
@@ -41,29 +44,35 @@
       align-items: center;
       padding: max(env(safe-area-inset-top), 12px) 14px 12px;
       background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      border-bottom: 2px solid var(--border);
       flex-wrap: wrap;
     }
 
     .file-button, .tool-button {
       display: inline-block;
       padding: 11px 14px;
-      border-radius: 12px;
-      border: 1px solid rgba(102, 224, 255, 0.35);
-      background: rgba(102, 224, 255, 0.12);
-      color: var(--accent);
+      border: 2px solid var(--accent);
+      background: var(--accent);
+      color: #fff;
       font-weight: 700;
       cursor: pointer;
       user-select: none;
       white-space: nowrap;
       font-size: 0.95rem;
+      font-family: inherit;
+      box-shadow: 3px 3px 0 var(--accent-glow);
+      transition: transform .1s, box-shadow .1s;
+    }
+    .file-button:active, .tool-button:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0 0 0;
     }
 
     .tool-button {
-      border-color: rgba(255, 255, 255, 0.18);
-      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
+      background: var(--panel-h);
       color: var(--text);
+      box-shadow: 3px 3px 0 #1a1a1a;
     }
 
     input[type="file"] { display: none; }
@@ -76,6 +85,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      font-style: italic;
     }
 
     #stage {
@@ -106,7 +116,8 @@
       display: block;
       margin: 0 auto;
       background: #fff;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      border: 2px solid var(--border);
+      box-shadow: 6px 6px 0 #1a1a1a;
     }
 
     /* Text viewer */
@@ -129,58 +140,67 @@
       gap: 10px;
       padding: 12px 14px max(env(safe-area-inset-bottom), 14px);
       background: var(--panel);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(12px);
+      border-top: 2px solid var(--border);
     }
 
     .controls button {
       flex: 1;
       padding: 13px 16px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.04);
+      border: 2px solid var(--border);
+      background: var(--panel-h);
       color: var(--text);
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
+      font-family: inherit;
+      box-shadow: 3px 3px 0 #1a1a1a;
+      transition: transform .1s, box-shadow .1s, border-color .15s;
+    }
+    .controls button:active {
+      transform: translate(3px, 3px);
+      box-shadow: 0 0 0;
+      border-color: var(--accent);
     }
 
-    .controls button:active { transform: scale(0.98); border-color: var(--accent); }
-
     #zoom-in, #zoom-out { flex: 0 0 60px; }
+
+    /* Close Sigil */
+    .close-sigil {
+      position: fixed;
+      top: max(env(safe-area-inset-top), 15px);
+      right: 15px;
+      z-index: 9999;
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: 0;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: var(--text);
+      box-shadow: 3px 3px 0 #1a1a1a;
+      transition: transform .1s, box-shadow .1s, border-color .15s;
+    }
+    .close-sigil:hover {
+      border-color: #ef4444;
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 rgba(239, 68, 68, 0.3);
+    }
+    .close-sigil:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0 0 0;
+    }
+    .close-sigil svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; }
   </style>
 </head>
 <body>
-<!-- THE CLOSE SIGIL (Paste after <body>) -->
-<style>
-  .close-sigil {
-    position: fixed;
-    top: max(env(safe-area-inset-top), 15px);
-    right: 15px;
-    z-index: 9999;
-    background: rgba(26, 29, 36, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: #e2e8f0;
-    border: 1px solid #2a2e39;
-    border-radius: 50%;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    transition: all 0.2s ease;
-  }
-  .close-sigil:hover { background: rgba(255, 80, 80, 0.2); border-color: rgba(255, 80, 80, 0.4); transform: scale(1.05); }
-  .close-sigil svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; }
-</style>
 
 <a href="index.html" class="close-sigil" title="Return to Gate">
   <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
 </a>
-<!-- END OF CLOSE SIGIL -->
+
   <div class="toolbar">
     <label class="file-button" for="file">Open Book</label>
     <input id="file" type="file" accept=".epub,.pdf,.txt,.md,application/epub+zip,application/pdf,text/plain" />
@@ -317,7 +337,7 @@
 
         rendition.themes.register("dark-serif", {
           "body": {
-            "background": "#05070f !important",
+            "background": "#000000 !important",
             "color": "#e5edff !important",
             "font-family": "Georgia, 'Times New Roman', serif !important",
             "line-height": "1.6 !important",
@@ -327,7 +347,7 @@
             "color": "#e5edff !important",
             "font-family": "Georgia, 'Times New Roman', serif !important"
           },
-          "a": { "color": "#66e0ff !important" }
+          "a": { "color": "#6366f1 !important" }
         });
         rendition.themes.select("dark-serif");
 
