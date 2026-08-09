@@ -4,244 +4,136 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Media Hub</title>
-
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-180.png?v=2" />
-
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Media Hub" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#000000" />
-
   <style>
-    :root {
-      --bg: #000000;
-      --panel: #101010;
-      --panel-h: #1a1a1a;
-      --border: #333333;
-      --text: #f5f5f5;
-      --muted: #9a9a9a;
-      --accent: #6366f1;
-      --accent-glow: rgba(99, 102, 241, 0.25);
+    :root{
+      --bg:#000;--panel:#0e0e14;--panel-h:#16161f;--border:#2a2a38;
+      --text:#e8e8ef;--muted:#9a9ab0;
+      --blue:#6366f1;--purple:#a855f7;--grey:#c7c7d6;
+      --grad:linear-gradient(135deg,#6366f1,#a855f7);
+      --glow:rgba(99,102,241,.28);--glow2:rgba(168,85,247,.28);
+      --mono:'Cascadia Mono','Cascadia Code',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
-    body {
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Georgia, 'Times New Roman', serif;
-      overflow: hidden;
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--text);font-family:Georgia,'Times New Roman',serif;overflow:hidden}
 
-    /* Close Sigil */
-    .close-sigil {
-      position: fixed;
-      top: max(env(safe-area-inset-top), 15px);
-      right: 15px;
-      z-index: 9999;
-      background: var(--panel);
-      border: 2px solid var(--border);
-      width: 44px; height: 44px;
-      display: flex; align-items: center; justify-content: center;
-      text-decoration: none; color: var(--text);
-      box-shadow: 3px 3px 0 #1a1a1a;
-      transition: transform .1s, box-shadow .1s, border-color .15s;
-    }
-    .close-sigil:hover { border-color: #ef4444; transform: translate(-2px,-2px); box-shadow: 5px 5px 0 rgba(239,68,68,.3); }
-    .close-sigil:active { transform: translate(2px,2px); box-shadow: 0 0 0; }
-    .close-sigil svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2.5; fill: none; stroke-linecap: round; }
+    /* Hamburger + Drawer */
+    .hamburger{position:fixed;top:max(env(safe-area-inset-top),12px);left:16px;z-index:200;width:42px;height:42px;background:var(--panel);border:2px solid var(--border);box-shadow:3px 3px 0 #14141c;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--grey);font-size:1.2rem;font-family:var(--mono);transition:transform .1s,box-shadow .1s,border-color .15s}
+    .hamburger:active{transform:translate(3px,3px);box-shadow:0 0 0}
+    .hamburger:hover{border-color:var(--blue);color:var(--text)}
+    .close-sigil{position:fixed;top:max(env(safe-area-inset-top),12px);right:16px;z-index:200;width:42px;height:42px;background:var(--panel);border:2px solid var(--border);box-shadow:3px 3px 0 #14141c;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--grey);font-size:1.1rem;font-family:var(--mono);transition:transform .1s,box-shadow .1s,border-color .15s}
+    .close-sigil:active{transform:translate(3px,3px);box-shadow:0 0 0}
+    .close-sigil:hover{border-color:#ef4444;color:#ef4444}
+    .dov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;opacity:0;pointer-events:none;transition:opacity .25s}
+    .dov.active{opacity:1;pointer-events:auto}
+    .drawer{position:fixed;top:0;left:-280px;width:272px;height:100%;background:var(--panel);border-right:2px solid var(--border);z-index:301;transition:left .25s;padding:max(env(safe-area-inset-top),20px) 0 20px;overflow-y:auto}
+    .drawer.active{left:0}
+    .dt{padding:0 20px 16px;font-size:1.05rem;font-weight:800;letter-spacing:2px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;border-bottom:2px solid var(--border);margin-bottom:8px;font-family:var(--mono)}
+    .di{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:background .15s,color .15s;font-size:.95rem;font-weight:700;color:var(--dim);border-left:3px solid transparent;font-family:inherit;background:none;border-top:none;border-right:none;border-bottom:none;width:100%;text-align:left}
+    .di:hover{background:var(--panel-h);color:var(--text)}
+    .di.active{background:var(--panel-h);color:var(--blue);border-left-color:var(--blue)}
+    .di-i{width:24px;height:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .di-i svg{width:100%;height:100%}
+    .drawer-foot{margin-top:auto;padding:16px 20px 0;border-top:2px solid var(--border);font-size:.72rem;color:var(--muted);font-style:italic;line-height:1.5;font-family:var(--mono)}
 
-    /* Mode Tabs */
-    .mode-tabs {
-      display: flex;
-      padding: max(env(safe-area-inset-top), 12px) 14px 0;
-      gap: 8px;
-      background: var(--panel);
-      border-bottom: 2px solid var(--border);
-    }
-    .mode-tab {
-      flex: 1;
-      padding: 11px 14px;
-      border: 2px solid var(--border);
-      background: var(--panel-h);
-      color: var(--muted);
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      font-family: inherit;
-      text-align: center;
-      box-shadow: 3px 3px 0 #1a1a1a;
-      transition: transform .1s, box-shadow .1s, border-color .15s, color .15s;
-    }
-    .mode-tab:active { transform: translate(3px,3px); box-shadow: 0 0 0; }
-    .mode-tab.active {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
-      box-shadow: 3px 3px 0 var(--accent-glow);
-    }
+    .toolbar{display:flex;gap:10px;align-items:center;padding:12px 14px;padding-left:64px;padding-right:64px;background:var(--panel);border-bottom:2px solid var(--border);flex-wrap:wrap}
+    .file-button,.tool-button{display:inline-block;padding:11px 14px;border:2px solid var(--accent,var(--blue));background:var(--blue);color:#fff;font-weight:700;cursor:pointer;user-select:none;white-space:nowrap;font-size:.9rem;font-family:var(--mono);letter-spacing:1px;box-shadow:3px 3px 0 var(--glow);transition:transform .1s,box-shadow .1s}
+    .file-button:active,.tool-button:active{transform:translate(3px,3px);box-shadow:0 0 0}
+    .tool-button{border-color:var(--border);background:var(--panel-h);color:var(--text);box-shadow:3px 3px 0 #14141c}
+    .tool-button.on{border-color:var(--blue);background:var(--blue);color:#fff;box-shadow:3px 3px 0 var(--glow)}
+    input[type="file"].hidden-input{display:none}
+    #status,#wstatus{flex:1;min-width:120px;color:var(--muted);font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:italic;font-family:var(--mono)}
 
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      padding: 12px 14px;
-      background: var(--panel);
-      border-bottom: 2px solid var(--border);
-      flex-wrap: wrap;
-    }
-    .file-button, .tool-button {
-      display: inline-block;
-      padding: 11px 14px;
-      border: 2px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      font-weight: 700;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
-      font-size: 0.95rem;
-      font-family: inherit;
-      box-shadow: 3px 3px 0 var(--accent-glow);
-      transition: transform .1s, box-shadow .1s;
-    }
-    .file-button:active, .tool-button:active { transform: translate(3px,3px); box-shadow: 0 0 0; }
-    .tool-button {
-      border-color: var(--border);
-      background: var(--panel-h);
-      color: var(--text);
-      box-shadow: 3px 3px 0 #1a1a1a;
-    }
-    input[type="file"].hidden-input { display: none; }
-    #status {
-      flex: 1;
-      min-width: 120px;
-      color: var(--muted);
-      font-size: 0.92rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      font-style: italic;
-    }
+    #stage,#stage-read{position:relative;flex:1;overflow:hidden;background:#000;display:flex;align-items:center;justify-content:center}
 
-    #stage {
-      position: relative;
-      flex: 1;
-      overflow: hidden;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+    #viewer{width:100%;height:100%;transition:opacity .2s ease-in-out;opacity:1}
+    #viewer iframe{border:0;background:transparent}
+    #pdf-viewer{width:100%;height:100%;overflow:auto;padding:12px;display:none}
+    #pdf-canvas{display:block;margin:0 auto;background:#fff;border:2px solid var(--border);box-shadow:6px 6px 0 #14141c}
+    #text-viewer{width:100%;height:100%;overflow:auto;padding:28px 24px 60px;font-family:Georgia,'Times New Roman',serif;color:#e5edff;line-height:1.75;font-size:1.06rem;white-space:pre-wrap;word-wrap:break-word;display:none}
 
-    /* READ mode viewers */
-    #viewer { width: 100%; height: 100%; transition: opacity 0.2s ease-in-out; opacity: 1; }
-    #viewer iframe { border: 0; background: transparent; }
-    #pdf-viewer { width: 100%; height: 100%; overflow: auto; padding: 12px; display: none; }
-    #pdf-canvas { display: block; margin: 0 auto; background: #fff; border: 2px solid var(--border); box-shadow: 6px 6px 0 #1a1a1a; }
-    #text-viewer {
-      width: 100%; height: 100%; overflow: auto; padding: 28px 24px 60px;
-      font-family: Georgia, 'Times New Roman', serif; color: #e5edff;
-      line-height: 1.75; font-size: 1.06rem; white-space: pre-wrap; word-wrap: break-word; display: none;
-    }
+    #player{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;display:none}
+    #audioOverlay{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(circle at center,#14141f,#000);pointer-events:none;padding:20px;text-align:center}
+    #audioOverlay.visible{display:flex}
+    .overlay-glyph{width:80px;height:80px;border:3px solid var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px var(--glow)}
+    .overlay-glyph svg{width:42px;height:42px}
+    .overlay-title{color:var(--text);font-size:1.05rem;font-weight:600;max-width:90%;word-wrap:break-word;font-family:var(--mono)}
 
-    /* WATCH mode */
-    #player { max-width: 100%; max-height: 100%; width: 100%; height: 100%; object-fit: contain; display: none; }
-    #audioOverlay {
-      position: absolute; inset: 0; display: none; flex-direction: column;
-      align-items: center; justify-content: center; gap: 16px;
-      background: radial-gradient(circle at center, #14141f, #000);
-      pointer-events: none; padding: 20px; text-align: center;
-    }
-    #audioOverlay.visible { display: flex; }
-    .overlay-icon { font-size: 3rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
-    .overlay-title { color: var(--text); font-size: 1.1rem; font-weight: 600; max-width: 90%; word-wrap: break-word; }
+    .info-row{padding:10px 16px 4px;background:var(--panel);display:none}
+    #trackTitle{font-weight:600;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+    .seek-row{display:none;align-items:center;gap:10px;padding:6px 16px 10px;background:var(--panel)}
+    .seek-row span{font-size:.76rem;color:var(--muted);min-width:42px;text-align:center;font-variant-numeric:tabular-nums;font-family:var(--mono)}
+    input[type="range"]{-webkit-appearance:none;appearance:none;flex:1;height:5px;background:rgba(255,255,255,.15);outline:none}
+    input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;background:var(--blue);cursor:pointer}
 
-    /* Watch info + seek */
-    .info-row { padding: 10px 16px 4px; background: var(--panel); display: none; }
-    #trackTitle { font-weight: 600; font-size: 0.98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .seek-row { display: none; align-items: center; gap: 10px; padding: 6px 16px 10px; background: var(--panel); }
-    .seek-row span { font-size: 0.8rem; color: var(--muted); min-width: 42px; text-align: center; font-variant-numeric: tabular-nums; }
-    input[type="range"] {
-      -webkit-appearance: none; appearance: none; flex: 1; height: 5px;
-      background: rgba(255,255,255,0.15); outline: none;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
-      background: var(--accent); cursor: pointer;
-    }
+    .controls{display:none;gap:8px;padding:6px 16px;background:var(--panel)}
+    .controls.secondary{padding-top:0}
+    .ctrl{flex:1;padding:12px 0;border:2px solid var(--border);background:var(--panel-h);color:var(--text);font-size:.82rem;cursor:pointer;font-family:var(--mono);font-weight:700;letter-spacing:1px;box-shadow:3px 3px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,color .15s,background .15s}
+    .ctrl:active{transform:translate(3px,3px);box-shadow:0 0 0}
+    .ctrl.main{font-size:1rem;border-color:var(--blue);background:var(--grad);color:#fff;box-shadow:3px 3px 0 var(--glow)}
+    .ctrl svg{width:18px;height:18px;vertical-align:middle}
+    .ctrl.on{background:var(--blue);border-color:var(--blue);color:#fff}
+    .volume-row{display:none;align-items:center;gap:12px;padding:8px 16px 12px;background:var(--panel);border-bottom:2px solid var(--border)}
+    .volume-row span{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
 
-    /* Controls */
-    .controls { display: none; gap: 8px; padding: 6px 16px; background: var(--panel); }
-    .controls.secondary { padding-top: 0; }
-    .ctrl {
-      flex: 1; padding: 12px 0; border: 2px solid var(--border);
-      background: var(--panel-h); color: var(--text); font-size: 1rem;
-      cursor: pointer; font-family: inherit; font-weight: 700;
-      box-shadow: 3px 3px 0 #1a1a1a;
-      transition: transform .1s, box-shadow .1s, border-color .15s, color .15s, background .15s;
-    }
-    .ctrl:active { transform: translate(3px,3px); box-shadow: 0 0 0; }
-    .ctrl.main { font-size: 1.4rem; border-color: var(--accent); }
-    .ctrl.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-    .volume-row { display: none; align-items: center; gap: 12px; padding: 8px 16px 12px; background: var(--panel); border-bottom: 2px solid var(--border); }
-    .volume-row span { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .read-controls{display:none;gap:10px;padding:12px 14px max(env(safe-area-inset-bottom),14px);background:var(--panel);border-top:2px solid var(--border)}
+    .read-controls button{flex:1;padding:13px 16px;border:2px solid var(--border);background:var(--panel-h);color:var(--text);font-size:.85rem;font-weight:700;cursor:pointer;font-family:var(--mono);letter-spacing:1px;box-shadow:3px 3px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s}
+    .read-controls button:active{transform:translate(3px,3px);box-shadow:0 0 0;border-color:var(--blue)}
+    #zoom-in,#zoom-out{flex:0 0 60px}
 
-    /* Read controls */
-    .read-controls { display: none; gap: 10px; padding: 12px 14px max(env(safe-area-inset-bottom), 14px); background: var(--panel); border-top: 2px solid var(--border); }
-    .read-controls button {
-      flex: 1; padding: 13px 16px; border: 2px solid var(--border);
-      background: var(--panel-h); color: var(--text); font-size: 1rem; font-weight: 700;
-      cursor: pointer; font-family: inherit; box-shadow: 3px 3px 0 #1a1a1a;
-      transition: transform .1s, box-shadow .1s, border-color .15s;
-    }
-    .read-controls button:active { transform: translate(3px,3px); box-shadow: 0 0 0; border-color: var(--accent); }
-    #zoom-in, #zoom-out { flex: 0 0 60px; }
-
-    /* Playlist */
-    #playlist { max-height: 160px; overflow-y: auto; background: #0a0a0a; display: none; }
-    .pl-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #1f1f1f; cursor: pointer; }
-    .pl-item.active { background: var(--accent-glow); }
-    .pl-tag { font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border: 1px solid var(--border); color: var(--muted); }
-    .pl-item.active .pl-tag { border-color: var(--accent); color: var(--accent); }
-    .pl-name { flex: 1; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pl-item.active .pl-name { color: var(--accent); font-weight: 600; }
-    .pl-remove { background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 4px 8px; font-family: inherit; }
-    .pl-remove:hover { color: #ef4444; }
-    .pl-empty { text-align: center; color: var(--muted); padding: 24px 16px; font-size: 0.9rem; font-style: italic; }
+    #playlist{max-height:160px;overflow-y:auto;background:#0a0a0a;display:none}
+    .pl-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid #1f1f1f;cursor:pointer}
+    .pl-item.active{background:var(--glow)}
+    .pl-tag{font-size:.62rem;font-weight:700;padding:2px 6px;border:1px solid var(--border);color:var(--muted);font-family:var(--mono)}
+    .pl-item.active .pl-tag{border-color:var(--blue);color:var(--blue)}
+    .pl-name{flex:1;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono)}
+    .pl-item.active .pl-name{color:var(--blue);font-weight:600}
+    .pl-remove{background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer;padding:4px 8px;font-family:var(--mono)}
+    .pl-remove:hover{color:#ef4444}
+    .pl-empty{text-align:center;color:var(--muted);padding:24px 16px;font-size:.86rem;font-style:italic}
   </style>
 </head>
 <body>
 
-<a href="index.html" class="close-sigil" title="Return to Gate">
-  <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-</a>
+<!-- SVG defs (shared gradients) -->
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient>
+</defs></svg>
 
-  <div class="mode-tabs">
-    <button class="mode-tab active" id="tab-read" type="button">Read</button>
-    <button class="mode-tab" id="tab-watch" type="button">Watch / Listen</button>
-  </div>
+<div class="hamburger" onclick="toggleDrawer()">≡</div>
+<a href="index.html" class="close-sigil" title="Return to Gate">✕</a>
+
+<div class="dov" id="dov" onclick="toggleDrawer()"></div>
+<nav class="drawer" id="drawer">
+  <div class="dt">☯ MEDIA HUB</div>
+  <button class="di active" id="nav-read" type="button"><span class="di-i"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg></span>Read</button>
+  <button class="di" id="nav-watch" type="button"><span class="di-i"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="10,8 16,12 10,16" fill="url(#gi)" stroke="none"/></svg></span>Watch / Listen</button>
+  <div class="drawer-foot">EPUB · PDF · TXT<br>Audio · Video · Subtitles<br>Progress autosaves per file.</div>
+</nav>
 
   <!-- ===== READ MODE ===== -->
-  <div id="read-mode">
+  <div id="read-mode" style="display:flex;flex:1;flex-direction:column;min-height:0">
     <div class="toolbar">
-      <label class="file-button" for="readFile">Open Book</label>
+      <label class="file-button" for="readFile">OPEN BOOK</label>
       <input id="readFile" class="hidden-input" type="file" accept=".epub,.pdf,.txt,.md,application/epub+zip,application/pdf,text/plain" />
-      <button id="spreadButton" class="tool-button" type="button">Spread: Double</button>
+      <button id="spreadButton" class="tool-button" type="button">SPREAD: DOUBLE</button>
       <div id="status">No book loaded</div>
     </div>
-    <div id="stage-read" style="position:relative;flex:1;overflow:hidden;background:#000;display:flex">
+    <div id="stage-read">
       <div id="viewer" style="flex:1"></div>
       <div id="pdf-viewer"><canvas id="pdf-canvas"></canvas></div>
       <div id="text-viewer"></div>
     </div>
     <div class="read-controls" id="read-controls">
       <button id="zoom-out" type="button" style="display:none;">−</button>
-      <button id="prev" type="button">← Prev</button>
-      <button id="next" type="button">Next →</button>
+      <button id="prev" type="button">← PREV</button>
+      <button id="next" type="button">NEXT →</button>
       <button id="zoom-in" type="button" style="display:none;">+</button>
     </div>
   </div>
@@ -249,7 +141,7 @@
   <!-- ===== WATCH MODE ===== -->
   <div id="watch-mode" style="display:none;flex:1;flex-direction:column;min-height:0">
     <div class="toolbar">
-      <label class="file-button" for="file">Add Media</label>
+      <label class="file-button" for="file">ADD MEDIA</label>
       <input id="file" class="hidden-input" type="file" accept="audio/*,video/*" multiple />
       <input id="subFile" class="hidden-input" type="file" accept=".vtt,.srt" />
       <button id="ccBtnTop" class="tool-button" type="button">CC</button>
@@ -258,7 +150,7 @@
     <div id="stage">
       <video id="player" playsinline webkit-playsinline></video>
       <div id="audioOverlay">
-        <div class="overlay-icon">♪</div>
+        <div class="overlay-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3" fill="url(#gi)" stroke="none"/><circle cx="18" cy="16" r="3" fill="url(#gi)" stroke="none"/></svg></div>
         <div class="overlay-title" id="overlayTitle"></div>
       </div>
     </div>
@@ -269,16 +161,16 @@
       <span id="duration">0:00</span>
     </div>
     <div class="controls" id="controls-main">
-      <button id="prevBtn" class="ctrl">⏮</button>
-      <button id="back10" class="ctrl">−10</button>
-      <button id="playBtn" class="ctrl main">▶</button>
-      <button id="fwd10" class="ctrl">+10</button>
-      <button id="nextBtn" class="ctrl">⏭</button>
+      <button id="prevBtn" class="ctrl" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+      <button id="back10" class="ctrl" type="button">−10</button>
+      <button id="playBtn" class="ctrl main" type="button"><svg id="playIco" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+      <button id="fwd10" class="ctrl" type="button">+10</button>
+      <button id="nextBtn" class="ctrl" type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zm-2.5 6L5 6v12z"/></svg></button>
     </div>
     <div class="controls secondary" id="controls-sec">
-      <button id="shuffleBtn" class="ctrl">Shuffle</button>
-      <button id="muteBtn" class="ctrl">Mute</button>
-      <button id="loopBtn" class="ctrl">Loop</button>
+      <button id="shuffleBtn" class="ctrl" type="button">SHUFFLE</button>
+      <button id="muteBtn" class="ctrl" type="button">MUTE</button>
+      <button id="loopBtn" class="ctrl" type="button">LOOP</button>
     </div>
     <div class="volume-row" id="volume-row">
       <span>Vol</span>
@@ -287,341 +179,169 @@
     <div id="playlist"><div class="pl-empty">Add audio or video files to build your queue.</div></div>
   </div>
 
-  <!-- Spirit Engines (Read) -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <script>
-    // ===================== MODE SWITCHING =====================
-    const tabRead = document.getElementById('tab-read');
-    const tabWatch = document.getElementById('tab-watch');
-    const readMode = document.getElementById('read-mode');
-    const watchMode = document.getElementById('watch-mode');
-    let currentMode = 'read';
+    // ===================== DRAWER + MODE SWITCH =====================
+    const drawer=document.getElementById('drawer');
+    const dov=document.getElementById('dov');
+    const navRead=document.getElementById('nav-read');
+    const navWatch=document.getElementById('nav-watch');
+    const readMode=document.getElementById('read-mode');
+    const watchMode=document.getElementById('watch-mode');
+    let currentMode='read';
 
-    function setMode(mode) {
-      currentMode = mode;
-      const isRead = mode === 'read';
-      tabRead.classList.toggle('active', isRead);
-      tabWatch.classList.toggle('active', !isRead);
-      readMode.style.display = isRead ? 'flex' : 'none';
-      readMode.style.flexDirection = 'column';
-      readMode.style.minHeight = '0';
-      readMode.style.flex = isRead ? '1' : 'none';
-      watchMode.style.display = isRead ? 'none' : 'flex';
-      if (!isRead && rendition) { try { rendition.resize(); } catch(e){} }
-      if (!isRead && pdfDoc) renderPdfPage();
+    function toggleDrawer(){drawer.classList.toggle('active');dov.classList.toggle('active');}
+    function setMode(mode){
+      currentMode=mode;
+      const isRead=mode==='read';
+      navRead.classList.toggle('active',isRead);
+      navWatch.classList.toggle('active',!isRead);
+      readMode.style.display=isRead?'flex':'none';
+      watchMode.style.display=isRead?'none':'flex';
+      toggleDrawer();
+      if(!isRead&&rendition){try{rendition.resize();}catch(e){}}
+      if(!isRead&&pdfDoc)renderPdfPage();
     }
-    tabRead.addEventListener('click', () => setMode('read'));
-    tabWatch.addEventListener('click', () => setMode('watch'));
-    setMode('read');
+    navRead.addEventListener('click',()=>setMode('read'));
+    navWatch.addEventListener('click',()=>setMode('watch'));
 
     // ===================== READ ENGINE =====================
-    if (typeof pdfjsLib !== 'undefined') {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    }
-    const readFileInput = document.getElementById("readFile");
-    const status = document.getElementById("status");
-    const prevButton = document.getElementById("prev");
-    const nextButton = document.getElementById("next");
-    const spreadButton = document.getElementById("spreadButton");
-    const zoomIn = document.getElementById("zoom-in");
-    const zoomOut = document.getElementById("zoom-out");
-    const viewer = document.getElementById("viewer");
-    const pdfViewerEl = document.getElementById("pdf-viewer");
-    const textViewerEl = document.getElementById("text-viewer");
-    const pdfCanvas = document.getElementById("pdf-canvas");
-    const readControls = document.getElementById("read-controls");
+    if(typeof pdfjsLib!=='undefined'){pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';}
+    const readFileInput=document.getElementById("readFile");
+    const status=document.getElementById("status");
+    const prevButton=document.getElementById("prev");
+    const nextButton=document.getElementById("next");
+    const spreadButton=document.getElementById("spreadButton");
+    const zoomIn=document.getElementById("zoom-in");
+    const zoomOut=document.getElementById("zoom-out");
+    const viewer=document.getElementById("viewer");
+    const pdfViewerEl=document.getElementById("pdf-viewer");
+    const textViewerEl=document.getElementById("text-viewer");
+    const pdfCanvas=document.getElementById("pdf-canvas");
+    const readControls=document.getElementById("read-controls");
 
-    let currentType = null, currentFileName = "", currentBuffer = null;
-    let book = null, rendition = null, animating = false;
-    let spreadMode = localStorage.getItem("epub-spread-mode") || "double";
-    let pdfDoc = null, pdfPage = 1, pdfNumPages = 0, pdfZoom = 1, pdfRenderTask = null;
-    let textScrollTimer = null;
+    let currentType=null,currentFileName="",currentBuffer=null;
+    let book=null,rendition=null,animating=false;
+    let spreadMode=localStorage.getItem("epub-spread-mode")||"double";
+    let pdfDoc=null,pdfPage=1,pdfNumPages=0,pdfZoom=1,pdfRenderTask=null;
+    let textScrollTimer=null;
 
-    function updateSpreadButton() { spreadButton.textContent = spreadMode === "double" ? "Spread: Double" : "Spread: Single"; }
+    function updateSpreadButton(){spreadButton.textContent=spreadMode==="double"?"SPREAD: DOUBLE":"SPREAD: SINGLE";}
     updateSpreadButton();
 
-    function getFileType(filename) {
-      const ext = filename.split('.').pop().toLowerCase();
-      if (ext === 'epub') return 'epub';
-      if (ext === 'pdf') return 'pdf';
-      if (['txt','md','text','markdown'].includes(ext)) return 'text';
-      return 'unknown';
-    }
-    function showViewer(type) {
-      viewer.style.display = type === 'epub' ? 'block' : 'none';
-      pdfViewerEl.style.display = type === 'pdf' ? 'block' : 'none';
-      textViewerEl.style.display = type === 'text' ? 'block' : 'none';
-      if (type === 'epub') viewer.style.opacity = '1';
-    }
-    function setControlsForType(type) {
-      const isEpub = type === 'epub', isPdf = type === 'pdf';
-      readControls.style.display = (isEpub || isPdf || type === 'text') ? 'flex' : 'none';
-      spreadButton.style.display = isEpub ? 'inline-block' : 'none';
-      prevButton.style.display = (isEpub || isPdf) ? 'block' : 'none';
-      nextButton.style.display = (isEpub || isPdf) ? 'block' : 'none';
-      zoomIn.style.display = isPdf ? 'block' : 'none';
-      zoomOut.style.display = isPdf ? 'block' : 'none';
-    }
-    async function openBook() {
-      currentType = getFileType(currentFileName);
-      if (currentType === 'epub') await openEpub();
-      else if (currentType === 'pdf') await openPdf();
-      else if (currentType === 'text') await openText();
-      else { showViewer('none'); readControls.style.display='none'; status.textContent = 'Unsupported file. Use EPUB, PDF, or TXT.'; }
-    }
-    async function openEpub() {
-      showViewer('epub'); setControlsForType('epub'); status.textContent = 'Opening...';
-      try {
-        if (rendition) { try { rendition.destroy(); } catch(e){} rendition = null; }
-        if (book) { try { book.destroy(); } catch(e){} book = null; }
-        book = ePub(currentBuffer.slice(0));
-        rendition = book.renderTo("viewer", { width:"100%", height:"100%", flow:"paginated", spread: spreadMode==="double"?"always":"none", minSpreadWidth:0 });
-        rendition.themes.register("dark-serif", {
-          "body": { "background":"#000 !important","color":"#e5edff !important","font-family":"Georgia,'Times New Roman',serif !important","line-height":"1.6 !important","padding":"20px !important" },
-          "p,div,span,li,h1,h2,h3,h4,h5,h6": { "color":"#e5edff !important","font-family":"Georgia,'Times New Roman',serif !important" },
-          "a": { "color":"#6366f1 !important" }
-        });
-        rendition.themes.select("dark-serif");
-        rendition.on('rendered', () => { viewer.style.opacity='1'; animating=false; });
-        rendition.on('relocated', (loc) => { if (loc && loc.start && loc.start.cfi) localStorage.setItem(`epub-progress-${currentFileName}`, loc.start.cfi); });
-        await rendition.display();
-        const saved = localStorage.getItem(`epub-progress-${currentFileName}`);
-        if (saved) { try { await rendition.display(saved); } catch(e){ console.warn(e); } }
-        status.textContent = currentFileName;
-      } catch (err) { console.error(err); status.textContent = 'Error: ' + (err.message||err.name||'Could not open EPUB'); }
-    }
-    async function turn(direction) {
-      if (!rendition || animating) return;
-      animating = true; viewer.style.opacity = '0';
-      await new Promise(r => setTimeout(r, 200));
-      if (direction === "next") await rendition.next(); else await rendition.prev();
-    }
-    async function openPdf() {
-      showViewer('pdf'); setControlsForType('pdf'); status.textContent = 'Opening PDF...';
-      try {
-        pdfDoc = await pdfjsLib.getDocument({ data: new Uint8Array(currentBuffer) }).promise;
-        pdfNumPages = pdfDoc.numPages; pdfPage = 1; pdfZoom = 1;
-        const saved = localStorage.getItem(`pdf-page-${currentFileName}`);
-        if (saved) { const p = parseInt(saved); if (p>=1 && p<=pdfNumPages) pdfPage = p; }
-        await renderPdfPage();
-      } catch (err) { console.error(err); status.textContent = 'Error: Could not open PDF'; }
-    }
-    async function renderPdfPage() {
-      if (!pdfDoc) return;
-      try {
-        if (pdfRenderTask) { try { pdfRenderTask.cancel(); } catch(e){} }
-        const page = await pdfDoc.getPage(pdfPage);
-        const containerWidth = pdfViewerEl.clientWidth - 24;
-        const baseViewport = page.getViewport({ scale: 1 });
-        const scale = (containerWidth / baseViewport.width) * pdfZoom;
-        const viewport = page.getViewport({ scale: scale });
-        pdfCanvas.width = viewport.width; pdfCanvas.height = viewport.height;
-        pdfRenderTask = page.render({ canvasContext: pdfCanvas.getContext('2d'), viewport: viewport });
-        await pdfRenderTask.promise; pdfRenderTask = null;
-        localStorage.setItem(`pdf-page-${currentFileName}`, pdfPage);
-        status.textContent = `${currentFileName} — Page ${pdfPage} / ${pdfNumPages}`;
-      } catch (e) { if (e && e.name !== 'RenderingCancelledException') console.error(e); }
-    }
-    async function openText() {
-      showViewer('text'); setControlsForType('text'); status.textContent = 'Opening...';
-      try {
-        textViewerEl.textContent = new TextDecoder().decode(currentBuffer);
-        const saved = localStorage.getItem(`txt-scroll-${currentFileName}`);
-        requestAnimationFrame(() => { if (saved) textViewerEl.scrollTop = parseInt(saved); });
-        status.textContent = `${currentFileName} — Scroll to read`;
-      } catch (err) { console.error(err); status.textContent = 'Error: Could not open text file'; }
-    }
-    textViewerEl.addEventListener('scroll', () => {
-      if (currentType !== 'text') return;
-      clearTimeout(textScrollTimer);
-      textScrollTimer = setTimeout(() => localStorage.setItem(`txt-scroll-${currentFileName}`, textViewerEl.scrollTop), 300);
-    });
-    readFileInput.addEventListener("change", async function () {
-      const f = readFileInput.files[0]; if (!f) return;
-      currentFileName = f.name; currentBuffer = await f.arrayBuffer(); await openBook();
-    });
-    spreadButton.addEventListener("click", async function () {
-      if (currentType !== 'epub') return;
-      spreadMode = spreadMode === "double" ? "single" : "double";
-      localStorage.setItem("epub-spread-mode", spreadMode); updateSpreadButton(); await openEpub();
-    });
-    zoomIn.addEventListener("click", () => { if (currentType==='pdf'){ pdfZoom=Math.min(pdfZoom+0.25,4); renderPdfPage(); } });
-    zoomOut.addEventListener("click", () => { if (currentType==='pdf'){ pdfZoom=Math.max(pdfZoom-0.25,0.5); renderPdfPage(); } });
-    function goPrev(){ if(currentType==='epub')turn('prev'); else if(currentType==='pdf'&&pdfPage>1){pdfPage--;renderPdfPage();} }
-    function goNext(){ if(currentType==='epub')turn('next'); else if(currentType==='pdf'&&pdfPage<pdfNumPages){pdfPage++;renderPdfPage();} }
-    prevButton.addEventListener("click", goPrev);
-    nextButton.addEventListener("click", goNext);
-    document.addEventListener("keydown", function (e) {
-      if (currentMode !== 'read' || animating) return;
-      if (e.key === "ArrowLeft") goPrev();
-      if (e.key === "ArrowRight") goNext();
-    });
-    let rPointerDown=false, rStartX=0, rLastX=0, rSwipe=null;
-    const stageRead = document.getElementById('stage-read');
-    stageRead.addEventListener("pointerdown", function(e){ if(currentType==='text'||animating)return; rPointerDown=true; rStartX=rLastX=e.clientX; rSwipe=null; });
-    window.addEventListener("pointermove", function(e){ if(!rPointerDown||animating)return; rLastX=e.clientX; const dx=rLastX-rStartX; if(rSwipe===null&&Math.abs(dx)>8)rSwipe=true; });
-    window.addEventListener("pointerup", function(){ if(!rPointerDown)return; rPointerDown=false; if(currentType==='text')return; const dx=rLastX-rStartX; if(rSwipe&&Math.abs(dx)>55){ if(dx<0)goNext();else goPrev(); } rSwipe=null; });
-    window.addEventListener("resize", function(){ if(currentMode==='read'){ if(currentType==='epub'&&rendition)rendition.resize(); if(currentType==='pdf')renderPdfPage(); } });
+    function getFileType(filename){const ext=filename.split('.').pop().toLowerCase();if(ext==='epub')return'epub';if(ext==='pdf')return'pdf';if(['txt','md','text','markdown'].includes(ext))return'text';return'unknown';}
+    function showViewer(type){viewer.style.display=type==='epub'?'block':'none';pdfViewerEl.style.display=type==='pdf'?'block':'none';textViewerEl.style.display=type==='text'?'block':'none';if(type==='epub')viewer.style.opacity='1';}
+    function setControlsForType(type){const isEpub=type==='epub',isPdf=type==='pdf';readControls.style.display=(isEpub||isPdf||type==='text')?'flex':'none';spreadButton.style.display=isEpub?'inline-block':'none';prevButton.style.display=(isEpub||isPdf)?'block':'none';nextButton.style.display=(isEpub||isPdf)?'block':'none';zoomIn.style.display=isPdf?'block':'none';zoomOut.style.display=isPdf?'block':'none';}
+    async function openBook(){currentType=getFileType(currentFileName);if(currentType==='epub')await openEpub();else if(currentType==='pdf')await openPdf();else if(currentType==='text')await openText();else{showViewer('none');readControls.style.display='none';status.textContent='Unsupported file. Use EPUB, PDF, or TXT.';}}
+    async function openEpub(){showViewer('epub');setControlsForType('epub');status.textContent='Opening...';try{if(rendition){try{rendition.destroy();}catch(e){}rendition=null;}if(book){try{book.destroy();}catch(e){}book=null;}book=ePub(currentBuffer.slice(0));rendition=book.renderTo("viewer",{width:"100%",height:"100%",flow:"paginated",spread:spreadMode==="double"?"always":"none",minSpreadWidth:0});rendition.themes.register("dark-serif",{"body":{"background":"#000 !important","color":"#e5edff !important","font-family":"Georgia,'Times New Roman',serif !important","line-height":"1.6 !important","padding":"20px !important"},"p,div,span,li,h1,h2,h3,h4,h5,h6":{"color":"#e5edff !important","font-family":"Georgia,'Times New Roman',serif !important"},"a":{"color":"#6366f1 !important"}});rendition.themes.select("dark-serif");rendition.on('rendered',()=>{viewer.style.opacity='1';animating=false;});rendition.on('relocated',(loc)=>{if(loc&&loc.start&&loc.start.cfi)localStorage.setItem(`epub-progress-${currentFileName}`,loc.start.cfi);});await rendition.display();const saved=localStorage.getItem(`epub-progress-${currentFileName}`);if(saved){try{await rendition.display(saved);}catch(e){console.warn(e);}}status.textContent=currentFileName;}catch(err){console.error(err);status.textContent='Error: '+(err.message||err.name||'Could not open EPUB');}}
+    async function turn(direction){if(!rendition||animating)return;animating=true;viewer.style.opacity='0';await new Promise(r=>setTimeout(r,200));if(direction==="next")await rendition.next();else await rendition.prev();}
+    async function openPdf(){showViewer('pdf');setControlsForType('pdf');status.textContent='Opening PDF...';try{pdfDoc=await pdfjsLib.getDocument({data:new Uint8Array(currentBuffer)}).promise;pdfNumPages=pdfDoc.numPages;pdfPage=1;pdfZoom=1;const saved=localStorage.getItem(`pdf-page-${currentFileName}`);if(saved){const p=parseInt(saved);if(p>=1&&p<=pdfNumPages)pdfPage=p;}await renderPdfPage();}catch(err){console.error(err);status.textContent='Error: Could not open PDF';}}
+    async function renderPdfPage(){if(!pdfDoc)return;try{if(pdfRenderTask){try{pdfRenderTask.cancel();}catch(e){}}const page=await pdfDoc.getPage(pdfPage);const containerWidth=pdfViewerEl.clientWidth-24;const baseViewport=page.getViewport({scale:1});const scale=(containerWidth/baseViewport.width)*pdfZoom;const viewport=page.getViewport({scale:scale});pdfCanvas.width=viewport.width;pdfCanvas.height=viewport.height;pdfRenderTask=page.render({canvasContext:pdfCanvas.getContext('2d'),viewport:viewport});await pdfRenderTask.promise;pdfRenderTask=null;localStorage.setItem(`pdf-page-${currentFileName}`,pdfPage);status.textContent=`${currentFileName} — Page ${pdfPage} / ${pdfNumPages}`;}catch(e){if(e&&e.name!=='RenderingCancelledException')console.error(e);}}
+    async function openText(){showViewer('text');setControlsForType('text');status.textContent='Opening...';try{textViewerEl.textContent=new TextDecoder().decode(currentBuffer);const saved=localStorage.getItem(`txt-scroll-${currentFileName}`);requestAnimationFrame(()=>{if(saved)textViewerEl.scrollTop=parseInt(saved);});status.textContent=`${currentFileName} — Scroll to read`;}catch(err){console.error(err);status.textContent='Error: Could not open text file';}}
+    textViewerEl.addEventListener('scroll',()=>{if(currentType!=='text')return;clearTimeout(textScrollTimer);textScrollTimer=setTimeout(()=>localStorage.setItem(`txt-scroll-${currentFileName}`,textViewerEl.scrollTop),300);});
+    readFileInput.addEventListener("change",async function(){const f=readFileInput.files[0];if(!f)return;currentFileName=f.name;currentBuffer=await f.arrayBuffer();await openBook();});
+    spreadButton.addEventListener("click",async function(){if(currentType!=='epub')return;spreadMode=spreadMode==="double"?"single":"double";localStorage.setItem("epub-spread-mode",spreadMode);updateSpreadButton();await openEpub();});
+    zoomIn.addEventListener("click",()=>{if(currentType==='pdf'){pdfZoom=Math.min(pdfZoom+0.25,4);renderPdfPage();}});
+    zoomOut.addEventListener("click",()=>{if(currentType==='pdf'){pdfZoom=Math.max(pdfZoom-0.25,0.5);renderPdfPage();}});
+    function goPrev(){if(currentType==='epub')turn('prev');else if(currentType==='pdf'&&pdfPage>1){pdfPage--;renderPdfPage();}}
+    function goNext(){if(currentType==='epub')turn('next');else if(currentType==='pdf'&&pdfPage<pdfNumPages){pdfPage++;renderPdfPage();}}
+    prevButton.addEventListener("click",goPrev);
+    nextButton.addEventListener("click",goNext);
+    document.addEventListener("keydown",function(e){if(currentMode!=='read'||animating)return;if(e.key==="ArrowLeft")goPrev();if(e.key==="ArrowRight")goNext();});
+    let rPointerDown=false,rStartX=0,rLastX=0,rSwipe=null;
+    const stageRead=document.getElementById('stage-read');
+    stageRead.addEventListener("pointerdown",function(e){if(currentType==='text'||animating)return;rPointerDown=true;rStartX=rLastX=e.clientX;rSwipe=null;});
+    window.addEventListener("pointermove",function(e){if(!rPointerDown||animating)return;rLastX=e.clientX;const dx=rLastX-rStartX;if(rSwipe===null&&Math.abs(dx)>8)rSwipe=true;});
+    window.addEventListener("pointerup",function(){if(!rPointerDown)return;rPointerDown=false;if(currentType==='text')return;const dx=rLastX-rStartX;if(rSwipe&&Math.abs(dx)>55){if(dx<0)goNext();else goPrev();}rSwipe=null;});
+    window.addEventListener("resize",function(){if(currentMode==='read'){if(currentType==='epub'&&rendition)rendition.resize();if(currentType==='pdf')renderPdfPage();}});
 
     // ===================== WATCH ENGINE =====================
-    const fileInput = document.getElementById("file");
-    const subFile = document.getElementById("subFile");
-    const wstatus = document.getElementById("wstatus");
-    const player = document.getElementById("player");
-    const audioOverlay = document.getElementById("audioOverlay");
-    const overlayTitle = document.getElementById("overlayTitle");
-    const trackTitle = document.getElementById("trackTitle");
-    const currentTimeEl = document.getElementById("currentTime");
-    const durationEl = document.getElementById("duration");
-    const seek = document.getElementById("seek");
-    const playBtn = document.getElementById("playBtn");
-    const prevBtn = document.getElementById("prevBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const back10 = document.getElementById("back10");
-    const fwd10 = document.getElementById("fwd10");
-    const shuffleBtn = document.getElementById("shuffleBtn");
-    const muteBtn = document.getElementById("muteBtn");
-    const ccBtn = document.getElementById("ccBtnTop");
-    const loopBtn = document.getElementById("loopBtn");
-    const volume = document.getElementById("volume");
-    const playlistEl = document.getElementById("playlist");
-    const infoRow = document.getElementById("info-row");
-    const seekRow = document.getElementById("seek-row");
-    const controlsMain = document.getElementById("controls-main");
-    const controlsSec = document.getElementById("controls-sec");
-    const volumeRow = document.getElementById("volume-row");
+    const fileInput=document.getElementById("file");
+    const subFile=document.getElementById("subFile");
+    const wstatus=document.getElementById("wstatus");
+    const player=document.getElementById("player");
+    const audioOverlay=document.getElementById("audioOverlay");
+    const overlayTitle=document.getElementById("overlayTitle");
+    const trackTitle=document.getElementById("trackTitle");
+    const currentTimeEl=document.getElementById("currentTime");
+    const durationEl=document.getElementById("duration");
+    const seek=document.getElementById("seek");
+    const playBtn=document.getElementById("playBtn");
+    const playIco=document.getElementById("playIco");
+    const prevBtn=document.getElementById("prevBtn");
+    const nextBtn=document.getElementById("nextBtn");
+    const back10=document.getElementById("back10");
+    const fwd10=document.getElementById("fwd10");
+    const shuffleBtn=document.getElementById("shuffleBtn");
+    const muteBtn=document.getElementById("muteBtn");
+    const ccBtn=document.getElementById("ccBtnTop");
+    const loopBtn=document.getElementById("loopBtn");
+    const volume=document.getElementById("volume");
+    const playlistEl=document.getElementById("playlist");
+    const infoRow=document.getElementById("info-row");
+    const seekRow=document.getElementById("seek-row");
+    const controlsMain=document.getElementById("controls-main");
+    const controlsSec=document.getElementById("controls-sec");
+    const volumeRow=document.getElementById("volume-row");
 
-    let playlist = [], currentIndex = -1, isSeeking = false;
-    let isShuffle = localStorage.getItem("player-shuffle") === "true";
-    let isLoop = localStorage.getItem("player-loop") === "true";
-    let pendingRestore = 0, lastSaveTs = 0;
+    let playlist=[],currentIndex=-1,isSeeking=false;
+    let isShuffle=localStorage.getItem("player-shuffle")==="true";
+    let isLoop=localStorage.getItem("player-loop")==="true";
+    let pendingRestore=0,lastSaveTs=0;
 
-    function showWatchChrome(on) {
-      const d = on ? 'flex' : 'none';
-      infoRow.style.display = on ? 'block' : 'none';
-      seekRow.style.display = d;
-      controlsMain.style.display = d;
-      controlsSec.style.display = d;
-      volumeRow.style.display = d;
-      playlistEl.style.display = on ? 'block' : 'none';
-    }
+    const PLAY_PATH="M8 5v14l11-7z";
+    const PAUSE_PATH="M6 5h4v14H6zm8 0h4v14h-4z";
+    function setPlayIcon(playing){playIco.querySelector('path').setAttribute('d',playing?PAUSE_PATH:PLAY_PATH);}
+
+    function showWatchChrome(on){const d=on?'flex':'none';infoRow.style.display=on?'block':'none';seekRow.style.display=d;controlsMain.style.display=d;controlsSec.style.display=d;volumeRow.style.display=d;playlistEl.style.display=on?'block':'none';}
     showWatchChrome(false);
 
-    const savedVolume = localStorage.getItem("player-volume");
-    if (savedVolume !== null) player.volume = parseFloat(savedVolume);
-    volume.value = player.volume;
-    updateToggleUI(); updateMuteUI();
+    const savedVolume=localStorage.getItem("player-volume");
+    if(savedVolume!==null)player.volume=parseFloat(savedVolume);
+    volume.value=player.volume;
+    updateToggleUI();updateMuteUI();
 
-    function updateToggleUI(){ shuffleBtn.classList.toggle("on",isShuffle); loopBtn.classList.toggle("on",isLoop); }
-    function updateMuteUI(){ muteBtn.textContent = player.muted ? "Unmute" : "Mute"; muteBtn.classList.toggle("on", player.muted); }
-    function formatTime(s){ if(isNaN(s))return"0:00"; const m=Math.floor(s/60),sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; }
-    function stripExt(n){ return n.replace(/\.[^/.]+$/,""); }
+    function updateToggleUI(){shuffleBtn.classList.toggle("on",isShuffle);loopBtn.classList.toggle("on",isLoop);}
+    function updateMuteUI(){muteBtn.textContent=player.muted?"UNMUTE":"MUTE";muteBtn.classList.toggle("on",player.muted);}
+    function formatTime(s){if(isNaN(s))return"0:00";const m=Math.floor(s/60),sec=Math.floor(s%60);return m+":"+(sec<10?"0":"")+sec;}
+    function stripExt(n){return n.replace(/\.[^/.]+$/,"");}
 
-    fileInput.addEventListener("change", (e) => {
-      Array.from(e.target.files).forEach((f) => {
-        playlist.push({ name:f.name, url:URL.createObjectURL(f), isVideo:f.type.startsWith("video") });
-      });
-      renderPlaylist(); showWatchChrome(true);
-      if (currentIndex === -1 && playlist.length > 0) playTrack(0);
-      fileInput.value = "";
-    });
+    fileInput.addEventListener("change",(e)=>{Array.from(e.target.files).forEach((f)=>{playlist.push({name:f.name,url:URL.createObjectURL(f),isVideo:f.type.startsWith("video")});});renderPlaylist();showWatchChrome(true);if(currentIndex===-1&&playlist.length>0)playTrack(0);fileInput.value="";});
 
-    function setupMediaSession(item){
-      if (!("mediaSession" in navigator)) return;
-      try {
-        navigator.mediaSession.metadata = new MediaMetadata({ title:stripExt(item.name), artist:"Nexus Gate", album:"Media Hub" });
-        navigator.mediaSession.setActionHandler("play",()=>player.play());
-        navigator.mediaSession.setActionHandler("pause",()=>player.pause());
-        navigator.mediaSession.setActionHandler("previoustrack",()=>prevTrack());
-        navigator.mediaSession.setActionHandler("nexttrack",()=>nextTrack());
-        navigator.mediaSession.setActionHandler("seekbackward",()=>{player.currentTime=Math.max(0,player.currentTime-10);});
-        navigator.mediaSession.setActionHandler("seekforward",()=>{player.currentTime=Math.min(player.duration||0,player.currentTime+10);});
-      } catch(e){ console.warn("Media Session error:",e); }
-    }
-    function playTrack(i){
-      if (i<0||i>=playlist.length) return;
-      currentIndex = i; const item = playlist[i];
-      player.src = item.url; player.play().catch(e=>console.warn(e));
-      trackTitle.textContent = item.name; wstatus.textContent = item.name;
-      const saved = localStorage.getItem("media-progress-"+item.name);
-      pendingRestore = saved ? parseFloat(saved) : 0;
-      if (item.isVideo) audioOverlay.classList.remove("visible");
-      else { overlayTitle.textContent = item.name; audioOverlay.classList.add("visible"); }
-      setupMediaSession(item); renderPlaylist();
-    }
-    function togglePlay(){ if(playlist.length===0)return; if(currentIndex===-1){playTrack(0);return;} if(player.paused)player.play();else player.pause(); }
-    function prevTrack(){ if(playlist.length===0)return; if(player.currentTime>3){player.currentTime=0;return;} let p=currentIndex-1; if(p<0)p=playlist.length-1; playTrack(p); }
-    function nextTrack(){ if(playlist.length===0)return; let n=currentIndex+1; if(n>=playlist.length)n=0; playTrack(n); }
-    playBtn.addEventListener("click", togglePlay);
-    prevBtn.addEventListener("click", prevTrack);
-    nextBtn.addEventListener("click", nextTrack);
-    back10.addEventListener("click", ()=>{ player.currentTime=Math.max(0,player.currentTime-10); });
-    fwd10.addEventListener("click", ()=>{ player.currentTime=Math.min(player.duration||0,player.currentTime+10); });
-    player.addEventListener("play", ()=>{ playBtn.textContent="⏸"; });
-    player.addEventListener("pause", ()=>{ playBtn.textContent="▶"; });
-    player.addEventListener("click", togglePlay);
-    player.addEventListener("ended", ()=>{
-      if (currentIndex>=0) localStorage.removeItem("media-progress-"+playlist[currentIndex].name);
-      if (isShuffle){ if(playlist.length===1){player.currentTime=0;player.play();return;} let r; do{r=Math.floor(Math.random()*playlist.length);}while(r===currentIndex); playTrack(r); return; }
-      let n=currentIndex+1; if(n>=playlist.length){ if(isLoop)n=0; else return; } playTrack(n);
-    });
-    player.addEventListener("loadedmetadata", ()=>{
-      seek.max = player.duration; durationEl.textContent = formatTime(player.duration);
-      if (pendingRestore>0 && pendingRestore<player.duration-5) player.currentTime = pendingRestore;
-      pendingRestore = 0;
-    });
-    player.addEventListener("timeupdate", ()=>{
-      currentTimeEl.textContent = formatTime(player.currentTime);
-      if (!isSeeking) seek.value = player.currentTime;
-      const now = Date.now();
-      if (currentIndex>=0 && now-lastSaveTs>2000){ lastSaveTs=now; localStorage.setItem("media-progress-"+playlist[currentIndex].name, player.currentTime); }
-    });
-    seek.addEventListener("pointerdown", ()=>{ isSeeking=true; });
-    seek.addEventListener("pointerup", ()=>{ isSeeking=false; });
-    seek.addEventListener("input", ()=>{ isSeeking=true; player.currentTime=parseFloat(seek.value); });
-    seek.addEventListener("change", ()=>{ isSeeking=false; });
-    volume.addEventListener("input", ()=>{ player.volume=parseFloat(volume.value); localStorage.setItem("player-volume",volume.value); });
-    muteBtn.addEventListener("click", ()=>{ player.muted=!player.muted; updateMuteUI(); });
-    shuffleBtn.addEventListener("click", ()=>{ isShuffle=!isShuffle; localStorage.setItem("player-shuffle",isShuffle); updateToggleUI(); });
-    loopBtn.addEventListener("click", ()=>{ isLoop=!isLoop; localStorage.setItem("player-loop",isLoop); updateToggleUI(); });
+    function setupMediaSession(item){if(!("mediaSession"in navigator))return;try{navigator.mediaSession.metadata=new MediaMetadata({title:stripExt(item.name),artist:"Nexus Gate",album:"Media Hub"});navigator.mediaSession.setActionHandler("play",()=>player.play());navigator.mediaSession.setActionHandler("pause",()=>player.pause());navigator.mediaSession.setActionHandler("previoustrack",()=>prevTrack());navigator.mediaSession.setActionHandler("nexttrack",()=>nextTrack());navigator.mediaSession.setActionHandler("seekbackward",()=>{player.currentTime=Math.max(0,player.currentTime-10);});navigator.mediaSession.setActionHandler("seekforward",()=>{player.currentTime=Math.min(player.duration||0,player.currentTime+10);});}catch(e){console.warn("Media Session error:",e);}}
+    function playTrack(i){if(i<0||i>=playlist.length)return;currentIndex=i;const item=playlist[i];player.src=item.url;player.play().catch(e=>console.warn(e));trackTitle.textContent=item.name;wstatus.textContent=item.name;const saved=localStorage.getItem("media-progress-"+item.name);pendingRestore=saved?parseFloat(saved):0;if(item.isVideo)audioOverlay.classList.remove("visible");else{overlayTitle.textContent=item.name;audioOverlay.classList.add("visible");}setupMediaSession(item);renderPlaylist();}
+    function togglePlay(){if(playlist.length===0)return;if(currentIndex===-1){playTrack(0);return;}if(player.paused)player.play();else player.pause();}
+    function prevTrack(){if(playlist.length===0)return;if(player.currentTime>3){player.currentTime=0;return;}let p=currentIndex-1;if(p<0)p=playlist.length-1;playTrack(p);}
+    function nextTrack(){if(playlist.length===0)return;let n=currentIndex+1;if(n>=playlist.length)n=0;playTrack(n);}
+    playBtn.addEventListener("click",togglePlay);
+    prevBtn.addEventListener("click",prevTrack);
+    nextBtn.addEventListener("click",nextTrack);
+    back10.addEventListener("click",()=>{player.currentTime=Math.max(0,player.currentTime-10);});
+    fwd10.addEventListener("click",()=>{player.currentTime=Math.min(player.duration||0,player.currentTime+10);});
+    player.addEventListener("play",()=>{setPlayIcon(true);});
+    player.addEventListener("pause",()=>{setPlayIcon(false);});
+    player.addEventListener("click",togglePlay);
+    player.addEventListener("ended",()=>{if(currentIndex>=0)localStorage.removeItem("media-progress-"+playlist[currentIndex].name);if(isShuffle){if(playlist.length===1){player.currentTime=0;player.play();return;}let r;do{r=Math.floor(Math.random()*playlist.length);}while(r===currentIndex);playTrack(r);return;}let n=currentIndex+1;if(n>=playlist.length){if(isLoop)n=0;else return;}playTrack(n);});
+    player.addEventListener("loadedmetadata",()=>{seek.max=player.duration;durationEl.textContent=formatTime(player.duration);if(pendingRestore>0&&pendingRestore<player.duration-5)player.currentTime=pendingRestore;pendingRestore=0;});
+    player.addEventListener("timeupdate",()=>{currentTimeEl.textContent=formatTime(player.currentTime);if(!isSeeking)seek.value=player.currentTime;const now=Date.now();if(currentIndex>=0&&now-lastSaveTs>2000){lastSaveTs=now;localStorage.setItem("media-progress-"+playlist[currentIndex].name,player.currentTime);}});
+    seek.addEventListener("pointerdown",()=>{isSeeking=true;});
+    seek.addEventListener("pointerup",()=>{isSeeking=false;});
+    seek.addEventListener("input",()=>{isSeeking=true;player.currentTime=parseFloat(seek.value);});
+    seek.addEventListener("change",()=>{isSeeking=false;});
+    volume.addEventListener("input",()=>{player.volume=parseFloat(volume.value);localStorage.setItem("player-volume",volume.value);});
+    muteBtn.addEventListener("click",()=>{player.muted=!player.muted;updateMuteUI();});
+    shuffleBtn.addEventListener("click",()=>{isShuffle=!isShuffle;localStorage.setItem("player-shuffle",isShuffle);updateToggleUI();});
+    loopBtn.addEventListener("click",()=>{isLoop=!isLoop;localStorage.setItem("player-loop",isLoop);updateToggleUI();});
 
-    function srtToVtt(srt){ return "WEBVTT\n\n"+srt.replace(/\r+/g,"").replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g,"$1.$2"); }
-    ccBtn.addEventListener("click", ()=>subFile.click());
-    subFile.addEventListener("change", async (e)=>{
-      const f=e.target.files[0]; if(!f)return;
-      let text = await f.text();
-      if (f.name.toLowerCase().endsWith(".srt")) text = srtToVtt(text);
-      const url = URL.createObjectURL(new Blob([text],{type:"text/vtt"}));
-      player.querySelectorAll("track").forEach(t=>t.remove());
-      const track=document.createElement("track"); track.kind="subtitles"; track.label="Subtitles"; track.srclang="en"; track.src=url; track.default=true;
-      player.appendChild(track);
-      setTimeout(()=>{ for(const tt of player.textTracks) tt.mode="showing"; },100);
-      ccBtn.classList.add("on"); wstatus.textContent="Subtitles: "+f.name; subFile.value="";
-    });
+    function srtToVtt(srt){return"WEBVTT\n\n"+srt.replace(/\r+/g,"").replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g,"$1.$2");}
+    ccBtn.addEventListener("click",()=>subFile.click());
+    subFile.addEventListener("change",async(e)=>{const f=e.target.files[0];if(!f)return;let text=await f.text();if(f.name.toLowerCase().endsWith(".srt"))text=srtToVtt(text);const url=URL.createObjectURL(new Blob([text],{type:"text/vtt"}));player.querySelectorAll("track").forEach(t=>t.remove());const track=document.createElement("track");track.kind="subtitles";track.label="Subtitles";track.srclang="en";track.src=url;track.default=true;player.appendChild(track);setTimeout(()=>{for(const tt of player.textTracks)tt.mode="showing";},100);ccBtn.classList.add("on");wstatus.textContent="Subtitles: "+f.name;subFile.value="";});
 
-    function renderPlaylist(){
-      playlistEl.innerHTML="";
-      if (playlist.length===0){ playlistEl.innerHTML='<div class="pl-empty">Add audio or video files to build your queue.</div>'; return; }
-      playlist.forEach((item,i)=>{
-        const row=document.createElement("div"); row.className="pl-item"+(i===currentIndex?" active":"");
-        const tag=document.createElement("span"); tag.className="pl-tag"; tag.textContent=item.isVideo?"VID":"AUD";
-        const name=document.createElement("span"); name.className="pl-name"; name.textContent=item.name;
-        const remove=document.createElement("button"); remove.className="pl-remove"; remove.textContent="✕";
-        remove.addEventListener("click",(e)=>{ e.stopPropagation(); removeTrack(i); });
-        row.appendChild(tag); row.appendChild(name); row.appendChild(remove);
-        row.addEventListener("click",()=>playTrack(i)); playlistEl.appendChild(row);
-      });
-    }
-    function removeTrack(i){
-      if (i<0||i>=playlist.length) return;
-      URL.revokeObjectURL(playlist[i].url); playlist.splice(i,1);
-      if (i===currentIndex){ player.pause(); player.removeAttribute("src"); currentIndex=-1; trackTitle.textContent="—"; audioOverlay.classList.remove("visible"); if(playlist.length>0)playTrack(Math.min(i,playlist.length-1)); else showWatchChrome(false); }
-      else if (i<currentIndex) currentIndex--;
-      renderPlaylist();
-    }
+    function renderPlaylist(){playlistEl.innerHTML="";if(playlist.length===0){playlistEl.innerHTML='<div class="pl-empty">Add audio or video files to build your queue.</div>';return;}playlist.forEach((item,i)=>{const row=document.createElement("div");row.className="pl-item"+(i===currentIndex?" active":"");const tag=document.createElement("span");tag.className="pl-tag";tag.textContent=item.isVideo?"VID":"AUD";const name=document.createElement("span");name.className="pl-name";name.textContent=item.name;const remove=document.createElement("button");remove.className="pl-remove";remove.textContent="✕";remove.addEventListener("click",(e)=>{e.stopPropagation();removeTrack(i);});row.appendChild(tag);row.appendChild(name);row.appendChild(remove);row.addEventListener("click",()=>playTrack(i));playlistEl.appendChild(row);});}
+    function removeTrack(i){if(i<0||i>=playlist.length)return;URL.revokeObjectURL(playlist[i].url);playlist.splice(i,1);if(i===currentIndex){player.pause();player.removeAttribute("src");currentIndex=-1;trackTitle.textContent="—";audioOverlay.classList.remove("visible");setPlayIcon(false);if(playlist.length>0)playTrack(Math.min(i,playlist.length-1));else showWatchChrome(false);}else if(i<currentIndex)currentIndex--;renderPlaylist();}
   </script>
 </body>
 </html>
