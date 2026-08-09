@@ -12,189 +12,148 @@
   <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
   <meta name="theme-color" content="#000000" />
   <style>
-    :root {
-      --bg: #000000;
-      --panel: #101010;
-      --panel-h: #1a1a1a;
-      --border: #333333;
-      --border-hi: #555555;
-      --text: #f5f5f5;
-      --text-muted: #9a9a9a;
-      --accent: #6366f1;
-      --accent-glow: rgba(99, 102, 241, 0.25);
+    :root{
+      --bg:#000;--panel:#0e0e14;--panel-h:#16161f;--border:#2a2a38;
+      --text:#e8e8ef;--muted:#9a9ab0;
+      --blue:#6366f1;--purple:#a855f7;--grey:#c7c7d6;
+      --accent:#6366f1;--accent2:#a855f7;
+      --grad:linear-gradient(135deg,#6366f1,#a855f7);
+      --glow:rgba(99,102,241,.28);--glow2:rgba(168,85,247,.28);
+      --mono:'Cascadia Mono','Cascadia Code',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: Georgia, 'Times New Roman', serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      min-height: 100dvh;
-      padding: max(env(safe-area-inset-top), 20px) 16px 100px;
-    }
-    .container { max-width: 1000px; margin: 0 auto; }
-    header { margin-bottom: 40px; text-align: center; }
-    h1 {
-      font-size: 2.2rem; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; margin-bottom: 8px; color: var(--text);
-    }
-    .subtitle { color: var(--text-muted); font-size: 1rem; margin-bottom: 32px; font-style: italic; }
-    .search-wrapper { position: relative; max-width: 550px; margin: 0 auto; }
-    .search-input {
-      width: 100%; padding: 14px 24px; font-size: 1rem;
-      background: var(--panel); border: 2px solid var(--border);
-      box-shadow: 4px 4px 0 #1a1a1a;
-      color: var(--text); outline: none;
-      transition: border-color .15s, box-shadow .15s, transform .1s;
-      font-family: inherit;
-    }
-    .search-input:focus { border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent-glow); transform: translate(-2px,-2px); }
-    .search-input::placeholder { color: var(--text-muted); font-style: italic; }
-    .category { margin-bottom: 48px; }
-    .category-title {
-      font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 3px; color: var(--accent); margin-bottom: 20px;
-      padding-bottom: 8px; border-bottom: 2px solid var(--border);
-    }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-    .card {
-      display: flex; align-items: center; gap: 16px; padding: 18px;
-      background: var(--panel); border: 2px solid var(--border);
-      box-shadow: 4px 4px 0 #1a1a1a;
-      text-decoration: none; color: var(--text);
-      transition: transform .1s, box-shadow .1s, border-color .15s, background .15s;
-      position: relative;
-    }
-    .card:hover {
-      transform: translate(-3px,-3px);
-      box-shadow: 7px 7px 0 var(--accent-glow);
-      border-color: var(--accent);
-      background: var(--panel-h);
-    }
-    .card:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #1a1a1a; }
-    .card-icon {
-      width: 48px; height: 48px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      background: #000; border: 2px solid var(--border);
-      padding: 7px;
-    }
-    .card-icon img { width: 100%; height: 100%; object-fit: contain; }
-    .card-icon.badge {
-      padding: 0; background: var(--accent); color: #fff;
-      font-weight: 700; font-size: 0.9rem; letter-spacing: 1px;
-    }
-    .card-content { flex: 1; min-width: 0; }
-    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-desc {
-      font-size: 0.82rem; color: var(--text-muted); line-height: 1.4;
-      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      font-style: italic;
-    }
-    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); display: none; font-style: italic; }
-    .empty-state.show { display: block; }
-    .fab {
-      position: fixed; bottom: 30px; right: 30px; width: 64px; height: 64px;
-      background: var(--accent); color: #fff; border: 2px solid #fff;
-      box-shadow: 5px 5px 0 rgba(255,255,255,.2);
-      font-size: 2.2rem; font-weight: 700; display: flex; align-items: center; justify-content: center;
-      cursor: pointer; z-index: 100;
-      transition: transform .1s, box-shadow .1s;
-      font-family: inherit;
-    }
-    .fab:hover { transform: translate(-3px,-3px); box-shadow: 8px 8px 0 rgba(255,255,255,.25); }
-    .fab:active { transform: translate(3px,3px); box-shadow: 1px 1px 0 rgba(255,255,255,.2); }
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85);
-      display: none; align-items: center; justify-content: center;
-      z-index: 200; padding: 20px;
-    }
-    .modal-overlay.active { display: flex; }
-    .modal {
-      background: var(--panel); border: 2px solid var(--accent);
-      box-shadow: 8px 8px 0 rgba(0,0,0,.6);
-      padding: 28px; width: 100%; max-width: 420px;
-    }
-    .modal h2 { margin-bottom: 20px; font-size: 1.2rem; text-align: center; text-transform: uppercase; letter-spacing: 2px; }
-    .form-group { margin-bottom: 16px; }
-    .form-group label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-    .form-group input, .form-group select {
-      width: 100%; padding: 12px; background: #000; border: 2px solid var(--border);
-      color: var(--text); font-size: 0.95rem; font-family: inherit; outline: none;
-    }
-    .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
-    .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
-    .modal-buttons button {
-      flex: 1; padding: 14px; border: 2px solid var(--border);
-      font-size: 0.95rem; font-weight: 700; cursor: pointer;
-      font-family: inherit; box-shadow: 3px 3px 0 #1a1a1a;
-      transition: transform .1s, box-shadow .1s;
-    }
-    .modal-buttons button:active { transform: translate(3px,3px); box-shadow: 0 0 0; }
-    .btn-save { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .btn-cancel { background: var(--panel-h); color: var(--text); }
-    .custom-card { position: relative; }
-    .delete-btn {
-      position: absolute; top: -3px; right: -3px; width: 28px; height: 28px;
-      background: #ef4444; color: #fff; border: 2px solid #000;
-      font-size: 0.8rem; font-weight: 700; cursor: pointer;
-      display: none; align-items: center; justify-content: center;
-      font-family: inherit;
-    }
-    .custom-card:hover .delete-btn { display: flex; }
-    .viewer-overlay {
-      position: fixed; inset: 0; background: var(--bg); z-index: 300;
-      display: none; flex-direction: column;
-    }
-    .viewer-overlay.active { display: flex; animation: viewerRise 0.2s ease; }
-    @keyframes viewerRise { from { opacity: 0; } to { opacity: 1; } }
-    .viewer-toolbar {
-      display: flex; gap: 8px; align-items: center; padding: 10px;
-      padding-top: max(env(safe-area-inset-top), 10px);
-      background: var(--panel); border-bottom: 2px solid var(--border);
-    }
-    .viewer-btn {
-      width: 40px; height: 40px; flex-shrink: 0; border: 2px solid var(--border);
-      box-shadow: 2px 2px 0 #1a1a1a;
-      background: #000; color: var(--text); font-size: 1.1rem; cursor: pointer;
-      font-family: inherit; font-weight: 700;
-      transition: transform .08s, box-shadow .08s;
-    }
-    .viewer-btn:active { transform: translate(2px,2px); box-shadow: 0 0 0; }
-    .viewer-omnibox {
-      flex: 1; min-width: 0; padding: 10px 14px; background: #000;
-      border: 2px solid var(--border); color: var(--text);
-      font-size: 0.95rem; outline: none; font-family: inherit;
-    }
-    .viewer-omnibox:focus { border-color: var(--accent); }
-    .viewer-stage { flex: 1; position: relative; background: #fff; }
-    .viewer-stage iframe { width: 100%; height: 100%; border: none; }
-    .viewer-ward {
-      position: absolute; inset: 0; background: var(--bg); color: var(--text);
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; padding: 30px; gap: 12px;
-    }
-    .ward-icon { font-size: 2.5rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
-    .viewer-ward h3 { font-size: 1.2rem; text-transform: uppercase; letter-spacing: 2px; }
-    .viewer-ward p { color: var(--text-muted); font-size: 0.95rem; max-width: 420px; margin-bottom: 12px; font-style: italic; }
-    .ward-btn {
-      padding: 14px 28px; border: 2px solid var(--accent); box-shadow: 4px 4px 0 var(--accent-glow);
-      background: var(--accent); color: #fff; font-size: 0.95rem; font-weight: 700;
-      cursor: pointer; font-family: inherit;
-      transition: transform .1s, box-shadow .1s;
-    }
-    .ward-btn:active { transform: translate(4px,4px); box-shadow: 0 0 0; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100dvh;padding-bottom:80px}
+
+    /* ===== TOP NAV ===== */
+    .topnav{position:sticky;top:0;z-index:120;display:flex;align-items:center;gap:6px;padding:max(env(safe-area-inset-top),10px) 14px 10px;background:rgba(0,0,0,.92);border-bottom:2px solid var(--border);backdrop-filter:blur(8px);flex-wrap:wrap}
+    .brand{font-family:var(--mono);font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:.9rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:auto;white-space:nowrap}
+    .nav-link{padding:8px 12px;border:2px solid var(--border);background:var(--panel);color:var(--muted);font-family:inherit;font-weight:700;font-size:.82rem;text-decoration:none;box-shadow:2px 2px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,color .15s}
+    .nav-link:hover{border-color:var(--purple);color:var(--text);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--glow2)}
+    .nav-link:active{transform:translate(2px,2px);box-shadow:0 0 0}
+    .font-btn{width:38px;height:38px;flex-shrink:0;border:2px solid var(--border);background:var(--panel);color:var(--grey);font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:2px 2px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s}
+    .font-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
+    .font-btn:hover{border-color:var(--blue);color:var(--text)}
+
+    .container{max-width:1000px;margin:0 auto;padding:0 16px}
+
+    /* ===== HERO ===== */
+    .hero{text-align:center;padding:48px 16px 40px;border-bottom:2px solid var(--border);margin-bottom:40px}
+    .hero-mark{font-family:var(--mono);font-size:1rem;font-weight:700;letter-spacing:6px;color:var(--purple);margin-bottom:14px}
+    .hero h1{font-size:clamp(2.4rem,9vw,3.6rem);font-weight:800;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;line-height:1.05;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .hero-tag{font-size:1.05rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:14px}
+    .hero-sub{font-size:.95rem;color:var(--muted);max-width:560px;margin:0 auto 28px;font-style:italic;line-height:1.6}
+    .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:520px;margin:0 auto}
+    .hero-btn{display:flex;align-items:center;gap:12px;padding:16px 18px;border:2px solid var(--border);background:var(--panel);color:var(--text);text-decoration:none;font-weight:700;font-size:.95rem;box-shadow:4px 4px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,background .15s}
+    .hero-btn:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
+    .hero-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
+    .hero-btn .hb-ico{width:34px;height:34px;flex-shrink:0;border:2px solid var(--border);background:#000;padding:5px;display:flex;align-items:center;justify-content:center}
+    .hero-btn .hb-ico img{width:100%;height:100%;object-fit:contain}
+    .hero-btn .hb-badge{width:34px;height:34px;flex-shrink:0;border:2px solid rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:700;font-size:.78rem;color:#fff}
+
+    /* ===== SEARCH ===== */
+    .search-wrap{max-width:560px;margin:0 auto 44px;position:relative}
+    .search-label{font-family:var(--mono);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block}
+    .search-input{width:100%;padding:14px 20px;font-size:1rem;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;color:var(--text);outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s,transform .1s}
+    .search-input:focus{border-color:var(--blue);box-shadow:4px 4px 0 var(--glow);transform:translate(-2px,-2px)}
+    .search-input::placeholder{color:var(--muted);font-style:italic}
+
+    /* ===== SECTIONS ===== */
+    .category{margin-bottom:44px}
+    .category-title{font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--border)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+    .card{display:flex;align-items:center;gap:14px;padding:16px;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;text-decoration:none;color:var(--text);transition:transform .1s,box-shadow .1s,border-color .15s,background .15s;position:relative}
+    .card:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
+    .card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
+    .card-icon{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#000;border:2px solid var(--border);padding:6px}
+    .card-icon img{width:100%;height:100%;object-fit:contain}
+    .card-icon.badge{padding:0;color:#fff;font-family:var(--mono);font-weight:700;font-size:.85rem;letter-spacing:1px;border-color:rgba(0,0,0,.35)}
+    .card-content{flex:1;min-width:0}
+    .card-title{font-size:1rem;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-desc{font-size:.8rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
+    .card-foot{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:5px;letter-spacing:.5px;opacity:.9}
+    .empty-state{text-align:center;padding:40px 20px;color:var(--muted);display:none;font-style:italic}
+    .empty-state.show{display:block}
+    .section-note{text-align:center;color:var(--muted);font-style:italic;font-size:.9rem;padding:10px 0 0}
+
+    /* ===== FAB + MODAL ===== */
+    .fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;background:var(--grad);color:#fff;border:2px solid var(--grey);box-shadow:5px 5px 0 var(--glow2);font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;font-family:inherit;transition:transform .1s,box-shadow .1s}
+    .fab:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--glow)}
+    .fab:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--glow2)}
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+    .modal-overlay.active{display:flex}
+    .modal{background:var(--panel);border:2px solid var(--purple);box-shadow:8px 8px 0 rgba(0,0,0,.6);padding:26px;width:100%;max-width:420px}
+    .modal h2{margin-bottom:18px;font-size:1.15rem;text-align:center;text-transform:uppercase;letter-spacing:2px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .form-group{margin-bottom:14px}
+    .form-group label{display:block;margin-bottom:6px;color:var(--muted);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+    .form-group input,.form-group select{width:100%;padding:12px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.95rem;font-family:inherit;outline:none}
+    .form-group input:focus,.form-group select:focus{border-color:var(--blue)}
+    .modal-buttons{display:flex;gap:12px;margin-top:18px}
+    .modal-buttons button{flex:1;padding:13px;border:2px solid var(--border);font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:3px 3px 0 #14141c;transition:transform .1s,box-shadow .1s}
+    .modal-buttons button:active{transform:translate(3px,3px);box-shadow:0 0 0}
+    .btn-save{background:var(--grad);color:#fff;border-color:var(--purple)}
+    .btn-cancel{background:var(--panel-h);color:var(--text)}
+    .custom-card{position:relative}
+    .delete-btn{position:absolute;top:-3px;right:-3px;width:26px;height:26px;background:#ef4444;color:#fff;border:2px solid #000;font-size:.78rem;font-weight:700;cursor:pointer;display:none;align-items:center;justify-content:center;font-family:inherit}
+    .custom-card:hover .delete-btn{display:flex}
+
+    /* ===== ASTRAL HUB VIEWER ===== */
+    .viewer-overlay{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column}
+    .viewer-overlay.active{display:flex;animation:viewerRise .2s ease}
+    @keyframes viewerRise{from{opacity:0}to{opacity:1}}
+    .viewer-toolbar{display:flex;gap:8px;align-items:center;padding:10px;padding-top:max(env(safe-area-inset-top),10px);background:var(--panel);border-bottom:2px solid var(--border)}
+    .viewer-btn{width:40px;height:40px;flex-shrink:0;border:2px solid var(--border);box-shadow:2px 2px 0 #14141c;background:#000;color:var(--grey);font-size:1.05rem;cursor:pointer;font-family:inherit;font-weight:700;transition:transform .08s,box-shadow .08s}
+    .viewer-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
+    .viewer-btn:hover{border-color:var(--blue);color:var(--text)}
+    .viewer-omnibox{flex:1;min-width:0;padding:10px 14px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.92rem;outline:none;font-family:var(--mono)}
+    .viewer-omnibox:focus{border-color:var(--blue)}
+    .viewer-stage{flex:1;position:relative;background:#fff}
+    .viewer-stage iframe{width:100%;height:100%;border:none}
+    .viewer-ward{position:absolute;inset:0;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px}
+    .ward-icon{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:var(--purple);letter-spacing:2px}
+    .viewer-ward h3{font-size:1.15rem;text-transform:uppercase;letter-spacing:2px;font-weight:800}
+    .viewer-ward p{color:var(--muted);font-size:.92rem;max-width:420px;margin-bottom:12px;font-style:italic}
+    .ward-btn{padding:14px 28px;border:2px solid var(--purple);box-shadow:4px 4px 0 var(--glow2);background:var(--grad);color:#fff;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,box-shadow .1s}
+    .ward-btn:active{transform:translate(4px,4px);box-shadow:0 0 0}
+
+    .site-foot{text-align:center;padding:30px 16px 10px;border-top:2px solid var(--border);margin-top:20px;font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:1px}
+
+    @media(max-width:480px){.hero-actions{grid-template-columns:1fr}.nav-link{padding:7px 9px;font-size:.75rem}}
   </style>
 </head>
 <body>
+
+  <!-- ===== TOP NAV ===== -->
+  <nav class="topnav">
+    <span class="brand">&#9775; Nexus Gate</span>
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="clicker.html">Cultivate</a>
+    <a class="nav-link" href="rpg.html">RPG</a>
+    <a class="nav-link" href="reader.html">Reader</a>
+    <a class="nav-link" href="#" id="navHub">Hub</a>
+    <button class="font-btn" id="fontBtn" title="Change font">Aa</button>
+  </nav>
+
+  <!-- ===== HERO ===== -->
+  <header class="hero">
+    <div class="hero-mark">&#36947; &middot; &#38272;</div>
+    <h1>Nexus Gate</h1>
+    <div class="hero-tag">Gateway to the Multiverse</div>
+    <p class="hero-sub">A cultivator's portal — forge your Dao, explore realms, read the archives, and build your world. All tools are local-first; no accounts, no tracking.</p>
+    <div class="hero-actions">
+      <a class="hero-btn" href="clicker.html"><span class="hb-badge" style="background:linear-gradient(135deg,#f59e0b,#f97316)">SC</span>Begin Cultivation</a>
+      <a class="hero-btn" href="rpg.html"><span class="hb-ico"><img src="icons/icon-rpg.png" alt=""></span>Enter the RPG</a>
+      <a class="hero-btn" href="reader.html"><span class="hb-ico"><img src="icons/icon-reader.png" alt=""></span>Open Reader</a>
+      <a class="hero-btn" href="#" id="heroHub"><span class="hb-badge" style="background:linear-gradient(135deg,#6366f1,#a855f7)">AH</span>Astral Hub</a>
+    </div>
+  </header>
+
   <div class="container">
-    <header>
-      <h1>Nexus Gate</h1>
-      <p class="subtitle">Curated directory for sanctioned realms and local artifacts.</p>
-      <div class="search-wrapper">
-        <input type="text" id="search" class="search-input" placeholder="Filter the archives..." autocomplete="off">
-      </div>
-    </header>
+
+    <!-- ===== SEARCH ===== -->
+    <div class="search-wrap">
+      <label class="search-label" for="search">&#10225; Search the Archives</label>
+      <input type="text" id="search" class="search-input" placeholder="Filter your artifacts..." autocomplete="off">
+    </div>
 
     <main id="main-content">
       <section class="category" data-category="local">
@@ -203,130 +162,25 @@
           <a class="card" href="reader.html" target="_self">
             <div class="card-icon"><img src="icons/icon-reader.png" alt=""></div>
             <div class="card-content">
-              <div class="card-title">EPUB Reader</div>
-              <div class="card-desc">Read local cultivation manuals and novels offline. Autosaves progress.</div>
-            </div>
-          </a>
-          <a class="card" href="player.html" target="_self">
-            <div class="card-icon"><img src="icons/icon-player.png" alt=""></div>
-            <div class="card-content">
-              <div class="card-title">Media Player</div>
-              <div class="card-desc">Play local audio and video files with a playlist queue.</div>
+              <div class="card-title">Media Hub</div>
+              <div class="card-desc">Read EPUB/PDF/TXT and play audio/video in one unified hub. Autosaves progress.</div>
+              <div class="card-foot">reader.html</div>
             </div>
           </a>
           <a class="card" href="#" id="openViewerBtn">
-            <div class="card-icon badge" style="background:#3b82f6">PV</div>
+            <div class="card-icon badge" style="background:linear-gradient(135deg,#6366f1,#a855f7)">AH</div>
             <div class="card-content">
-              <div class="card-title">Portal Viewer</div>
+              <div class="card-title">Astral Hub</div>
               <div class="card-desc">Browse frame-friendly realms without leaving the Gate.</div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      <section class="category" data-category="archives">
-        <h2 class="category-title">The Grand Archives</h2>
-        <div class="grid">
-          <a class="card" href="https://annas-archive.gl" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#78716c">SL</div>
-            <div class="card-content">
-              <div class="card-title">Shadow Library</div>
-              <div class="card-desc">Anna's Archive. Vast repository of texts and novels.</div>
-            </div>
-          </a>
-          <a class="card" href="https://comix.to" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#a855f7">IS</div>
-            <div class="card-content">
-              <div class="card-title">Illustrated Scrolls</div>
-              <div class="card-desc">Manga, comics, and visual storytelling.</div>
-            </div>
-          </a>
-          <a class="card" href="https://mkissa.to" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#ec4899">MC</div>
-            <div class="card-content">
-              <div class="card-title">The Moving Canvas</div>
-              <div class="card-desc">mkissa.to — Manhwa, webtoons, and anime streams.</div>
-            </div>
-          </a>
-          <a class="card" href="https://pinterest.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#dc2626">VL</div>
-            <div class="card-content">
-              <div class="card-title">The Vision Loom</div>
-              <div class="card-desc">Pinterest. Visual discovery and inspiration boards.</div>
-            </div>
-          </a>
-          <a class="card" href="https://fmhy.net/startpage" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#0891b2">FM</div>
-            <div class="card-content">
-              <div class="card-title">Free Media Nexus</div>
-              <div class="card-desc">FMHY Directory for streaming and software.</div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      <section class="category" data-category="social">
-        <h2 class="category-title">Guilds & Harmonies</h2>
-        <div class="grid">
-          <a class="card" href="https://discord.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#5865f2">GH</div>
-            <div class="card-content">
-              <div class="card-title">The Guild Hall</div>
-              <div class="card-desc">Discord. Voice, text, and community servers.</div>
-            </div>
-          </a>
-          <a class="card" href="https://spotify.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#1db954">HW</div>
-            <div class="card-content">
-              <div class="card-title">Harmonic Weave</div>
-              <div class="card-desc">Spotify. Audio streaming and playlists.</div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      <section class="category" data-category="oracles">
-        <h2 class="category-title">The Oracles</h2>
-        <div class="grid">
-          <a class="card" href="https://chat.qwen.ai" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#6366f1">OQ</div>
-            <div class="card-content">
-              <div class="card-title">Oracle of Qwen</div>
-              <div class="card-desc">AI Scholar, assistant, and coding companion.</div>
-            </div>
-          </a>
-          <a class="card" href="https://google.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#4285f4">AS</div>
-            <div class="card-content">
-              <div class="card-title">All-Seeing Eye</div>
-              <div class="card-desc">The standard global search engine.</div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      <section class="category" data-category="arcade">
-        <h2 class="category-title">The Astral Arcade</h2>
-        <div class="grid">
-          <a class="card" href="https://itch.io/games/free" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#fa5c5c">II</div>
-            <div class="card-content">
-              <div class="card-title">Itch.io Indies</div>
-              <div class="card-desc">Thousands of free indie web games. Most work in iframes.</div>
-            </div>
-          </a>
-          <a class="card" href="https://krunker.io" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#2f3542">KR</div>
-            <div class="card-content">
-              <div class="card-title">Krunker.io</div>
-              <div class="card-desc">Fast-paced block FPS action.</div>
+              <div class="card-foot">portal viewer</div>
             </div>
           </a>
           <a class="card" href="clicker.html" target="_self">
-            <div class="card-icon badge" style="background:#f59e0b">SC</div>
+            <div class="card-icon badge" style="background:linear-gradient(135deg,#f59e0b,#f97316)">SC</div>
             <div class="card-content">
               <div class="card-title">Spirit Clicker</div>
               <div class="card-desc">A custom cultivation idle game built for the Gate.</div>
+              <div class="card-foot">clicker.html</div>
             </div>
           </a>
           <a class="card" href="rpg.html" target="_self">
@@ -334,58 +188,29 @@
             <div class="card-content">
               <div class="card-title">Pocket RPG</div>
               <div class="card-desc">A custom turn-based adventure forged in the Gate's depths.</div>
-            </div>
-          </a>
-        </div>
-      </section>
-
-      <section class="category" data-category="academy">
-        <h2 class="category-title">The Academy & Forge</h2>
-        <div class="grid">
-          <a class="card" href="https://web.dev/learn/html" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#1a73e8">HC</div>
-            <div class="card-content">
-              <div class="card-title">HTML Codex</div>
-              <div class="card-desc">web.dev's official guide to the foundational runes.</div>
-            </div>
-          </a>
-          <a class="card" href="https://chunkbase.com" target="_self" rel="noopener noreferrer">
-            <div class="card-icon badge" style="background:#84a59d">WC</div>
-            <div class="card-content">
-              <div class="card-title">World Cartographer</div>
-              <div class="card-desc">Chunkbase. Minecraft biome and seed mapping.</div>
+              <div class="card-foot">rpg.html</div>
             </div>
           </a>
         </div>
       </section>
     </main>
 
-    <div class="empty-state" id="empty-state">
-      No artifacts match your query. The archives are silent.
-    </div>
+    <p class="section-note">Every realm here is yours — hand-built, self-hosted, no trackers. Add more with the + below.</p>
+    <div class="empty-state" id="empty-state">No artifacts match your query. The archives are silent.</div>
   </div>
+
+  <div class="site-foot">Nexus Gate &middot; crafted for the cultivator who walks alone</div>
 
   <button class="fab" id="addBookmarkBtn">+</button>
 
   <div class="modal-overlay" id="modalOverlay">
     <div class="modal">
       <h2>Inscribe New Portal</h2>
-      <div class="form-group">
-        <label>Realm Name (Title)</label>
-        <input type="text" id="bmTitle" placeholder="e.g., My Secret Base">
-      </div>
-      <div class="form-group">
-        <label>Spirit Link (URL)</label>
-        <input type="url" id="bmUrl" placeholder="https://...">
-      </div>
-      <div class="form-group">
-        <label>Sect (Category)</label>
+      <div class="form-group"><label>Realm Name (Title)</label><input type="text" id="bmTitle" placeholder="e.g., My Secret Base"></div>
+      <div class="form-group"><label>Spirit Link (URL)</label><input type="url" id="bmUrl" placeholder="https://... or ./mypage.html"></div>
+      <div class="form-group"><label>Sect (Category)</label>
         <select id="bmCategory">
           <option value="personal">Personal Portals</option>
-          <option value="archives">The Grand Archives</option>
-          <option value="social">Guilds & Harmonies</option>
-          <option value="oracles">The Oracles</option>
-          <option value="academy">The Academy & Forge</option>
         </select>
       </div>
       <div class="modal-buttons">
@@ -397,124 +222,104 @@
 
   <div class="viewer-overlay" id="viewerOverlay">
     <div class="viewer-toolbar">
-      <button class="viewer-btn" id="viewerBack" title="Back">←</button>
-      <button class="viewer-btn" id="viewerForward" title="Forward">→</button>
-      <button class="viewer-btn" id="viewerReload" title="Reload">⟳</button>
+      <button class="viewer-btn" id="viewerBack" title="Back">&larr;</button>
+      <button class="viewer-btn" id="viewerForward" title="Forward">&rarr;</button>
+      <button class="viewer-btn" id="viewerReload" title="Reload">&#10227;</button>
       <input type="text" class="viewer-omnibox" id="viewerOmnibox" placeholder="Summon a realm (e.g., en.wikipedia.org)" autocomplete="off">
-      <button class="viewer-btn" id="viewerExternal" title="Open in new tab">↗</button>
+      <button class="viewer-btn" id="viewerExternal" title="Open in new tab">&#8599;</button>
       <button class="viewer-btn" id="viewerClose" title="Close">X</button>
     </div>
     <div class="viewer-stage">
       <iframe id="viewerFrame" src="about:blank" allow="fullscreen"></iframe>
-      <div class="viewer-ward" id="viewerWard" style="display:none;">
+      <div class="viewer-ward" id="viewerWard" style="display:none">
         <div class="ward-icon">!!</div>
         <h3>This realm is protected by Anti-Summoning Wards.</h3>
         <p>Some realms refuse to appear inside another app's frame. You must visit them directly through the outer veil.</p>
-        <button class="ward-btn" id="wardOpen">Open in New Tab ↗</button>
+        <button class="ward-btn" id="wardOpen">Open in New Tab &#8599;</button>
       </div>
     </div>
   </div>
 
   <script>
+    // --- FONT CHANGE (Georgia -> Serif -> Sans -> Cascadia Mono) ---
+    const FONTS = [
+      ['Georgia', "Georgia, 'Times New Roman', serif"],
+      ['Serif', "'Times New Roman', Times, serif"],
+      ['Sans', "-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"],
+      ['Mono', "'Cascadia Mono', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace"]
+    ];
+    let fontIdx = parseInt(localStorage.getItem('nexus-font') || '0', 10);
+    if (isNaN(fontIdx) || fontIdx < 0 || fontIdx >= FONTS.length) fontIdx = 0;
+    const fontBtn = document.getElementById('fontBtn');
+    function applyFont(){ document.body.style.fontFamily = FONTS[fontIdx][1]; fontBtn.title = 'Font: ' + FONTS[fontIdx][0] + ' (tap to change)'; }
+    fontBtn.addEventListener('click', () => { fontIdx = (fontIdx + 1) % FONTS.length; localStorage.setItem('nexus-font', String(fontIdx)); applyFont(); });
+    applyFont();
+
+    // --- SEARCH ---
     const searchInput = document.getElementById('search');
     const emptyState = document.getElementById('empty-state');
-
-    function runSearch() {
-      const query = searchInput.value.toLowerCase().trim();
-      const allCards = document.querySelectorAll('.card');
-      const allCategories = document.querySelectorAll('.category');
-      let visibleCount = 0;
-      allCards.forEach(card => {
-        const title = card.querySelector('.card-title').textContent.toLowerCase();
-        const desc = card.querySelector('.card-desc').textContent.toLowerCase();
-        if (title.includes(query) || desc.includes(query)) { card.style.display = 'flex'; visibleCount++; }
-        else { card.style.display = 'none'; }
+    function runSearch(){
+      const q = searchInput.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.card');
+      const cats = document.querySelectorAll('.category');
+      let vis = 0;
+      cards.forEach(c => {
+        const t = c.querySelector('.card-title').textContent.toLowerCase();
+        const d = c.querySelector('.card-desc').textContent.toLowerCase();
+        if (t.includes(q) || d.includes(q)){ c.style.display='flex'; vis++; } else c.style.display='none';
       });
-      allCategories.forEach(cat => {
-        let hasVisible = false;
-        cat.querySelectorAll('.card').forEach(c => { if(c.style.display !== 'none') hasVisible = true; });
-        cat.style.display = hasVisible ? 'block' : 'none';
+      cats.forEach(cat => {
+        let any = false; cat.querySelectorAll('.card').forEach(c => { if (c.style.display !== 'none') any = true; });
+        cat.style.display = any ? 'block' : 'none';
       });
-      if (visibleCount === 0 && query !== '') emptyState.classList.add('show');
-      else emptyState.classList.remove('show');
+      if (vis === 0 && q !== '') emptyState.classList.add('show'); else emptyState.classList.remove('show');
     }
     searchInput.addEventListener('input', runSearch);
 
+    // --- CUSTOM BOOKMARKS ---
     const fab = document.getElementById('addBookmarkBtn');
     const modalOverlay = document.getElementById('modalOverlay');
     const cancelBtn = document.getElementById('cancelBtn');
     const saveBtn = document.getElementById('saveBtn');
-
-    function iconFromTitle(t) {
-      const words = t.trim().split(/\s+/);
-      if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
-      return t.substring(0,2).toUpperCase();
-    }
-    function colorFromString(s) {
-      let h = 0;
-      for (let i = 0; i < s.length; i++) h = s.charCodeAt(i) + ((h << 5) - h);
-      const palette = ['#ef4444','#f97316','#f59e0b','#22c55e','#14b8a6','#3b82f6','#6366f1','#a855f7','#ec4899','#78716c','#0891b2','#5865f2'];
-      return palette[Math.abs(h) % palette.length];
-    }
-
+    function iconFromTitle(t){ const w = t.trim().split(/\s+/); return w.length >= 2 ? (w[0][0]+w[1][0]).toUpperCase() : t.substring(0,2).toUpperCase(); }
+    function gradFromString(s){ let h=0; for(let i=0;i<s.length;i++) h = s.charCodeAt(i)+((h<<5)-h); const pairs=[['#6366f1','#a855f7'],['#a855f7','#7c3aed'],['#818cf8','#6366f1'],['#c084fc','#a855f7'],['#6366f1','#4f46e5'],['#94a3b8','#64748b']]; return pairs[Math.abs(h)%pairs.length]; }
     fab.addEventListener('click', () => modalOverlay.classList.add('active'));
     cancelBtn.addEventListener('click', () => modalOverlay.classList.remove('active'));
-
     saveBtn.addEventListener('click', () => {
       const title = document.getElementById('bmTitle').value.trim();
       const url = document.getElementById('bmUrl').value.trim();
       const category = document.getElementById('bmCategory').value;
-      if (!title || !url) { alert('A portal requires a Name and a Link, Sect Leader.'); return; }
-      const bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
-      bookmarks.push({ title, url, icon: iconFromTitle(title), color: colorFromString(title), category, id: Date.now() });
-      localStorage.setItem('nexus_bookmarks', JSON.stringify(bookmarks));
+      if (!title || !url){ alert('A portal requires a Name and a Link, Sect Leader.'); return; }
+      const bm = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+      const g = gradFromString(title);
+      bm.push({ title, url, icon: iconFromTitle(title), grad: 'linear-gradient(135deg,'+g[0]+','+g[1]+')', category, id: Date.now() });
+      localStorage.setItem('nexus_bookmarks', JSON.stringify(bm));
       modalOverlay.classList.remove('active');
-      document.getElementById('bmTitle').value = '';
-      document.getElementById('bmUrl').value = '';
-      renderCustomBookmarks();
-      runSearch();
+      document.getElementById('bmTitle').value = ''; document.getElementById('bmUrl').value = '';
+      renderCustomBookmarks(); runSearch();
     });
-
-    function renderCustomBookmarks() {
+    function renderCustomBookmarks(){
       document.querySelectorAll('.custom-card').forEach(el => el.remove());
-      const personalCat = document.querySelector('[data-category="personal"]');
-      if (personalCat) personalCat.remove();
-      const bookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
-      if (bookmarks.length === 0) return;
-      const mainContent = document.getElementById('main-content');
-      const personalBookmarks = bookmarks.filter(b => b.category === 'personal');
-      if (personalBookmarks.length > 0) {
-        const personalSection = document.createElement('section');
-        personalSection.className = 'category';
-        personalSection.dataset.category = 'personal';
-        personalSection.innerHTML = '<h2 class="category-title">Personal Portals</h2><div class="grid"></div>';
-        mainContent.insertBefore(personalSection, mainContent.firstChild);
-      }
-      bookmarks.forEach(bm => {
-        let targetGrid;
-        if (bm.category === 'personal') targetGrid = document.querySelector('[data-category="personal"] .grid');
-        else {
-          const existingCat = document.querySelector('[data-category="' + bm.category + '"] .grid');
-          targetGrid = existingCat || document.querySelector('[data-category="personal"] .grid') || document.querySelector('.grid');
-        }
-        const card = document.createElement('a');
-        card.className = 'card custom-card';
-        card.href = bm.url;
-        card.target = '_self';
-        card.rel = 'noopener noreferrer';
-        const color = bm.color || colorFromString(bm.title);
-        const icon = bm.icon || iconFromTitle(bm.title);
-        card.innerHTML =
-          '<div class="card-icon badge" style="background:' + color + '">' + icon + '</div>' +
-          '<div class="card-content"><div class="card-title">' + bm.title + '</div><div class="card-desc">Custom inscribed portal.</div></div>' +
-          '<button class="delete-btn" data-id="' + bm.id + '">X</button>';
-        targetGrid.appendChild(card);
+      const pc = document.querySelector('[data-category="personal"]'); if (pc) pc.remove();
+      const bm = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+      if (bm.length === 0) return;
+      const main = document.getElementById('main-content');
+      const sec = document.createElement('section'); sec.className='category'; sec.dataset.category='personal';
+      sec.innerHTML = '<h2 class="category-title">Personal Portals</h2><div class="grid"></div>';
+      main.appendChild(sec);
+      const grid = sec.querySelector('.grid');
+      bm.forEach(b => {
+        const card = document.createElement('a'); card.className='card custom-card'; card.href=b.url; card.target='_self'; card.rel='noopener noreferrer';
+        const grad = b.grad || ('linear-gradient(135deg,' + gradFromString(b.title)[0] + ',' + gradFromString(b.title)[1] + ')');
+        const icon = b.icon || iconFromTitle(b.title);
+        card.innerHTML = '<div class="card-icon badge" style="background:'+grad+'">'+icon+'</div><div class="card-content"><div class="card-title">'+b.title+'</div><div class="card-desc">Custom inscribed portal.</div><div class="card-foot">'+b.url.replace(/^https?:\/\//,'').split('/')[0]+'</div></div><button class="delete-btn" data-id="'+b.id+'">X</button>';
+        grid.appendChild(card);
         card.querySelector('.delete-btn').addEventListener('click', (e) => {
           e.preventDefault(); e.stopPropagation();
-          if (confirm('Banish the portal "' + bm.title + '" from your memory crystals?')) {
-            let currentBookmarks = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
-            currentBookmarks = currentBookmarks.filter(b => b.id !== bm.id);
-            localStorage.setItem('nexus_bookmarks', JSON.stringify(currentBookmarks));
+          if (confirm('Banish the portal "'+b.title+'" from your memory crystals?')){
+            let cur = JSON.parse(localStorage.getItem('nexus_bookmarks') || '[]');
+            cur = cur.filter(x => x.id !== b.id);
+            localStorage.setItem('nexus_bookmarks', JSON.stringify(cur));
             renderCustomBookmarks(); runSearch();
           }
         });
@@ -522,57 +327,27 @@
     }
     renderCustomBookmarks();
 
+    // --- ASTRAL HUB (PORTAL VIEWER) ---
     const viewerOverlay = document.getElementById('viewerOverlay');
     const viewerFrame = document.getElementById('viewerFrame');
     const viewerOmnibox = document.getElementById('viewerOmnibox');
     const viewerWard = document.getElementById('viewerWard');
-    let viewerHistory = [], viewerIndex = -1;
-    const wardedRealms = ['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
-
-    function isWarded(url) {
-      try {
-        const host = new URL(url).hostname.replace(/^www\./, '');
-        return wardedRealms.some(r => host === r || host.endsWith('.' + r));
-      } catch (e) { return false; }
-    }
-    function normalizeUrl(input) {
-      const t = input.trim();
-      if (!t) return null;
-      if (/^https?:\/\//i.test(t)) return t;
-      if (/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t)) return 'https://' + t;
-      return 'https://www.mojeek.com/search?q=' + encodeURIComponent(t);
-    }
-    function viewerNavigate(url, pushToHistory) {
-      if (pushToHistory === undefined) pushToHistory = true;
-      if (!url) return;
-      if (isWarded(url)) {
-        viewerWard.style.display = 'flex';
-        viewerFrame.src = 'about:blank';
-        document.getElementById('wardOpen').onclick = () => window.open(url, '_blank');
-      } else {
-        viewerWard.style.display = 'none';
-        viewerFrame.src = url;
-      }
-      viewerOmnibox.value = url;
-      if (pushToHistory) {
-        viewerHistory = viewerHistory.slice(0, viewerIndex + 1);
-        viewerHistory.push(url);
-        viewerIndex = viewerHistory.length - 1;
-      }
-    }
-    document.getElementById('openViewerBtn').addEventListener('click', (e) => {
-      e.preventDefault();
-      viewerOverlay.classList.add('active');
-      if (viewerIndex === -1) viewerNavigate('./hub.html');
-      viewerOmnibox.focus();
-    });
+    let vHist = [], vIdx = -1;
+    const warded = ['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
+    function isWarded(u){ try { const h = new URL(u).hostname.replace(/^www\./,''); return warded.some(r => h===r || h.endsWith('.'+r)); } catch(e){ return false; } }
+    function normUrl(inp){ const t=inp.trim(); if(!t)return null; if(/^https?:\/\//i.test(t))return t; if(/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t))return 'https://'+t; return 'https://www.mojeek.com/search?q='+encodeURIComponent(t); }
+    function vNav(u, push){ if(push===undefined)push=true; if(!u)return; if(isWarded(u)){ viewerWard.style.display='flex'; viewerFrame.src='about:blank'; document.getElementById('wardOpen').onclick=()=>window.open(u,'_blank'); } else { viewerWard.style.display='none'; viewerFrame.src=u; } viewerOmnibox.value=u; if(push){ vHist=vHist.slice(0,vIdx+1); vHist.push(u); vIdx=vHist.length-1; } }
+    function openHub(e){ if(e)e.preventDefault(); viewerOverlay.classList.add('active'); if(vIdx===-1)vNav('./hub.html'); viewerOmnibox.focus(); }
+    document.getElementById('openViewerBtn').addEventListener('click', openHub);
+    document.getElementById('navHub').addEventListener('click', openHub);
+    document.getElementById('heroHub').addEventListener('click', openHub);
     viewerOmnibox.addEventListener('focus', () => viewerOmnibox.select());
-    viewerOmnibox.addEventListener('keydown', (e) => { if (e.key === 'Enter') viewerNavigate(normalizeUrl(viewerOmnibox.value)); });
+    viewerOmnibox.addEventListener('keydown', (e) => { if (e.key==='Enter') vNav(normUrl(viewerOmnibox.value)); });
     document.getElementById('viewerClose').addEventListener('click', () => viewerOverlay.classList.remove('active'));
-    document.getElementById('viewerBack').addEventListener('click', () => { if (viewerIndex > 0) { viewerIndex--; viewerNavigate(viewerHistory[viewerIndex], false); } });
-    document.getElementById('viewerForward').addEventListener('click', () => { if (viewerIndex < viewerHistory.length - 1) { viewerIndex++; viewerNavigate(viewerHistory[viewerIndex], false); } });
-    document.getElementById('viewerReload').addEventListener('click', () => { if (viewerIndex >= 0) viewerNavigate(viewerHistory[viewerIndex], false); });
-    document.getElementById('viewerExternal').addEventListener('click', () => { if (viewerIndex >= 0) window.open(viewerHistory[viewerIndex], '_blank'); });
+    document.getElementById('viewerBack').addEventListener('click', () => { if (vIdx>0){ vIdx--; vNav(vHist[vIdx], false); } });
+    document.getElementById('viewerForward').addEventListener('click', () => { if (vIdx<vHist.length-1){ vIdx++; vNav(vHist[vIdx], false); } });
+    document.getElementById('viewerReload').addEventListener('click', () => { if (vIdx>=0) vNav(vHist[vIdx], false); });
+    document.getElementById('viewerExternal').addEventListener('click', () => { if (vIdx>=0) window.open(vHist[vIdx], '_blank'); });
   </script>
 </body>
 </html>
