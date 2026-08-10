@@ -1,9 +1,12 @@
-const CACHE_NAME = "nexus-gate-v2"; // I updated this to v2 to clear out old caches!
+const CACHE_NAME = "nexus-gate-v3"; // bumped to v3 — clears v2 + older caches, forces fresh files
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./reader.html",
+  "./clicker.html",
+  "./rpg.html",
+  "./hub.html",
   "./manifest.json",
   "./app.js"
 ];
@@ -41,7 +44,7 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
 
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin) return; // Ignore external sites
+  if (url.origin !== self.location.origin) return; // Ignore external sites (CDNs etc.) — network only
 
   if (request.mode === "navigate") {
     event.respondWith(
