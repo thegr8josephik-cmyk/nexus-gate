@@ -1,289 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Nexus Gate</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icons/icon-180.png" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Nexus Gate" />
-  <meta name="theme-color" content="#000000" />
-  <style>
-    :root{
-      --bg:#000;--panel:#0e0e14;--panel-h:#16161f;--border:#2a2a38;
-      --text:#e8e8ef;--muted:#9a9ab0;
-      --blue:#6366f1;--purple:#a855f7;--grey:#c7c7d6;
-      --grad:linear-gradient(135deg,#6366f1,#a855f7);
-      --glow:rgba(99,102,241,.28);--glow2:rgba(168,85,247,.28);
-      --mono:'Cascadia Mono','Cascadia Code',ui-monospace,'SF Mono',Menlo,Consolas,monospace;
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100dvh;padding-bottom:80px}
-    .topnav{position:sticky;top:0;z-index:120;display:flex;align-items:center;gap:6px;padding:max(env(safe-area-inset-top),10px) 14px 10px;background:rgba(0,0,0,.92);border-bottom:2px solid var(--border);backdrop-filter:blur(8px);flex-wrap:wrap}
-    .brand{font-family:var(--mono);font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:.9rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:auto;white-space:nowrap}
-    .nav-link{padding:8px 12px;border:2px solid var(--border);background:var(--panel);color:var(--muted);font-family:inherit;font-weight:700;font-size:.82rem;text-decoration:none;box-shadow:2px 2px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,color .15s}
-    .nav-link:hover{border-color:var(--purple);color:var(--text);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--glow2)}
-    .nav-link:active{transform:translate(2px,2px);box-shadow:0 0 0}
-    .font-btn{width:38px;height:38px;flex-shrink:0;border:2px solid var(--border);background:var(--panel);color:var(--grey);font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:2px 2px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s}
-    .font-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
-    .font-btn:hover{border-color:var(--blue);color:var(--text)}
-    .container{max-width:1000px;margin:0 auto;padding:0 16px}
-    .hero{text-align:center;padding:48px 16px 40px;border-bottom:2px solid var(--border);margin-bottom:40px}
-    .hero-mark{font-family:var(--mono);font-size:1rem;font-weight:700;letter-spacing:6px;color:var(--purple);margin-bottom:14px}
-    .hero h1{font-size:clamp(2.4rem,9vw,3.6rem);font-weight:800;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;line-height:1.05;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .hero-tag{font-size:1.05rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:14px}
-    .hero-sub{font-size:.95rem;color:var(--muted);max-width:560px;margin:0 auto 28px;font-style:italic;line-height:1.6}
-    .hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:520px;margin:0 auto}
-    .hero-btn{display:flex;align-items:center;gap:12px;padding:16px 18px;border:2px solid var(--border);background:var(--panel);color:var(--text);text-decoration:none;font-weight:700;font-size:.95rem;box-shadow:4px 4px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,background .15s}
-    .hero-btn:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
-    .hero-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
-    .hero-btn .hb-ico{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .hero-btn .hb-ico svg{width:100%;height:100%}
-    .search-wrap{max-width:560px;margin:0 auto 44px;position:relative}
-    .search-label{font-family:var(--mono);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block}
-    .search-input{width:100%;padding:14px 20px;font-size:1rem;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;color:var(--text);outline:none;font-family:inherit;transition:border-color .15s,box-shadow .15s,transform .1s}
-    .search-input:focus{border-color:var(--blue);box-shadow:4px 4px 0 var(--glow);transform:translate(-2px,-2px)}
-    .search-input::placeholder{color:var(--muted);font-style:italic}
-    .category{margin-bottom:44px}
-    .category-title{font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--border);font-family:var(--mono)}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
-    .card{display:flex;align-items:center;gap:14px;padding:16px;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;text-decoration:none;color:var(--text);transition:transform .1s,box-shadow .1s,border-color .15s,background .15s;position:relative}
-    .card:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
-    .card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
-    .card-icon{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);background:radial-gradient(circle at 30% 30%,rgba(99,102,241,.2),rgba(168,85,247,.07))}
-    .card-icon svg{width:26px;height:26px}
-    .card-content{flex:1;min-width:0}
-    .card-title{font-size:1rem;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .card-desc{font-size:.8rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
-    .card-foot{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:5px;letter-spacing:.5px;opacity:.9}
-    .empty-state{text-align:center;padding:40px 20px;color:var(--muted);display:none;font-style:italic}
-    .empty-state.show{display:block}
-    .section-note{text-align:center;color:var(--muted);font-style:italic;font-size:.9rem;padding:10px 0 0}
-    .fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;background:var(--grad);color:#fff;border:2px solid var(--grey);box-shadow:5px 5px 0 var(--glow2);font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;font-family:inherit;transition:transform .1s,box-shadow .1s}
-    .fab:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--glow)}
-    .fab:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--glow2)}
-    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
-    .modal-overlay.active{display:flex}
-    .modal{background:var(--panel);border:2px solid var(--purple);box-shadow:8px 8px 0 rgba(0,0,0,.6);padding:26px;width:100%;max-width:420px}
-    .modal h2{margin-bottom:18px;font-size:1.15rem;text-align:center;text-transform:uppercase;letter-spacing:2px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--mono)}
-    .form-group{margin-bottom:14px}
-    .form-group label{display:block;margin-bottom:6px;color:var(--muted);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
-    .form-group input,.form-group select{width:100%;padding:12px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.95rem;font-family:inherit;outline:none}
-    .form-group input:focus,.form-group select:focus{border-color:var(--blue)}
-    .modal-buttons{display:flex;gap:12px;margin-top:18px}
-    .modal-buttons button{flex:1;padding:13px;border:2px solid var(--border);font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:3px 3px 0 #14141c;transition:transform .1s,box-shadow .1s}
-    .modal-buttons button:active{transform:translate(3px,3px);box-shadow:0 0 0}
-    .btn-save{background:var(--grad);color:#fff;border-color:var(--purple)}
-    .btn-cancel{background:var(--panel-h);color:var(--text)}
-    .custom-card{position:relative}
-    .delete-btn{position:absolute;top:-3px;right:-3px;width:26px;height:26px;background:#ef4444;color:#fff;border:2px solid #000;font-size:.78rem;font-weight:700;cursor:pointer;display:none;align-items:center;justify-content:center;font-family:inherit}
-    .custom-card:hover .delete-btn{display:flex}
-    .viewer-overlay{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column}
-    .viewer-overlay.active{display:flex;animation:viewerRise .2s ease}
-    @keyframes viewerRise{from{opacity:0}to{opacity:1}}
-    .viewer-toolbar{display:flex;gap:8px;align-items:center;padding:10px;padding-top:max(env(safe-area-inset-top),10px);background:var(--panel);border-bottom:2px solid var(--border)}
-    .viewer-btn{width:40px;height:40px;flex-shrink:0;border:2px solid var(--border);box-shadow:2px 2px 0 #14141c;background:#000;color:var(--grey);font-size:1.05rem;cursor:pointer;font-family:inherit;font-weight:700;transition:transform .08s,box-shadow .08s}
-    .viewer-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
-    .viewer-btn:hover{border-color:var(--blue);color:var(--text)}
-    .viewer-omnibox{flex:1;min-width:0;padding:10px 14px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.92rem;outline:none;font-family:var(--mono)}
-    .viewer-omnibox:focus{border-color:var(--blue)}
-    .viewer-stage{flex:1;position:relative;background:#fff}
-    .viewer-stage iframe{width:100%;height:100%;border:none}
-    .viewer-ward{position:absolute;inset:0;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px}
-    .ward-icon{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:var(--purple);letter-spacing:2px}
-    .viewer-ward h3{font-size:1.15rem;text-transform:uppercase;letter-spacing:2px;font-weight:800}
-    .viewer-ward p{color:var(--muted);font-size:.92rem;max-width:420px;margin-bottom:12px;font-style:italic}
-    .ward-btn{padding:14px 28px;border:2px solid var(--purple);box-shadow:4px 4px 0 var(--glow2);background:var(--grad);color:#fff;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .1s,box-shadow .1s}
-    .ward-btn:active{transform:translate(4px,4px);box-shadow:0 0 0}
-    .site-foot{text-align:center;padding:30px 16px 10px;border-top:2px solid var(--border);margin-top:20px;font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:1px}
-    @media(max-width:480px){.hero-actions{grid-template-columns:1fr}.nav-link{padding:7px 9px;font-size:.75rem}}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Nexus Gate</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus Gate">
+<meta name="theme-color" content="#000000">
+<style>
+:root{--bg:#000;--panel:#0e0e14;--panel-h:#16161f;--border:#2a2a38;--text:#e8e8ef;--muted:#9a9ab0;--blue:#6366f1;--purple:#a855f7;--grey:#c7c7d6;--grad:linear-gradient(135deg,#6366f1,#a855f7);--glow:rgba(99,102,241,.28);--glow2:rgba(168,85,247,.28);--mono:'Cascadia Mono','Cascadia Code',ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Georgia,'Times New Roman',serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100dvh;padding-bottom:80px}
+.topnav{position:sticky;top:0;z-index:120;display:flex;align-items:center;gap:6px;padding:max(env(safe-area-inset-top),10px) 14px 10px;background:rgba(0,0,0,.92);border-bottom:2px solid var(--border);backdrop-filter:blur(8px);flex-wrap:wrap}
+.brand{font-family:var(--mono);font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:.9rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-right:auto;white-space:nowrap}
+.nav-link{padding:8px 12px;border:2px solid var(--border);background:var(--panel);color:var(--muted);font-family:inherit;font-weight:700;font-size:.82rem;text-decoration:none;box-shadow:2px 2px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,color .15s}
+.nav-link:hover{border-color:var(--purple);color:var(--text);transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--glow2)}
+.nav-link:active{transform:translate(2px,2px);box-shadow:0 0 0}
+.font-btn{width:38px;height:38px;flex-shrink:0;border:2px solid var(--border);background:var(--panel);color:var(--grey);font-family:inherit;font-weight:700;font-size:.95rem;cursor:pointer;box-shadow:2px 2px 0 #14141c}
+.font-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
+.font-btn:hover{border-color:var(--blue);color:var(--text)}
+.container{max-width:1000px;margin:0 auto;padding:0 16px}
+.hero{text-align:center;padding:48px 16px 40px;border-bottom:2px solid var(--border);margin-bottom:40px}
+.hero-mark{font-family:var(--mono);font-size:1rem;font-weight:700;letter-spacing:6px;color:var(--purple);margin-bottom:14px}
+.hero h1{font-size:clamp(2.4rem,9vw,3.6rem);font-weight:800;letter-spacing:4px;text-transform:uppercase;margin-bottom:12px;line-height:1.05;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-tag{font-size:1.05rem;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:14px}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:560px;margin:0 auto 28px;font-style:italic;line-height:1.6}
+.hero-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:520px;margin:0 auto}
+.hero-btn{display:flex;align-items:center;gap:12px;padding:16px 18px;border:2px solid var(--border);background:var(--panel);color:var(--text);text-decoration:none;font-weight:700;font-size:.95rem;box-shadow:4px 4px 0 #14141c;transition:transform .1s,box-shadow .1s,border-color .15s,background .15s}
+.hero-btn:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
+.hero-btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
+.hero-btn .hb-ico{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.hero-btn .hb-ico svg{width:100%;height:100%}
+.search-wrap{max-width:560px;margin:0 auto 44px}
+.search-label{font-family:var(--mono);font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;display:block}
+.search-input{width:100%;padding:14px 20px;font-size:1rem;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;color:var(--text);outline:none;font-family:inherit}
+.search-input:focus{border-color:var(--blue);box-shadow:4px 4px 0 var(--glow)}
+.search-input::placeholder{color:var(--muted);font-style:italic}
+.category{margin-bottom:44px}
+.category-title{font-size:1.1rem;font-weight:800;text-transform:uppercase;letter-spacing:3px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:18px;padding-bottom:8px;border-bottom:2px solid var(--border);font-family:var(--mono)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px}
+.card{display:flex;align-items:center;gap:14px;padding:16px;background:var(--panel);border:2px solid var(--border);box-shadow:4px 4px 0 #14141c;text-decoration:none;color:var(--text);transition:transform .1s,box-shadow .1s,border-color .15s,background .15s;position:relative}
+.card:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--glow);border-color:var(--blue);background:var(--panel-h)}
+.card:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #14141c}
+.card-icon{width:46px;height:46px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid var(--border);background:radial-gradient(circle at 30% 30%,rgba(99,102,241,.18),rgba(168,85,247,.06))}
+.card-icon svg{width:26px;height:26px}
+.card-content{flex:1;min-width:0}
+.card-title{font-size:1rem;font-weight:700;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-desc{font-size:.8rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-style:italic}
+.card-foot{font-family:var(--mono);font-size:.68rem;color:var(--blue);margin-top:5px;letter-spacing:.5px;opacity:.9}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);display:none;font-style:italic}
+.empty-state.show{display:block}
+.section-note{text-align:center;color:var(--muted);font-style:italic;font-size:.9rem;padding:10px 0 0}
+.fab{position:fixed;bottom:24px;right:24px;width:60px;height:60px;background:var(--grad);color:#fff;border:2px solid var(--grey);box-shadow:5px 5px 0 var(--glow2);font-size:2rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:100;font-family:inherit}
+.fab:hover{transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--glow)}
+.fab:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--glow2)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:var(--panel);border:2px solid var(--purple);box-shadow:8px 8px 0 rgba(0,0,0,.6);padding:26px;width:100%;max-width:420px}
+.modal h2{margin-bottom:18px;font-size:1.15rem;text-align:center;text-transform:uppercase;letter-spacing:2px;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:var(--mono)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;margin-bottom:6px;color:var(--muted);font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.form-group input,.form-group select{width:100%;padding:12px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.95rem;font-family:inherit;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--blue)}
+.modal-buttons{display:flex;gap:12px;margin-top:18px}
+.modal-buttons button{flex:1;padding:13px;border:2px solid var(--border);font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:3px 3px 0 #14141c}
+.modal-buttons button:active{transform:translate(3px,3px);box-shadow:0 0 0}
+.btn-save{background:var(--grad);color:#fff;border-color:var(--purple)}
+.btn-cancel{background:var(--panel-h);color:var(--text)}
+.custom-card{position:relative}
+.delete-btn{position:absolute;top:-3px;right:-3px;width:26px;height:26px;background:#ef4444;color:#fff;border:2px solid #000;font-size:.78rem;font-weight:700;cursor:pointer;display:none;align-items:center;justify-content:center;font-family:inherit}
+.custom-card:hover .delete-btn{display:flex}
+.viewer-overlay{position:fixed;inset:0;background:var(--bg);z-index:300;display:none;flex-direction:column}
+.viewer-overlay.active{display:flex}
+.viewer-toolbar{display:flex;gap:8px;align-items:center;padding:10px;padding-top:max(env(safe-area-inset-top),10px);background:var(--panel);border-bottom:2px solid var(--border)}
+.viewer-btn{width:40px;height:40px;flex-shrink:0;border:2px solid var(--border);box-shadow:2px 2px 0 #14141c;background:#000;color:var(--grey);font-size:1.05rem;cursor:pointer;font-family:inherit;font-weight:700}
+.viewer-btn:active{transform:translate(2px,2px);box-shadow:0 0 0}
+.viewer-btn:hover{border-color:var(--blue);color:var(--text)}
+.viewer-omnibox{flex:1;min-width:0;padding:10px 14px;background:#000;border:2px solid var(--border);color:var(--text);font-size:.92rem;outline:none;font-family:var(--mono)}
+.viewer-omnibox:focus{border-color:var(--blue)}
+.viewer-stage{flex:1;position:relative;background:#fff}
+.viewer-stage iframe{width:100%;height:100%;border:none}
+.viewer-ward{position:absolute;inset:0;background:var(--bg);color:var(--text);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;gap:12px}
+.ward-icon{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:var(--purple);letter-spacing:2px}
+.viewer-ward h3{font-size:1.15rem;text-transform:uppercase;letter-spacing:2px;font-weight:800}
+.viewer-ward p{color:var(--muted);font-size:.92rem;max-width:420px;margin-bottom:12px;font-style:italic}
+.ward-btn{padding:14px 28px;border:2px solid var(--purple);box-shadow:4px 4px 0 var(--glow2);background:var(--grad);color:#fff;font-size:.92rem;font-weight:700;cursor:pointer;font-family:inherit}
+.ward-btn:active{transform:translate(4px,4px);box-shadow:0 0 0}
+.site-foot{text-align:center;padding:30px 16px 10px;border-top:2px solid var(--border);margin-top:20px;font-family:var(--mono);font-size:.75rem;color:var(--muted);letter-spacing:1px}
+@media(max-width:480px){.hero-actions{grid-template-columns:1fr}.nav-link{padding:7px 9px;font-size:.75rem}}
+</style>
 </head>
 <body>
-  <nav class="topnav">
-    <span class="brand">&#9775; Nexus Gate</span>
-    <a class="nav-link" href="index.html">Home</a>
-    <a class="nav-link" href="clicker.html">Cultivate</a>
-    <a class="nav-link" href="rpg.html">RPG</a>
-    <a class="nav-link" href="reader.html">Reader</a>
-    <a class="nav-link" href="#" id="navHub">Hub</a>
-    <button class="font-btn" id="fontBtn" title="Change font">Aa</button>
-  </nav>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="gi" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs></svg>
 
-  <header class="hero">
-    <div class="hero-mark">&#36947; &middot; &#38272;</div>
-    <h1>Nexus Gate</h1>
-    <div class="hero-tag">Gateway to the Multiverse</div>
-    <p class="hero-sub">A cultivator's portal — forge your Dao, explore realms, read the archives, and build your world. All tools are local-first; no accounts, no tracking.</p>
-    <div class="hero-actions">
-      <a class="hero-btn" href="clicker.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span>Begin Cultivation</a>
-      <a class="hero-btn" href="rpg.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></span>Enter the RPG</a>
-      <a class="hero-btn" href="reader.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg></span>Open Reader</a>
-      <a class="hero-btn" href="#" id="heroHub"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg></span>Astral Hub</a>
-    </div>
-  </header>
+<nav class="topnav">
+<span class="brand">☯ Nexus Gate</span>
+<a class="nav-link" href="index.html">Home</a>
+<a class="nav-link" href="clicker.html">Cultivate</a>
+<a class="nav-link" href="rpg.html">RPG</a>
+<a class="nav-link" href="reader.html">Reader</a>
+<a class="nav-link" href="#" id="navHub">Hub</a>
+<button class="font-btn" id="fontBtn" type="button" title="Change font">Aa</button>
+</nav>
 
-  <div class="container">
-    <div class="search-wrap">
-      <label class="search-label" for="search">&#10225; Search the Archives</label>
-      <input type="text" id="search" class="search-input" placeholder="Filter your artifacts..." autocomplete="off">
-    </div>
+<header class="hero">
+<div class="hero-mark">道 · 門</div>
+<h1>Nexus Gate</h1>
+<div class="hero-tag">Gateway to the Multiverse</div>
+<p class="hero-sub">A cultivator's portal — forge your Dao, explore realms, read the archives, and build your world. All tools are local-first; no accounts, no tracking.</p>
+<div class="hero-actions">
+<a class="hero-btn" href="clicker.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></span>Begin Cultivation</a>
+<a class="hero-btn" href="rpg.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></span>Enter the RPG</a>
+<a class="hero-btn" href="reader.html"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg></span>Open Reader</a>
+<a class="hero-btn" href="#" id="heroHub"><span class="hb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg></span>Astral Hub</a>
+</div>
+</header>
 
-    <main id="main-content">
-      <section class="category" data-category="local">
-        <h2 class="category-title">Local Artifacts</h2>
-        <div class="grid">
-          <a class="card" href="reader.html" target="_self">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="gc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#a855f7"/></linearGradient></defs><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg></div>
-            <div class="card-content"><div class="card-title">Media Hub</div><div class="card-desc">Read EPUB/PDF/TXT and play audio/video in one unified hub. Autosaves progress.</div><div class="card-foot">reader.html</div></div>
-          </a>
-          <a class="card" href="#" id="openViewerBtn">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg></div>
-            <div class="card-content"><div class="card-title">Astral Hub</div><div class="card-desc">Browse frame-friendly realms without leaving the Gate.</div><div class="card-foot">portal viewer</div></div>
-          </a>
-          <a class="card" href="clicker.html" target="_self">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></div>
-            <div class="card-content"><div class="card-title">Spirit Clicker</div><div class="card-desc">A custom cultivation idle game built for the Gate.</div><div class="card-foot">clicker.html</div></div>
-          </a>
-          <a class="card" href="rpg.html" target="_self">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gc)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></div>
-            <div class="card-content"><div class="card-title">Pocket RPG</div><div class="card-desc">A custom turn-based adventure forged in the Gate's depths.</div><div class="card-foot">rpg.html</div></div>
-          </a>
-        </div>
-      </section>
-    </main>
+<div class="container">
+<div class="search-wrap">
+<label class="search-label" for="search">⟡ Search the Archives</label>
+<input type="text" id="search" class="search-input" placeholder="Filter your artifacts..." autocomplete="off">
+</div>
+<main id="main-content">
+<section class="category" data-category="local">
+<h2 class="category-title">Local Artifacts</h2>
+<div class="grid">
+<a class="card" href="reader.html"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4h6a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4h-6a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5H22z"/></svg></div><div class="card-content"><div class="card-title">Media Hub</div><div class="card-desc">Read EPUB/PDF/TXT and play audio/video in one unified hub. Autosaves progress.</div><div class="card-foot">reader.html</div></div></a>
+<a class="card" href="#" id="openViewerBtn"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></svg></div><div class="card-content"><div class="card-title">Astral Hub</div><div class="card-desc">Browse frame-friendly realms without leaving the Gate.</div><div class="card-foot">portal viewer</div></div></a>
+<a class="card" href="clicker.html"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg></div><div class="card-content"><div class="card-title">Spirit Clicker</div><div class="card-desc">A custom cultivation idle game built for the Gate.</div><div class="card-foot">clicker.html</div></div></a>
+<a class="card" href="rpg.html"><div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gi)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/></svg></div><div class="card-content"><div class="card-title">Pocket RPG</div><div class="card-desc">A custom turn-based adventure forged in the Gate's depths.</div><div class="card-foot">rpg.html</div></div></a>
+</div>
+</section>
+</main>
+<p class="section-note">Every realm here is yours — hand-built, self-hosted, no trackers. Add more with the + below.</p>
+<div class="empty-state" id="empty-state">No artifacts match your query. The archives are silent.</div>
+</div>
 
-    <p class="section-note">Every realm here is yours — hand-built, self-hosted, no trackers. Add more with the + below.</p>
-    <div class="empty-state" id="empty-state">No artifacts match your query. The archives are silent.</div>
-  </div>
+<div class="site-foot">Nexus Gate · crafted for the cultivator who walks alone</div>
 
-  <div class="site-foot">Nexus Gate &middot; crafted for the cultivator who walks alone</div>
+<button class="fab" id="addBookmarkBtn" type="button">+</button>
 
-  <button class="fab" id="addBookmarkBtn">+</button>
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal">
+<h2>Inscribe New Portal</h2>
+<div class="form-group"><label>Realm Name (Title)</label><input type="text" id="bmTitle" placeholder="e.g., My Secret Base"></div>
+<div class="form-group"><label>Spirit Link (URL)</label><input type="url" id="bmUrl" placeholder="https://... or ./mypage.html"></div>
+<div class="form-group"><label>Sect (Category)</label><select id="bmCategory"><option value="personal">Personal Portals</option></select></div>
+<div class="modal-buttons"><button class="btn-cancel" id="cancelBtn" type="button">Cancel</button><button class="btn-save" id="saveBtn" type="button">Inscribe</button></div>
+</div>
+</div>
 
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h2>Inscribe New Portal</h2>
-      <div class="form-group"><label>Realm Name (Title)</label><input type="text" id="bmTitle" placeholder="e.g., My Secret Base"></div>
-      <div class="form-group"><label>Spirit Link (URL)</label><input type="url" id="bmUrl" placeholder="https://... or ./mypage.html"></div>
-      <div class="form-group"><label>Sect (Category)</label>
-        <select id="bmCategory"><option value="personal">Personal Portals</option></select>
-      </div>
-      <div class="modal-buttons">
-        <button class="btn-cancel" id="cancelBtn">Cancel</button>
-        <button class="btn-save" id="saveBtn">Inscribe</button>
-      </div>
-    </div>
-  </div>
+<div class="viewer-overlay" id="viewerOverlay">
+<div class="viewer-toolbar">
+<button class="viewer-btn" id="viewerBack" type="button">←</button>
+<button class="viewer-btn" id="viewerForward" type="button">→</button>
+<button class="viewer-btn" id="viewerReload" type="button">⟳</button>
+<input type="text" class="viewer-omnibox" id="viewerOmnibox" placeholder="Summon a realm (e.g., en.wikipedia.org)" autocomplete="off">
+<button class="viewer-btn" id="viewerExternal" type="button">↗</button>
+<button class="viewer-btn" id="viewerClose" type="button">X</button>
+</div>
+<div class="viewer-stage">
+<iframe id="viewerFrame" src="about:blank"></iframe>
+<div class="viewer-ward" id="viewerWard" style="display:none">
+<div class="ward-icon">!!</div>
+<h3>This realm is protected by Anti-Summoning Wards.</h3>
+<p>Some realms refuse to appear inside another app's frame. You must visit them directly through the outer veil.</p>
+<button class="ward-btn" id="wardOpen" type="button">Open in New Tab ↗</button>
+</div>
+</div>
+</div>
 
-  <div class="viewer-overlay" id="viewerOverlay">
-    <div class="viewer-toolbar">
-      <button class="viewer-btn" id="viewerBack" title="Back">&larr;</button>
-      <button class="viewer-btn" id="viewerForward" title="Forward">&rarr;</button>
-      <button class="viewer-btn" id="viewerReload" title="Reload">&#10227;</button>
-      <input type="text" class="viewer-omnibox" id="viewerOmnibox" placeholder="Summon a realm (e.g., en.wikipedia.org)" autocomplete="off">
-      <button class="viewer-btn" id="viewerExternal" title="Open in new tab">&#8599;</button>
-      <button class="viewer-btn" id="viewerClose" title="Close">X</button>
-    </div>
-    <div class="viewer-stage">
-      <iframe id="viewerFrame" src="about:blank" allow="fullscreen"></iframe>
-      <div class="viewer-ward" id="viewerWard" style="display:none">
-        <div class="ward-icon">!!</div>
-        <h3>This realm is protected by Anti-Summoning Wards.</h3>
-        <p>Some realms refuse to appear inside another app's frame. You must visit them directly through the outer veil.</p>
-        <button class="ward-btn" id="wardOpen">Open in New Tab &#8599;</button>
-      </div>
-    </div>
-  </div>
+<script>
+"use strict";
+const FONTS=[['Georgia',"Georgia, 'Times New Roman', serif"],['Serif',"'Times New Roman', Times, serif"],['Sans',"-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"],['Mono',"'Cascadia Mono', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace"]];
+let fontIdx=parseInt(localStorage.getItem('nexus-font')||'0',10);
+if(isNaN(fontIdx)||fontIdx<0||fontIdx>=FONTS.length)fontIdx=0;
+const fontBtn=document.getElementById('fontBtn');
+function applyFont(){document.body.style.fontFamily=FONTS[fontIdx][1];fontBtn.title='Font: '+FONTS[fontIdx][0]+' (tap to change)';}
+fontBtn.addEventListener('click',function(){fontIdx=(fontIdx+1)%FONTS.length;localStorage.setItem('nexus-font',String(fontIdx));applyFont();});
+applyFont();
 
-  <script>
-    const FONTS=[['Georgia',"Georgia, 'Times New Roman', serif"],['Serif',"'Times New Roman', Times, serif"],['Sans',"-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif"],['Mono',"'Cascadia Mono', 'Cascadia Code', ui-monospace, Menlo, Consolas, monospace"]];
-    let fontIdx=parseInt(localStorage.getItem('nexus-font')||'0',10);
-    if(isNaN(fontIdx)||fontIdx<0||fontIdx>=FONTS.length)fontIdx=0;
-    const fontBtn=document.getElementById('fontBtn');
-    function applyFont(){document.body.style.fontFamily=FONTS[fontIdx][1];fontBtn.title='Font: '+FONTS[fontIdx][0]+' (tap to change)';}
-    fontBtn.addEventListener('click',()=>{fontIdx=(fontIdx+1)%FONTS.length;localStorage.setItem('nexus-font',String(fontIdx));applyFont();});
-    applyFont();
+const searchInput=document.getElementById('search');
+const emptyState=document.getElementById('empty-state');
+function runSearch(){
+  const q=searchInput.value.toLowerCase().trim();
+  const cards=document.querySelectorAll('.card');
+  const cats=document.querySelectorAll('.category');
+  let vis=0;
+  cards.forEach(function(c){
+    const t=c.querySelector('.card-title').textContent.toLowerCase();
+    const d=c.querySelector('.card-desc').textContent.toLowerCase();
+    if(t.indexOf(q)>=0||d.indexOf(q)>=0){c.style.display='flex';vis++;}
+    else{c.style.display='none';}
+  });
+  cats.forEach(function(cat){
+    let any=false;
+    cat.querySelectorAll('.card').forEach(function(c){if(c.style.display!=='none')any=true;});
+    cat.style.display=any?'block':'none';
+  });
+  if(vis===0&&q!=='')emptyState.classList.add('show');
+  else emptyState.classList.remove('show');
+}
+searchInput.addEventListener('input',runSearch);
 
-    const searchInput=document.getElementById('search');
-    const emptyState=document.getElementById('empty-state');
-    function runSearch(){
-      const q=searchInput.value.toLowerCase().trim();
-      const cards=document.querySelectorAll('.card');
-      const cats=document.querySelectorAll('.category');
-      let vis=0;
-      cards.forEach(c=>{const t=c.querySelector('.card-title').textContent.toLowerCase();const d=c.querySelector('.card-desc').textContent.toLowerCase();if(t.includes(q)||d.includes(q)){c.style.display='flex';vis++;}else c.style.display='none';});
-      cats.forEach(cat=>{let any=false;cat.querySelectorAll('.card').forEach(c=>{if(c.style.display!=='none')any=true;});cat.style.display=any?'block':'none';});
-      if(vis===0&&q!=='')emptyState.classList.add('show');else emptyState.classList.remove('show');
-    }
-    searchInput.addEventListener('input',runSearch);
-
-    const fab=document.getElementById('addBookmarkBtn');
-    const modalOverlay=document.getElementById('modalOverlay');
-    const cancelBtn=document.getElementById('cancelBtn');
-    const saveBtn=document.getElementById('saveBtn');
-    function iconFromTitle(t){const w=t.trim().split(/\s+/);return w.length>=2?(w[0][0]+w[1][0]).toUpperCase():t.substring(0,2).toUpperCase();}
-    function gradFromString(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);const pairs=[['#6366f1','#a855f7'],['#a855f7','#7c3aed'],['#818cf8','#6366f1'],['#c084fc','#a855f7'],['#6366f1','#4f46e5'],['#94a3b8','#64748b']];return pairs[Math.abs(h)%pairs.length];}
-    fab.addEventListener('click',()=>modalOverlay.classList.add('active'));
-    cancelBtn.addEventListener('click',()=>modalOverlay.classList.remove('active'));
-    saveBtn.addEventListener('click',()=>{
-      const title=document.getElementById('bmTitle').value.trim();
-      const url=document.getElementById('bmUrl').value.trim();
-      const category=document.getElementById('bmCategory').value;
-      if(!title||!url){alert('A portal requires a Name and a Link, Sect Leader.');return;}
-      const bm=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');
-      const g=gradFromString(title);
-      bm.push({title,url,icon:iconFromTitle(title),grad:'linear-gradient(135deg,'+g[0]+','+g[1]+')',category,id:Date.now()});
-      localStorage.setItem('nexus_bookmarks',JSON.stringify(bm));
-      modalOverlay.classList.remove('active');
-      document.getElementById('bmTitle').value='';document.getElementById('bmUrl').value='';
-      renderCustomBookmarks();runSearch();
+const fab=document.getElementById('addBookmarkBtn');
+const modalOverlay=document.getElementById('modalOverlay');
+const cancelBtn=document.getElementById('cancelBtn');
+const saveBtn=document.getElementById('saveBtn');
+function iconFromTitle(t){const w=t.trim().split(/\s+/);return w.length>=2?(w[0][0]+w[1][0]).toUpperCase():t.substring(0,2).toUpperCase();}
+function gradFromString(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);const pairs=[['#6366f1','#a855f7'],['#a855f7','#7c3aed'],['#818cf8','#6366f1'],['#c084fc','#a855f7'],['#6366f1','#4f46e5'],['#94a3b8','#64748b']];return pairs[Math.abs(h)%pairs.length];}
+fab.addEventListener('click',function(){modalOverlay.classList.add('active');});
+cancelBtn.addEventListener('click',function(){modalOverlay.classList.remove('active');});
+saveBtn.addEventListener('click',function(){
+  const title=document.getElementById('bmTitle').value.trim();
+  const url=document.getElementById('bmUrl').value.trim();
+  const category=document.getElementById('bmCategory').value;
+  if(!title||!url){alert('A portal requires a Name and a Link, Sect Leader.');return;}
+  const bm=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');
+  const g=gradFromString(title);
+  bm.push({title:title,url:url,icon:iconFromTitle(title),grad:'linear-gradient(135deg,'+g[0]+','+g[1]+')',category:category,id:Date.now()});
+  localStorage.setItem('nexus_bookmarks',JSON.stringify(bm));
+  modalOverlay.classList.remove('active');
+  document.getElementById('bmTitle').value='';
+  document.getElementById('bmUrl').value='';
+  renderCustomBookmarks();
+  runSearch();
+});
+function renderCustomBookmarks(){
+  document.querySelectorAll('.custom-card').forEach(function(el){el.remove();});
+  const pc=document.querySelector('[data-category="personal"]');
+  if(pc)pc.remove();
+  const bm=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');
+  if(bm.length===0)return;
+  const main=document.getElementById('main-content');
+  const sec=document.createElement('section');
+  sec.className='category';
+  sec.dataset.category='personal';
+  sec.innerHTML='<h2 class="category-title">Personal Portals</h2><div class="grid"></div>';
+  main.appendChild(sec);
+  const grid=sec.querySelector('.grid');
+  bm.forEach(function(b){
+    const card=document.createElement('a');
+    card.className='card custom-card';
+    card.href=b.url;
+    card.target='_self';
+    card.rel='noopener noreferrer';
+    const grad=b.grad||('linear-gradient(135deg,'+gradFromString(b.title)[0]+','+gradFromString(b.title)[1]+')');
+    const letter=(b.icon||iconFromTitle(b.title)).charAt(0);
+    const gid='gb'+letter.charCodeAt(0);
+    const g=gradFromString(letter);
+    const svg='<svg viewBox="0 0 24 24" fill="none" stroke="url(#'+gid+')" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="'+gid+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+g[0]+'"/><stop offset="1" stop-color="'+g[1]+'"/></linearGradient></defs><rect x="4" y="4" width="16" height="16" rx="3"/><text x="12" y="16" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="url(#'+gid+')" stroke="none">'+letter+'</text></svg>';
+    card.innerHTML='<div class="card-icon" style="background:'+grad+'">'+svg+'</div><div class="card-content"><div class="card-title">'+b.title+'</div><div class="card-desc">Custom inscribed portal.</div><div class="card-foot">'+b.url.replace(/^https?:\/\//,'').split('/')[0]+'</div></div><button class="delete-btn" data-id="'+b.id+'" type="button">X</button>';
+    grid.appendChild(card);
+    card.querySelector('.delete-btn').addEventListener('click',function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(confirm('Banish the portal "'+b.title+'" from your memory crystals?')){
+        let cur=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');
+        cur=cur.filter(function(x){return x.id!==b.id;});
+        localStorage.setItem('nexus_bookmarks',JSON.stringify(cur));
+        renderCustomBookmarks();
+        runSearch();
+      }
     });
-    function svgFor(letter){const g=gradFromString(letter===' '?'x':letter);return '<svg viewBox="0 0 24 24" fill="none" stroke="url(#gb'+Math.abs(letter.charCodeAt(0))+'')" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><defs><linearGradient id="gb'+Math.abs(letter.charCodeAt(0))+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+g[0]+'"/><stop offset="1" stop-color="'+g[1]+'"/></linearGradient></defs><rect x="4" y="4" width="16" height="16" rx="3"/><text x="12" y="16" text-anchor="middle" font-size="9" font-family="monospace" font-weight="700" fill="url(#gb'+Math.abs(letter.charCodeAt(0))+')" stroke="none">'+letter+'</text></svg>';}
-    function renderCustomBookmarks(){
-      document.querySelectorAll('.custom-card').forEach(el=>el.remove());
-      const pc=document.querySelector('[data-category="personal"]');if(pc)pc.remove();
-      const bm=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');
-      if(bm.length===0)return;
-      const main=document.getElementById('main-content');
-      const sec=document.createElement('section');sec.className='category';sec.dataset.category='personal';
-      sec.innerHTML='<h2 class="category-title">Personal Portals</h2><div class="grid"></div>';
-      main.appendChild(sec);
-      const grid=sec.querySelector('.grid');
-      bm.forEach(b=>{
-        const card=document.createElement('a');card.className='card custom-card';card.href=b.url;card.target='_self';card.rel='noopener noreferrer';
-        const grad=b.grad||('linear-gradient(135deg,'+gradFromString(b.title)[0]+','+gradFromString(b.title)[1]+')');
-        const letter=(b.icon||iconFromTitle(b.title)).charAt(0);
-        card.innerHTML='<div class="card-icon" style="background:'+grad+'22">'+svgFor(letter)+'</div><div class="card-content"><div class="card-title">'+b.title+'</div><div class="card-desc">Custom inscribed portal.</div><div class="card-foot">'+b.url.replace(/^https?:\/\//,'').split('/')[0]+'</div></div><button class="delete-btn" data-id="'+b.id+'">X</button>';
-        grid.appendChild(card);
-        card.querySelector('.delete-btn').addEventListener('click',(e)=>{e.preventDefault();e.stopPropagation();if(confirm('Banish the portal "'+b.title+'" from your memory crystals?')){let cur=JSON.parse(localStorage.getItem('nexus_bookmarks')||'[]');cur=cur.filter(x=>x.id!==b.id);localStorage.setItem('nexus_bookmarks',JSON.stringify(cur));renderCustomBookmarks();runSearch();}});
-      });
-    }
-    renderCustomBookmarks();
+  });
+}
+renderCustomBookmarks();
 
-    const viewerOverlay=document.getElementById('viewerOverlay');
-    const viewerFrame=document.getElementById('viewerFrame');
-    const viewerOmnibox=document.getElementById('viewerOmnibox');
-    const viewerWard=document.getElementById('viewerWard');
-    let vHist=[],vIdx=-1;
-    const warded=['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
-    function isWarded(u){try{const h=new URL(u).hostname.replace(/^www\./,'');return warded.some(r=>h===r||h.endsWith('.'+r));}catch(e){return false;}}
-    function normUrl(inp){const t=inp.trim();if(!t)return null;if(/^https?:\/\//i.test(t))return t;if(/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t))return 'https://'+t;return 'https://www.mojeek.com/search?q='+encodeURIComponent(t);}
-    function vNav(u,push){if(push===undefined)push=true;if(!u)return;if(isWarded(u)){viewerWard.style.display='flex';viewerFrame.src='about:blank';document.getElementById('wardOpen').onclick=()=>window.open(u,'_blank');}else{viewerWard.style.display='none';viewerFrame.src=u;}viewerOmnibox.value=u;if(push){vHist=vHist.slice(0,vIdx+1);vHist.push(u);vIdx=vHist.length-1;}}
-    function openHub(e){if(e)e.preventDefault();viewerOverlay.classList.add('active');if(vIdx===-1)vNav('./hub.html');viewerOmnibox.focus();}
-    document.getElementById('openViewerBtn').addEventListener('click',openHub);
-    document.getElementById('navHub').addEventListener('click',openHub);
-    document.getElementById('heroHub').addEventListener('click',openHub);
-    viewerOmnibox.addEventListener('focus',()=>viewerOmnibox.select());
-    viewerOmnibox.addEventListener('keydown',(e)=>{if(e.key==='Enter')vNav(normUrl(viewerOmnibox.value));});
-    document.getElementById('viewerClose').addEventListener('click',()=>viewerOverlay.classList.remove('active'));
-    document.getElementById('viewerBack').addEventListener('click',()=>{if(vIdx>0){vIdx--;vNav(vHist[vIdx],false);}});
-    document.getElementById('viewerForward').addEventListener('click',()=>{if(vIdx<vHist.length-1){vIdx++;vNav(vHist[vIdx],false);}});
-    document.getElementById('viewerReload').addEventListener('click',()=>{if(vIdx>=0)vNav(vHist[vIdx],false);});
-    document.getElementById('viewerExternal').addEventListener('click',()=>{if(vIdx>=0)window.open(vHist[vIdx],'_blank');});
-  </script>
+const viewerOverlay=document.getElementById('viewerOverlay');
+const viewerFrame=document.getElementById('viewerFrame');
+const viewerOmnibox=document.getElementById('viewerOmnibox');
+const viewerWard=document.getElementById('viewerWard');
+let vHist=[];
+let vIdx=-1;
+const warded=['google.com','youtube.com','discord.com','spotify.com','twitter.com','x.com','instagram.com','facebook.com','reddit.com','netflix.com','twitch.tv','github.com','chat.qwen.ai','pinterest.com','annas-archive.gl','comix.to','mkissa.to'];
+function isWarded(u){try{const h=new URL(u).hostname.replace(/^www\./,'');return warded.some(function(r){return h===r||h.endsWith('.'+r);});}catch(e){return false;}}
+function normUrl(inp){const t=inp.trim();if(!t)return null;if(/^https?:\/\//i.test(t))return t;if(/^[\w-]+(\.[\w-]+)+([\/?#].*)?$/.test(t))return 'https://'+t;return 'https://www.mojeek.com/search?q='+encodeURIComponent(t);}
+function vNav(u,push){if(push===undefined)push=true;if(!u)return;if(isWarded(u)){viewerWard.style.display='flex';viewerFrame.src='about:blank';document.getElementById('wardOpen').onclick=function(){window.open(u,'_blank');};}else{viewerWard.style.display='none';viewerFrame.src=u;}viewerOmnibox.value=u;if(push){vHist=vHist.slice(0,vIdx+1);vHist.push(u);vIdx=vHist.length-1;}}
+function openHub(e){if(e)e.preventDefault();viewerOverlay.classList.add('active');if(vIdx===-1)vNav('./hub.html');viewerOmnibox.focus();}
+document.getElementById('openViewerBtn').addEventListener('click',openHub);
+document.getElementById('navHub').addEventListener('click',openHub);
+document.getElementById('heroHub').addEventListener('click',openHub);
+viewerOmnibox.addEventListener('focus',function(){viewerOmnibox.select();});
+viewerOmnibox.addEventListener('keydown',function(e){if(e.key==='Enter')vNav(normUrl(viewerOmnibox.value));});
+document.getElementById('viewerClose').addEventListener('click',function(){viewerOverlay.classList.remove('active');});
+document.getElementById('viewerBack').addEventListener('click',function(){if(vIdx>0){vIdx--;vNav(vHist[vIdx],false);}});
+document.getElementById('viewerForward').addEventListener('click',function(){if(vIdx<vHist.length-1){vIdx++;vNav(vHist[vIdx],false);}});
+document.getElementById('viewerReload').addEventListener('click',function(){if(vIdx>=0)vNav(vHist[vIdx],false);});
+document.getElementById('viewerExternal').addEventListener('click',function(){if(vIdx>=0)window.open(vHist[vIdx],'_blank');});
+</script>
 </body>
 </html>
